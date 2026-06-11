@@ -586,7 +586,7 @@
         -2384,
         -3216
       ],
-      "id": "5a6c4d10-97ac-4c70-b815-6ef57be4375f",
+      "id": "7f4f352e-38aa-4dac-8f64-178331dbd2b9",
       "name": "Keyword Research Loop"
     },
     {
@@ -599,7 +599,7 @@
         -2208,
         -3168
       ],
-      "id": "7c0b25cd-7cb6-4a7e-a049-21ac9febf677",
+      "id": "80ce4832-6ea5-42e8-80ac-98a05c5618d8",
       "name": "Competitor SERP Research",
       "retryOnFail": true,
       "waitBetweenTries": 5000
@@ -623,7 +623,7 @@
         -2048,
         -3168
       ],
-      "id": "1859ab57-13e4-485d-9f71-6611dbf19204",
+      "id": "52205e89-3680-443b-8935-9aec7a134505",
       "name": "Competitor SERP Researcher",
       "retryOnFail": true,
       "maxTries": 5,
@@ -645,13 +645,13 @@
         -1888,
         -3168
       ],
-      "id": "7a5422d1-5650-4be3-957b-0c1a0d114768",
+      "id": "3ea825c3-3fa2-4a5c-a745-f74981b0d270",
       "name": "Parse Competitor SERP Research"
     },
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "// Memory Reader\n// Type: Code node\n// Mode: Run Once for Each Item\n//\n// Run-scoped global memory: reads ONLY the unique angles (content\n// briefs) already used in this run and passes them to the agent as\n// previously_used_angles. Static data is keyed by execution id, so\n// nothing leaks between runs. Manual test executions do not persist\n// static data, so a run-index scan of Memory Recorder output is the\n// fallback there.\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nconst memory = $getWorkflowStaticData('global');\nconst executionId = String($execution.id || 'unknown');\n\nif (!memory.contentPlanRunMemory || memory.contentPlanRunMemory.executionId !== executionId) {\n  memory.contentPlanRunMemory = { executionId, angles: [] };\n}\n\nlet usedAngles = Array.isArray(memory.contentPlanRunMemory.angles)\n  ? memory.contentPlanRunMemory.angles.slice()\n  : [];\n\nif (!usedAngles.length) {\n  const collected = [];\n  try {\n    for (let runIndex = 0; runIndex < 1000; runIndex++) {\n      for (const it of $('Memory Recorder').all(0, runIndex)) {\n        const angle = clean((it.json || {})['Content Brief']);\n        if (angle) collected.push(angle);\n      }\n    }\n  } catch (e) {\n    // no more runs\n  }\n  usedAngles = collected;\n}\n\n// Unique angles only\nconst seen = new Set();\nconst uniqueAngles = [];\nfor (const angle of usedAngles) {\n  const key = angle.toLowerCase();\n  if (seen.has(key)) continue;\n  seen.add(key);\n  uniqueAngles.push(angle);\n}\n\nreturn {\n  json: {\n    ...$json,\n    previously_used_angles: uniqueAngles.slice(-40),\n  },\n};"
+        "jsCode": "function clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nconst memory = $getWorkflowStaticData('global');\nconst executionId = String($execution.id || 'unknown');\n\nif (!memory.contentPlanRunMemory || memory.contentPlanRunMemory.executionId !== executionId) {\n  memory.contentPlanRunMemory = { executionId, angles: [] };\n}\n\nconst usedAngles = Array.isArray(memory.contentPlanRunMemory.angles)\n  ? memory.contentPlanRunMemory.angles\n  : [];\n\nconst seen = new Set();\nconst uniqueAngles = [];\nfor (const angle of usedAngles) {\n  const value = clean(angle);\n  if (!value) continue;\n  const key = value.toLowerCase();\n  if (seen.has(key)) continue;\n  seen.add(key);\n  uniqueAngles.push(value);\n}\n\nreturn {\n  json: {\n    ...$json,\n    previously_used_angles: uniqueAngles.slice(-40),\n  },\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -659,7 +659,7 @@
         -1728,
         -3168
       ],
-      "id": "c912fe2a-a8c7-4ce3-b4f0-1830e77d208b",
+      "id": "cf07d992-f619-4d86-9e65-148dcf8cd74c",
       "name": "Memory Reader"
     },
     {
@@ -673,7 +673,7 @@
         -1568,
         -3168
       ],
-      "id": "3a6e8dde-9edf-45fa-a137-5e61db7c194b",
+      "id": "b964de1c-a05c-410c-bd42-51ba8bb0fd67",
       "name": "Prepare Research Agent"
     },
     {
@@ -691,7 +691,7 @@
         -1360,
         -3168
       ],
-      "id": "8729077c-8045-458a-a5a6-8d94d90df9e4",
+      "id": "063cbc47-32de-4930-b99f-763800646c61",
       "name": "Brief Planner",
       "retryOnFail": true,
       "maxTries": 3,
@@ -713,7 +713,7 @@
         -1456,
         -2976
       ],
-      "id": "cbaba34a-c65f-4f2c-a6e1-2cc8dd9a1bcd",
+      "id": "e5c0d11e-2ca4-4d04-8a8e-81d9a2ad0e3b",
       "name": "Thinker",
       "credentials": {
         "anthropicApi": {
@@ -740,7 +740,7 @@
         -1296,
         -2976
       ],
-      "id": "af7a84c3-f538-4495-ba23-fd6dd7bb4192",
+      "id": "55c8e911-eba0-49ec-a0e7-c4f5602e1abc",
       "name": "Researcher",
       "credentials": {
         "tavilyApi": {
@@ -759,7 +759,7 @@
         -1136,
         -2976
       ],
-      "id": "7c1822e5-71b7-47a2-abd1-519a4ef54e50",
+      "id": "34e1f388-36c6-44c8-9d78-0833888552b1",
       "name": "Research Structure",
       "retryOnFail": true,
       "maxTries": 5
@@ -775,7 +775,7 @@
         -1072,
         -3168
       ],
-      "id": "e37074a2-808a-4c8a-93ff-ad59ce521c47",
+      "id": "759dc573-50a3-41b3-a662-2bc3ae2f0e59",
       "name": "Parser"
     },
     {
@@ -789,7 +789,7 @@
         -912,
         -3168
       ],
-      "id": "a1556ed6-63d6-4519-95aa-a5baae594d26",
+      "id": "6c838d30-923a-4d6a-b2df-bc3559b23316",
       "name": "Memory Recorder"
     },
     {
@@ -802,7 +802,7 @@
         -464,
         -3600
       ],
-      "id": "40ea780e-bbda-4d33-a071-79a74cf5f745",
+      "id": "15f42dbf-4c04-44d2-83e8-9c92602f2c6d",
       "name": "Audit Structure",
       "retryOnFail": true,
       "maxTries": 5
@@ -817,7 +817,7 @@
         432,
         -3456
       ],
-      "id": "3b28b1d4-c430-4452-a415-1c5fa310236f",
+      "id": "06db8e54-fc75-4842-9baa-1ffe74b38ba7",
       "name": "Rewrite Structure",
       "retryOnFail": true,
       "maxTries": 5
