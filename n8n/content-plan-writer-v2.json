@@ -586,7 +586,7 @@
         -2384,
         -3216
       ],
-      "id": "4c6d1972-3116-42af-8565-489f89dca1a1",
+      "id": "5d2d8cfa-db29-447f-a407-4eadf91c9c98",
       "name": "Keyword Research Loop"
     },
     {
@@ -599,7 +599,7 @@
         -2208,
         -3168
       ],
-      "id": "65d32e84-fe11-4ce7-83b1-e9dd62ad4113",
+      "id": "14c15a54-232b-47b8-9628-617d2cbad55f",
       "name": "Competitor SERP Research",
       "retryOnFail": true,
       "waitBetweenTries": 5000
@@ -623,7 +623,7 @@
         -2048,
         -3168
       ],
-      "id": "297341b1-54de-49e7-93fa-dd3b62df6867",
+      "id": "84edbc35-b3a7-42d7-9537-3a9baea0429c",
       "name": "Competitor SERP Researcher",
       "retryOnFail": true,
       "maxTries": 5,
@@ -645,7 +645,7 @@
         -1888,
         -3168
       ],
-      "id": "6a4a1a68-d686-4fde-ae57-e8a3de904db2",
+      "id": "067ebcb6-f97e-47d8-aeff-2865dc9e12fa",
       "name": "Parse Competitor SERP Research"
     },
     {
@@ -659,7 +659,7 @@
         -1728,
         -3168
       ],
-      "id": "cc49ac4e-13e9-417c-957d-3447ec91ee55",
+      "id": "24c1de6d-b688-4328-b1de-4b2e66513c47",
       "name": "Memory Reader"
     },
     {
@@ -673,7 +673,7 @@
         -1568,
         -3168
       ],
-      "id": "a447c545-34fe-4691-b32c-299b7f69bbe5",
+      "id": "c4680c95-aa23-4c09-8861-dfc9f88bb8a1",
       "name": "Prepare Research Agent Input"
     },
     {
@@ -691,7 +691,7 @@
         -1360,
         -3168
       ],
-      "id": "57801544-ca02-47c2-9423-781b90123b9e",
+      "id": "72584c8e-a9d6-4936-8c58-35c25e595d59",
       "name": "Research & Plan Agent",
       "retryOnFail": true,
       "maxTries": 3,
@@ -716,7 +716,7 @@
         -1456,
         -2976
       ],
-      "id": "e82fd0a2-5897-45cb-a8e4-3963f1aaff6f",
+      "id": "4bd82106-19b4-4219-9c36-0ebb77d75597",
       "name": "Research Agent Model",
       "credentials": {
         "openAiApi": {
@@ -743,7 +743,7 @@
         -1296,
         -2976
       ],
-      "id": "ff582315-6ed9-4696-866e-6fb589747121",
+      "id": "201d54f3-38e4-4d0c-b649-42651f574420",
       "name": "tavily_research"
     },
     {
@@ -756,7 +756,7 @@
         -1136,
         -2976
       ],
-      "id": "0a6bd118-e4a7-4d60-a986-daa317e5add7",
+      "id": "66fadeea-e515-4d63-bcd4-d8ba040696a3",
       "name": "Research Row Structure",
       "retryOnFail": true,
       "maxTries": 5
@@ -764,7 +764,7 @@
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "// Parse Research Agent Output\n// Type: Code node\n// Mode: Run Once for Each Item\n//\n// - Reads the structured agent output (7 final fields).\n// - Restores locked keyword fields from Prepare Research Agent Input\n//   (the agent is never trusted with them).\n// - Derives a Unicode-safe Blog Slug from the locked keyword, since the\n//   downstream audit, sheet, and callback still require a slug.\n// - Emits the row shape expected by build_audit_dataset and the\n//   handoff package.\n\nconst aiResponse = $json || {};\n\n// One item per loop iteration, so .first() is the matching row.\n// Do NOT use .item here: paired-item tracing across SplitInBatches\n// iterations gets slower every loop and eventually hangs the node.\nlet originalData = {};\ntry {\n  originalData = $('Prepare Research Agent Input').first().json || {};\n} catch (e) {\n  originalData = {};\n}\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nfunction firstNonEmpty(...values) {\n  for (const value of values) {\n    const s = clean(value);\n    if (s) return s;\n  }\n  return null;\n}\n\nfunction slugify(value) {\n  return clean(value)\n    .toLowerCase()\n    .normalize('NFC')\n    .replace(/&/g, ' and ')\n    .replace(/[^\\p{L}\\p{N}\\s-]/gu, '')\n    .replace(/\\s+/g, '-')\n    .replace(/-+/g, '-')\n    .replace(/^-|-$/g, '');\n}\n\nfunction extractJson(raw) {\n  if (raw && typeof raw === 'object' && !Array.isArray(raw)) {\n    if (raw.output) return extractJson(raw.output);\n    return raw;\n  }\n\n  const text = String(raw ?? '')\n    .replace(/^```(?:json)?\\s*/i, '')\n    .replace(/\\s*```$/i, '')\n    .trim();\n\n  const match = text.match(/\\{[\\s\\S]*\\}/);\n  const candidate = match ? match[0] : text;\n\n  return JSON.parse(candidate);\n}\n\nlet aiParsed = {};\nlet parseFailed = false;\nconst aiText = aiResponse.output || aiResponse.text || aiResponse.result || JSON.stringify(aiResponse);\n\ntry {\n  aiParsed = extractJson(aiText);\n} catch (error) {\n  aiParsed = {};\n  parseFailed = true;\n}\n\nconst targetKeyword = clean(originalData.core_keyword);\nconst semantic1 = clean(originalData.semantic_1_keyword);\nconst semantic2 = clean(originalData.semantic_2_keyword);\n\nconst blogTitle = clean(aiParsed['Blog Post Title']) || targetKeyword;\nconst articleType = clean(aiParsed['Article Type']);\nconst contentBrief = clean(aiParsed['Content Brief']);\nconst ctaRule = clean(aiParsed['CTA Rule']);\nconst blogSlug = slugify(targetKeyword);\n\nconst contentPlanLanguage = firstNonEmpty(originalData.content_plan_language, 'English');\nconst contentPlanLanguageCode = firstNonEmpty(originalData.content_plan_language_code, originalData.serper_hl, 'en');\n\n// Keep the row lean: the agent payload and memory list are not needed\n// downstream of this point.\nconst { previous_rows, research_agent_input, _competitor_body, ...rowBase } = originalData;\n\nreturn {\n  json: {\n    ...rowBase,\n\n    'Target Keyword': targetKeyword,\n    'Semantic Keyword 1': semantic1,\n    'Semantic Keyword 2': semantic2,\n    'Blog Post Title': blogTitle,\n    'Blog Slug': blogSlug,\n    'Article Type': articleType,\n    'Content Brief': contentBrief,\n    'CTA Rule': ctaRule,\n\n    'Client': originalData.company_name || '',\n    'Cluster Name': originalData.cluster_label || '',\n    'Primary Intent': 'other',\n    'Stage': 'MoFu',\n\n    article_type: articleType,\n    cta_rule: ctaRule,\n    unique_angle: contentBrief,\n    slug_basis: blogSlug,\n\n    content_plan_language: contentPlanLanguage,\n    content_plan_language_code: contentPlanLanguageCode,\n\n    parse_debug: {\n      agent_output_parse_failed: parseFailed,\n      locked_keywords_restored_from_input: true,\n      slug_derived_from_locked_keyword: true,\n    },\n  },\n};"
+        "jsCode": "// Parse Research Agent Output\n// Type: Code node\n// Mode: Run Once for Each Item\n//\n// - Reads the structured agent output (7 final fields).\n// - Restores locked keyword fields from Prepare Research Agent Input\n//   (the agent is never trusted with them).\n// - Derives a Unicode-safe Blog Slug from the locked keyword, since the\n//   downstream audit, sheet, and callback still require a slug.\n// - Emits the row shape expected by build_audit_dataset and the\n//   handoff package.\n\nconst aiResponse = $json || {};\n\n// One item per loop iteration, so .first() is the matching row.\n// Do NOT use .item here: paired-item tracing across SplitInBatches\n// iterations gets slower every loop and eventually hangs the node.\nlet originalData = {};\ntry {\n  originalData = $('Prepare Research Agent Input').first().json || {};\n} catch (e) {\n  originalData = {};\n}\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nfunction firstNonEmpty(...values) {\n  for (const value of values) {\n    const s = clean(value);\n    if (s) return s;\n  }\n  return null;\n}\n\nfunction slugify(value) {\n  return clean(value)\n    .toLowerCase()\n    .normalize('NFC')\n    .replace(/&/g, ' and ')\n    .replace(/[^\\p{L}\\p{N}\\s-]/gu, '')\n    .replace(/\\s+/g, '-')\n    .replace(/-+/g, '-')\n    .replace(/^-|-$/g, '');\n}\n\nfunction extractJson(raw) {\n  if (raw && typeof raw === 'object' && !Array.isArray(raw)) {\n    if (raw.output) return extractJson(raw.output);\n    return raw;\n  }\n\n  const text = String(raw ?? '')\n    .replace(/^```(?:json)?\\s*/i, '')\n    .replace(/\\s*```$/i, '')\n    .trim();\n\n  const match = text.match(/\\{[\\s\\S]*\\}/);\n  const candidate = match ? match[0] : text;\n\n  return JSON.parse(candidate);\n}\n\nlet aiParsed = {};\nlet parseFailed = false;\nconst aiText = aiResponse.output || aiResponse.text || aiResponse.result || JSON.stringify(aiResponse);\n\ntry {\n  aiParsed = extractJson(aiText);\n} catch (error) {\n  aiParsed = {};\n  parseFailed = true;\n}\n\nconst targetKeyword = clean(originalData.core_keyword);\nconst semantic1 = clean(originalData.semantic_1_keyword);\nconst semantic2 = clean(originalData.semantic_2_keyword);\n\n// The locked keyword is the backbone of the row: the memory, audit,\n// sheet, and callback all key on it. If it is missing, the node\n// reference above silently failed - fail loudly instead of producing\n// a hollow row that the Memory Recorder would skip.\nif (!targetKeyword) {\n  throw new Error(\n    \"Parse Research Agent Output: could not read the keyword row back from $('Prepare Research Agent Input'). \" +\n    \"Check that a node with EXACTLY that name exists and ran in this loop iteration (rename the reference here if you renamed the node).\"\n  );\n}\n\nconst blogTitle = clean(aiParsed['Blog Post Title']) || targetKeyword;\nconst articleType = clean(aiParsed['Article Type']);\nconst contentBrief = clean(aiParsed['Content Brief']);\nconst ctaRule = clean(aiParsed['CTA Rule']);\nconst blogSlug = slugify(targetKeyword);\n\nconst contentPlanLanguage = firstNonEmpty(originalData.content_plan_language, 'English');\nconst contentPlanLanguageCode = firstNonEmpty(originalData.content_plan_language_code, originalData.serper_hl, 'en');\n\n// Keep the row lean: the agent payload and memory list are not needed\n// downstream of this point.\nconst { previous_rows, research_agent_input, _competitor_body, ...rowBase } = originalData;\n\nreturn {\n  json: {\n    ...rowBase,\n\n    'Target Keyword': targetKeyword,\n    'Semantic Keyword 1': semantic1,\n    'Semantic Keyword 2': semantic2,\n    'Blog Post Title': blogTitle,\n    'Blog Slug': blogSlug,\n    'Article Type': articleType,\n    'Content Brief': contentBrief,\n    'CTA Rule': ctaRule,\n\n    'Client': originalData.company_name || '',\n    'Cluster Name': originalData.cluster_label || '',\n    'Primary Intent': 'other',\n    'Stage': 'MoFu',\n\n    article_type: articleType,\n    cta_rule: ctaRule,\n    unique_angle: contentBrief,\n    slug_basis: blogSlug,\n\n    content_plan_language: contentPlanLanguage,\n    content_plan_language_code: contentPlanLanguageCode,\n\n    parse_debug: {\n      agent_output_parse_failed: parseFailed,\n      locked_keywords_restored_from_input: true,\n      slug_derived_from_locked_keyword: true,\n    },\n  },\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -772,7 +772,7 @@
         -1072,
         -3168
       ],
-      "id": "16153f27-0a43-4bb2-8c50-016b4ece96be",
+      "id": "d824254a-b5f6-4fc7-a2ff-b1e573648331",
       "name": "Parse Research Agent Output"
     },
     {
@@ -786,7 +786,7 @@
         -912,
         -3168
       ],
-      "id": "106407fb-29b8-41c3-9f88-985867a0fd72",
+      "id": "3e79aad8-4cc3-4eb9-bc96-5981e4b17db5",
       "name": "Memory Recorder"
     },
     {
@@ -799,7 +799,7 @@
         -464,
         -3600
       ],
-      "id": "818ec31f-a591-48e6-bcf2-1d1a4e93610a",
+      "id": "c45a8dea-e624-427f-93a0-aeb0e8de001a",
       "name": "Audit Structure",
       "retryOnFail": true,
       "maxTries": 5
@@ -814,7 +814,7 @@
         432,
         -3456
       ],
-      "id": "ab171efd-b3f1-4482-a0ac-0090e9393e77",
+      "id": "c5976b14-da79-4f1e-8def-c4c052829b64",
       "name": "Rewrite Structure",
       "retryOnFail": true,
       "maxTries": 5
