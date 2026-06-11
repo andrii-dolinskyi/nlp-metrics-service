@@ -581,24 +581,83 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        -2128,
+        -2208,
         -3216
       ],
-      "id": "8c57d4f4-6b52-4b36-b04c-527544aaf683",
+      "id": "db7d8e60-f6b6-402d-b217-af87ba00b665",
       "name": "Keyword Research Loop"
     },
     {
       "parameters": {
-        "mode": "runOnceForEachItem",
-        "jsCode": "// Prepare Research Agent Input\n// Type: Code node\n// Mode: Run Once for Each Item\n//\n// Builds one compact research_agent_input per keyword row for the\n// Research & Plan Agent. Only planning-relevant data goes to the agent;\n// sheet/callback metadata stays on the row.\n\nconst row = $json || {};\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nfunction firstNonEmpty(...values) {\n  for (const value of values) {\n    const s = clean(value);\n    if (s) return s;\n  }\n  return null;\n}\n\nfunction list(value, limit) {\n  if (!Array.isArray(value)) return [];\n\n  return value\n    .map(v => (typeof v === 'string' ? clean(v) : v))\n    .filter(v => {\n      if (typeof v === 'string') return Boolean(v);\n      if (v && typeof v === 'object') return Object.keys(v).length > 0;\n      return v !== null && v !== undefined;\n    })\n    .slice(0, limit);\n}\n\nconst language = {\n  content_plan_language: firstNonEmpty(row.content_plan_language, 'English'),\n  content_plan_language_code: firstNonEmpty(row.content_plan_language_code, row.serper_hl, 'en'),\n  serper_hl: firstNonEmpty(row.serper_hl, row.content_plan_language_code, 'en'),\n};\n\nconst companyContext = row.company_context || {};\nconst company = companyContext.company || {};\nconst seo = companyContext.seo_context || {};\nconst positioning = companyContext.positioning || {};\nconst guardrails = companyContext.guardrails || {};\nconst serp = row.serp_data || {};\n\nconst icpSegments = list(companyContext.icp_segments_summary || [], 4).map(seg => ({\n  segment_name: clean(seg.segment_name || ''),\n  geography: list(seg.geography || [], 5),\n  industry: list(seg.industry || [], 6),\n  buyer_roles: list(seg.buyer_roles || [], 7),\n  pain_points: list(seg.pain_points || [], 7),\n  desired_outcomes: list(seg.desired_outcomes || [], 7),\n  relevant_offers: list(seg.relevant_offers || [], 6),\n}));\n\nconst research_agent_input = {\n  language,\n\n  locked_fields: {\n    target_keyword: clean(row.core_keyword),\n    semantic_keyword_1: clean(row.semantic_1_keyword),\n    semantic_keyword_2: clean(row.semantic_2_keyword),\n  },\n\n  keyword: {\n    cluster_label: clean(row.cluster_label),\n    search_volume: row.core_search_volume || 0,\n    competition_index: row.core_competition_index || null,\n    yoy_6_v6: row.core_yoy_6_v6 || null,\n    semantic_roles: [\n      { keyword: clean(row.semantic_1_keyword), role: clean(row.semantic_1_reason || row.semantic_1_type) },\n      { keyword: clean(row.semantic_2_keyword), role: clean(row.semantic_2_reason || row.semantic_2_type) },\n    ].filter(x => x.keyword),\n  },\n\n  company: {\n    name: clean(row.company_name || company.name),\n    client_url: clean(row.client_url),\n    business_summary: clean(company.business_summary),\n    primary_offers: list(company.primary_offers || [], 6),\n    strategic_focus: list(company.strategic_focus || [], 6),\n    differentiators: list(positioning.differentiators || [], 6),\n    value_props: list(positioning.value_props || [], 6),\n    messages_hooks: list(positioning.messages_hooks || [], 5),\n  },\n\n  audience: {\n    icp_segments: icpSegments,\n    best_fit_intents: list(seo.best_fit_intents || [], 7),\n    industry_modifiers: list(seo.industry_modifiers || [], 8),\n    geo_modifiers: list(seo.geo_modifiers || [], 8),\n    audience_modifiers: list(seo.audience_modifiers || [], 8),\n  },\n\n  constraints: {\n    compliance_restrictions: list(guardrails.compliance_restrictions || [], 8),\n    topics_to_avoid: list(guardrails.topics_to_avoid || [], 8),\n    claims_to_qualify_or_avoid: list(guardrails.claims_to_qualify_or_avoid || [], 8),\n    competitor_keyword_policy: clean(guardrails.competitor_keyword_policy),\n  },\n\n  serp_snapshot: {\n    top_results: list(serp.organic || [], 6)\n      .map(r => ({ position: r.position, title: clean(r.title), snippet: clean(r.snippet) }))\n      .filter(r => r.title || r.snippet),\n    people_also_ask: list((serp.peopleAlsoAsk || []).map(x => x.question).filter(Boolean), 7),\n    related_searches: list((serp.relatedSearches || []).map(x => x.query).filter(Boolean), 9),\n  },\n};\n\nreturn {\n  json: {\n    ...row,\n    research_agent_input,\n  },\n};"
+        "jsCode": "// Competitor SERP Research\n// Type: Code node\n// Mode: Run Once for Each Item (one keyword per loop iteration)\n//\n// Purpose:\n// - Build one Perplexity competitor-intelligence request.\n// - Use existing SERP snapshot + keyword + business context.\n// - Make competitor intelligence language-aware.\n// - Return _competitor_body for the Perplexity HTTP Request.\n\nconst row = $input.first().json || {};\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nfunction take(arr, limit) {\n  return Array.isArray(arr) ? arr.slice(0, limit) : [];\n}\n\nfunction firstNonEmpty(...values) {\n  for (const value of values) {\n    const s = clean(value);\n    if (s) return s;\n  }\n  return null;\n}\n\nconst coreKeyword = clean(row.core_keyword);\nconst semantic1 = clean(row.semantic_1_keyword || row.semantic_1);\nconst semantic2 = clean(row.semantic_2_keyword || row.semantic_2);\n\nconst language = {\n  content_plan_language: firstNonEmpty(row.content_plan_language, 'English'),\n  content_plan_language_code: firstNonEmpty(row.content_plan_language_code, row.serper_hl, 'en'),\n  serper_hl: firstNonEmpty(row.serper_hl, row.content_plan_language_code, 'en'),\n};\n\nconst companyContext = row.company_context || {};\nconst company = companyContext.company || {};\nconst seo = companyContext.seo_context || {};\nconst positioning = companyContext.positioning || {};\nconst guardrails = companyContext.guardrails || {};\nconst serp = row.serp_data || {};\n\nconst topResults = take(serp.organic || [], 8).map((r, index) => ({\n  position: r.position || index + 1,\n  title: clean(r.title),\n  url: clean(r.link || r.url),\n  snippet: clean(r.snippet),\n}));\n\nconst peopleAlsoAsk = take(serp.peopleAlsoAsk || [], 8)\n  .map(q => clean(q.question || q.title || q))\n  .filter(Boolean);\n\nconst relatedSearches = take(serp.relatedSearches || [], 10)\n  .map(q => clean(q.query || q.title || q))\n  .filter(Boolean);\n\nconst contextPayload = {\n  language,\n  company: {\n    name: clean(company.name || row.company_name),\n    business_summary: clean(company.business_summary),\n    primary_offers: take(company.primary_offers || [], 6),\n    strategic_focus: take(company.strategic_focus || [], 6),\n  },\n  seo_context: {\n    explicit_keywords: take(seo.explicit_keywords || [], 10),\n    best_fit_intents: take(seo.best_fit_intents || [], 8),\n    industry_modifiers: take(seo.industry_modifiers || [], 8),\n    geo_modifiers: take(seo.geo_modifiers || [], 6),\n    audience_modifiers: take(seo.audience_modifiers || [], 8),\n  },\n  positioning: {\n    differentiators: take(positioning.differentiators || [], 6),\n    value_props: take(positioning.value_props || [], 6),\n    messages_hooks: take(positioning.messages_hooks || [], 6),\n  },\n  guardrails: {\n    compliance_restrictions: take(guardrails.compliance_restrictions || [], 6),\n    topics_to_avoid: take(guardrails.topics_to_avoid || [], 6),\n    claims_to_qualify_or_avoid: take(guardrails.claims_to_qualify_or_avoid || [], 6),\n  },\n};\n\nconst httpBody = {\n  model: 'sonar-pro',\n  messages: [\n    {\n      role: 'system',\n      content: `You are a Senior SEO competitor-intelligence analyst.\n\nMISSION\nCreate compact competitor intelligence for one SEO content-plan keyword.\n\nThis research will support a downstream content-plan generator.\nYou are NOT writing the final blog title, slug, or content brief.\n\nLANGUAGE RULE\nThe selected content plan language is provided in COMPANY_CONTEXT.language.content_plan_language.\nPrefer competitor pages, SERP patterns, and market examples relevant to that language and market when available.\nKeep JSON field names exactly in English.\nReturn field values in the selected content plan language when useful for the downstream writer.\nDo not awkwardly translate source names, brand names, or URLs.\n\nRULES\n- Focus on search intent, competing page patterns, common subtopics, proof patterns, FAQs, and content gaps.\n- Prefer competitor-page and SERP-level patterns over generic SEO advice.\n- Keep the output concise.\n- Do not create a long article outline.\n- Do not make unsupported claims about the client.\n- If evidence is weak, set confidence to \"low\".\n- Return ONLY valid JSON.\n\nOUTPUT JSON\n{\n  \"competitor_intelligence\": {\n    \"dominant_h2_patterns\": [],\n    \"common_subtopics\": [],\n    \"content_approach_distribution\": {\n      \"technical\": 0,\n      \"beginner-friendly\": 0,\n      \"practical-examples\": 0,\n      \"sales-oriented\": 0,\n      \"mixed\": 0,\n      \"other\": 0\n    },\n    \"article_types_distribution\": {\n      \"guide\": 0,\n      \"how-to\": 0,\n      \"listicle\": 0,\n      \"comparison\": 0,\n      \"explainer\": 0,\n      \"service-page\": 0,\n      \"landing-page\": 0,\n      \"case-study\": 0,\n      \"category-page\": 0,\n      \"local-page\": 0,\n      \"other\": 0\n    },\n    \"avg_word_count\": 0,\n    \"recommended_length\": \"\",\n    \"proof_patterns\": {\n      \"use_statistics\": false,\n      \"use_expert_quotes\": false,\n      \"use_case_studies\": false,\n      \"use_named_tools\": false,\n      \"use_step_by_step\": false\n    },\n    \"coverage_gaps\": [],\n    \"recurring_faq_questions\": [],\n    \"unique_angle_opportunity\": \"\",\n    \"confidence\": \"high|medium|low\",\n    \"confidence_note\": \"\"\n  }\n}\n\nFIELD RULES\n- dominant_h2_patterns: max 8\n- common_subtopics: max 8\n- coverage_gaps: 3-6 specific gaps when possible\n- recurring_faq_questions: max 6\n- unique_angle_opportunity: one sharp angle that can help the client produce a better content-plan row\n- recommended_length can be a practical range like \"1,200-1,800 words\" or \"\" when not enough evidence\n- avg_word_count can be 0 if not confidently knowable`\n    },\n    {\n      role: 'user',\n      content: `Analyze competitor SEO patterns for:\n\nCORE_KEYWORD: ${coreKeyword}\nSEMANTIC_1: ${semantic1}\nSEMANTIC_2: ${semantic2}\n\nCOMPANY_CONTEXT:\n${JSON.stringify(contextPayload)}\n\nSERP_SNAPSHOT:\n${JSON.stringify({\n  top_results: topResults,\n  people_also_ask: peopleAlsoAsk,\n  related_searches: relatedSearches,\n})}\n\nCreate competitor_intelligence that helps a content planner understand what angle, coverage, proof, gaps, and FAQ patterns matter for this keyword.`\n    }\n  ],\n  temperature: 0.2,\n  max_tokens: 3500,\n  return_citations: false,\n  return_related_questions: false\n};\n\nreturn [\n  {\n    json: {\n      ...row,\n      _competitor_body: httpBody,\n    },\n  },\n];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1936,
+        -2032,
         -3168
       ],
-      "id": "f0d89ce4-51d9-4e8f-a4ce-6c190de3ff56",
+      "id": "d49bf9d0-c345-488a-86e8-86019a800e1b",
+      "name": "Competitor SERP Research",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.perplexity.ai/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "perplexityApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json._competitor_body }}",
+        "options": {
+          "timeout": 1200000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1872,
+        -3168
+      ],
+      "id": "514306ed-6632-4d21-b04c-ddd712a4847e",
+      "name": "Competitor SERP Researcher",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "perplexityApi": {
+          "id": "XqVnxMVinZVutuzV",
+          "name": "Perplexity API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse Competitor SERP Research\n// Mode: Run Once for Each Item (one keyword per loop iteration)\n//\n// Purpose:\n// - Parse the Perplexity competitor research response.\n// - Return original row + competitor_intelligence.\n// - If parsing fails, return safe low-confidence competitor_intelligence.\n\nconst response = $input.first().json || {};\n\nlet originalRow = {};\ntry {\n  originalRow = $('Competitor SERP Research').item.json || {};\n} catch (e) {\n  try {\n    originalRow = $('Competitor SERP Research').first().json || {};\n  } catch (e2) {\n    originalRow = {};\n  }\n}\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nfunction safeArray(value) {\n  return Array.isArray(value) ? value : [];\n}\n\nfunction safeParseJson(raw) {\n  if (!raw) return null;\n\n  if (typeof raw === 'object' && !Array.isArray(raw)) return raw;\n\n  const text = String(raw)\n    .replace(/^```(?:json)?\\s*/i, '')\n    .replace(/\\s*```$/i, '')\n    .trim();\n\n  const match = text.match(/\\{[\\s\\S]*\\}/);\n  const candidate = match ? match[0] : text;\n\n  try {\n    return JSON.parse(candidate);\n  } catch (e) {\n    return null;\n  }\n}\n\nfunction defaultCompetitorIntel(reason) {\n  return {\n    dominant_h2_patterns: [],\n    common_subtopics: [],\n    content_approach_distribution: {\n      technical: 0,\n      'beginner-friendly': 0,\n      'practical-examples': 0,\n      'sales-oriented': 0,\n      mixed: 0,\n      other: 0,\n    },\n    article_types_distribution: {\n      guide: 0,\n      'how-to': 0,\n      listicle: 0,\n      comparison: 0,\n      explainer: 0,\n      'service-page': 0,\n      'landing-page': 0,\n      'case-study': 0,\n      other: 0,\n    },\n    avg_word_count: 0,\n    recommended_length: '',\n    proof_patterns: {\n      use_statistics: false,\n      use_expert_quotes: false,\n      use_case_studies: false,\n      use_named_tools: false,\n      use_step_by_step: false,\n    },\n    coverage_gaps: [],\n    recurring_faq_questions: [],\n    unique_angle_opportunity: '',\n    confidence: 'low',\n    confidence_note: reason || 'No reliable competitor intelligence returned.',\n  };\n}\n\nconst content =\n  response?.choices?.[0]?.message?.content ||\n  response?.output ||\n  response?.text ||\n  '';\n\nconst parsed = safeParseJson(content);\n\nconst rawIntel =\n  parsed?.competitor_intelligence ||\n  parsed?.competitorIntelligence ||\n  parsed ||\n  null;\n\nlet competitorIntel = rawIntel && typeof rawIntel === 'object'\n  ? rawIntel\n  : defaultCompetitorIntel('Could not parse Perplexity competitor research JSON.');\n\ncompetitorIntel = {\n  dominant_h2_patterns: safeArray(competitorIntel.dominant_h2_patterns),\n  common_subtopics: safeArray(competitorIntel.common_subtopics),\n  content_approach_distribution: competitorIntel.content_approach_distribution || {},\n  article_types_distribution: competitorIntel.article_types_distribution || {},\n  avg_word_count: Number(competitorIntel.avg_word_count || 0),\n  recommended_length: clean(competitorIntel.recommended_length),\n  proof_patterns: competitorIntel.proof_patterns || {},\n  coverage_gaps: safeArray(competitorIntel.coverage_gaps),\n  recurring_faq_questions: safeArray(competitorIntel.recurring_faq_questions),\n  unique_angle_opportunity: clean(competitorIntel.unique_angle_opportunity),\n  confidence: clean(competitorIntel.confidence || 'low'),\n  confidence_note: clean(competitorIntel.confidence_note),\n};\n\nreturn [\n  {\n    json: {\n      ...originalRow,\n      competitor_intelligence: competitorIntel,\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1712,
+        -3168
+      ],
+      "id": "6d25595c-4c5b-41ad-920e-a0045889cba3",
+      "name": "Parse Competitor SERP Research"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Prepare Research Agent Input\n// Type: Code node\n// Mode: Run Once for Each Item\n//\n// Builds one compact research_agent_input per keyword row for the\n// Research & Plan Agent. Only planning-relevant data goes to the agent;\n// sheet/callback metadata stays on the row.\n\nconst row = $json || {};\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nfunction firstNonEmpty(...values) {\n  for (const value of values) {\n    const s = clean(value);\n    if (s) return s;\n  }\n  return null;\n}\n\nfunction list(value, limit) {\n  if (!Array.isArray(value)) return [];\n\n  return value\n    .map(v => (typeof v === 'string' ? clean(v) : v))\n    .filter(v => {\n      if (typeof v === 'string') return Boolean(v);\n      if (v && typeof v === 'object') return Object.keys(v).length > 0;\n      return v !== null && v !== undefined;\n    })\n    .slice(0, limit);\n}\n\nconst language = {\n  content_plan_language: firstNonEmpty(row.content_plan_language, 'English'),\n  content_plan_language_code: firstNonEmpty(row.content_plan_language_code, row.serper_hl, 'en'),\n  serper_hl: firstNonEmpty(row.serper_hl, row.content_plan_language_code, 'en'),\n};\n\nconst companyContext = row.company_context || {};\nconst company = companyContext.company || {};\nconst seo = companyContext.seo_context || {};\nconst positioning = companyContext.positioning || {};\nconst guardrails = companyContext.guardrails || {};\nconst serp = row.serp_data || {};\nconst serpIntel =\n  row.competitor_intelligence && typeof row.competitor_intelligence === 'object'\n    ? row.competitor_intelligence\n    : null;\n\nconst icpSegments = list(companyContext.icp_segments_summary || [], 4).map(seg => ({\n  segment_name: clean(seg.segment_name || ''),\n  geography: list(seg.geography || [], 5),\n  industry: list(seg.industry || [], 6),\n  buyer_roles: list(seg.buyer_roles || [], 7),\n  pain_points: list(seg.pain_points || [], 7),\n  desired_outcomes: list(seg.desired_outcomes || [], 7),\n  relevant_offers: list(seg.relevant_offers || [], 6),\n}));\n\nconst research_agent_input = {\n  language,\n\n  locked_fields: {\n    target_keyword: clean(row.core_keyword),\n    semantic_keyword_1: clean(row.semantic_1_keyword),\n    semantic_keyword_2: clean(row.semantic_2_keyword),\n  },\n\n  keyword: {\n    cluster_label: clean(row.cluster_label),\n    search_volume: row.core_search_volume || 0,\n    competition_index: row.core_competition_index || null,\n    yoy_6_v6: row.core_yoy_6_v6 || null,\n    semantic_roles: [\n      { keyword: clean(row.semantic_1_keyword), role: clean(row.semantic_1_reason || row.semantic_1_type) },\n      { keyword: clean(row.semantic_2_keyword), role: clean(row.semantic_2_reason || row.semantic_2_type) },\n    ].filter(x => x.keyword),\n  },\n\n  company: {\n    name: clean(row.company_name || company.name),\n    client_url: clean(row.client_url),\n    business_summary: clean(company.business_summary),\n    primary_offers: list(company.primary_offers || [], 6),\n    strategic_focus: list(company.strategic_focus || [], 6),\n    differentiators: list(positioning.differentiators || [], 6),\n    value_props: list(positioning.value_props || [], 6),\n    messages_hooks: list(positioning.messages_hooks || [], 5),\n  },\n\n  audience: {\n    icp_segments: icpSegments,\n    best_fit_intents: list(seo.best_fit_intents || [], 7),\n    industry_modifiers: list(seo.industry_modifiers || [], 8),\n    geo_modifiers: list(seo.geo_modifiers || [], 8),\n    audience_modifiers: list(seo.audience_modifiers || [], 8),\n  },\n\n  constraints: {\n    compliance_restrictions: list(guardrails.compliance_restrictions || [], 8),\n    topics_to_avoid: list(guardrails.topics_to_avoid || [], 8),\n    claims_to_qualify_or_avoid: list(guardrails.claims_to_qualify_or_avoid || [], 8),\n    competitor_keyword_policy: clean(guardrails.competitor_keyword_policy),\n  },\n\n  serp_snapshot: {\n    top_results: list(serp.organic || [], 6)\n      .map(r => ({ position: r.position, title: clean(r.title), link: clean(r.link), snippet: clean(r.snippet) }))\n      .filter(r => r.title || r.snippet),\n    people_also_ask: list((serp.peopleAlsoAsk || []).map(x => x.question).filter(Boolean), 7),\n    related_searches: list((serp.relatedSearches || []).map(x => x.query).filter(Boolean), 9),\n  },\n\n  serp_competitor_intelligence: serpIntel ? {\n    dominant_h2_patterns: list(serpIntel.dominant_h2_patterns || [], 8),\n    common_subtopics: list(serpIntel.common_subtopics || [], 8),\n    coverage_gaps: list(serpIntel.coverage_gaps || [], 8),\n    recurring_faq_questions: list(serpIntel.recurring_faq_questions || [], 6),\n    unique_angle_opportunity: clean(serpIntel.unique_angle_opportunity),\n    recommended_length: clean(serpIntel.recommended_length),\n    confidence: clean(serpIntel.confidence || 'low'),\n    confidence_note: clean(serpIntel.confidence_note),\n  } : null,\n};\n\nreturn {\n  json: {\n    ...row,\n    research_agent_input,\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1552,
+        -3168
+      ],
+      "id": "a23c684c-921a-4630-806c-f32089094f2f",
       "name": "Prepare Research Agent Input"
     },
     {
@@ -606,16 +665,16 @@
         "promptType": "define",
         "text": "=Research this keyword and produce the final content-plan row.\n\nRESEARCH_AGENT_INPUT:\n{{ JSON.stringify($json.research_agent_input) }}\n\nReturn ONLY valid JSON matching the required schema.",
         "options": {
-          "systemMessage": "<role>Senior SEO Research Analyst and Content Plan Writer</role>\n\n<mission>\nFor ONE target keyword, research the live landscape with your tools and then write the final production-ready content-plan row.\n\nYou produce, in one pass:\n- a unique content angle no top-ranking competitor currently owns\n- Blog Post Title\n- Blog Slug\n- Content Brief\n- supporting strategy metadata\n</mission>\n\n<tools>\nYou have three live research tools. YOU decide which research will most enhance this content idea - choose based on the keyword, its intent, and what is missing from the input. Options include competitor analysis, audience pain research, recent news, terminology checks, or reading a specific competitor page in depth.\n\n1. tavily_search - general live web search. Use it for:\n   - competitor landscape: what the top-ranking pages for the keyword cover, how they structure the topic, and what they all miss\n   - audience reality: how real buyers and operators talk about this problem in forums, communities, reviews, and Q&A sites (add terms like \"reddit\", \"forum\", \"problems\", \"vs\" to the query when hunting for audience language)\n   - definitions, market context, evaluation criteria, and statistics from credible sources\n2. tavily_news - live news search restricted to roughly the last 30 days. Use it ONLY when the topic could plausibly have a credible recent development (regulation, product launches, market shifts, official statements). Skip it entirely for evergreen topics. Never force a news angle.\n3. tavily_extract - fetch the readable content of one specific URL. Use it to read 1-2 of the most important competitor pages in depth, taken from the serp_snapshot in your input or from tavily_search results, when you need their actual structure and coverage to find a real gap.\n\nRESEARCH STRATEGY - decide first, then execute:\nStep 1. Read the input: keyword, semantic keywords, serp_snapshot, company, ICP, constraints. Form a hypothesis about which research dimensions would most improve the angle for THIS keyword: competitor gaps? audience pain language? recency? something else?\nStep 2. Make 2 to 5 tool calls maximum, highest-value first. A typical strong pattern: one tavily_search on the competitor landscape, one tavily_extract on the strongest competitor page, one tavily_search for audience language, and tavily_news only if the topic is time-sensitive. Adapt this pattern to the keyword - it is your call.\nStep 3. Stop researching as soon as you can name a specific angle that no top result owns. Do not exceed 5 tool calls. Do not repeat a query.\n</tools>\n\n<source_of_truth_priority>\n1. locked_fields (never change them)\n2. language\n3. company context (real offer, ICP, positioning)\n4. constraints and guardrails\n5. serp_snapshot provided in the input\n6. your tool research findings\n</source_of_truth_priority>\n\n<language_rule>\nThe selected content plan language is RESEARCH_AGENT_INPUT.language.content_plan_language.\n\nReturn JSON keys exactly in English.\nReturn Blog Post Title, Content Brief, unique_angle, target_audience, reader_problem, and why_now_hook in the selected content plan language.\nBlog Slug must be natural for the selected language and may preserve Unicode characters.\nDo not translate brand names, product names, acronyms, or the locked keywords.\n</language_rule>\n\n<non_negotiables>\n- \"Target Keyword\" must be copied exactly from locked_fields.target_keyword\n- \"Semantic Keyword 1\" must be copied exactly from locked_fields.semantic_keyword_1\n- \"Semantic Keyword 2\" must be copied exactly from locked_fields.semantic_keyword_2\n- Never rewrite, translate, pluralize, singularize, or normalize the locked keyword fields\n- Blog Post Title must include the target keyword phrase naturally; capitalization may adapt, wording and word order may not\n- Blog Slug must contain the target keyword basis\n- Content Brief must be grounded in the company's real offer and the unique angle you researched\n- Do not invent statistics, quotes, certifications, regulations, or capabilities\n- Ground the unique angle in what you actually found with your tools; if research came back weak, set research_summary.confidence to \"low\" instead of inventing findings\n- Respect constraints.topics_to_avoid, compliance_restrictions, claims_to_qualify_or_avoid, and competitor_keyword_policy\n- Return ONLY valid JSON: no markdown fences, no commentary before or after\n</non_negotiables>\n\n<unique_angle_rules>\nThe unique angle is the reason this article deserves to exist next to the current top results.\n- It must name one specific scenario, mechanism, decision, comparison, or evaluation frame that the top results do not own\n- It must be credible for the company to write given its offer and ICP\n- It must NOT be generic filler such as \"comprehensive guide\", \"everything you need to know\", or \"ultimate\"\n- It must not contradict the guardrails\n</unique_angle_rules>\n\n<title_rules>\n- Natural, human-sounding, in the selected content plan language\n- Includes the target keyword phrase once, naturally\n- Prefer 50-72 characters\n- Sentence-style capitalization\n- No clickbait, no \"Ultimate Guide\", \"Top X\", or \"Everything You Need to Know\"\n- Must reflect the unique angle, not just restate the keyword\n</title_rules>\n\n<slug_rules>\n- Lowercase where the language has casing, hyphen-separated, 3-6 tokens preferred\n- Contains the target keyword basis\n- No generic endings like guide, complete-guide, or ultimate-guide unless truly necessary\n- No dates, no filler\n</slug_rules>\n\n<content_brief_rules>\n- 1-2 sentences, 35-70 words, no bullets, no outline\n- Must read like a concise editorial assignment\n- Must state: what the piece covers, who it is for, the unique angle, how each semantic keyword supports it naturally, and how it connects to the company's real offer\n</content_brief_rules>\n\n<output_schema>\n{\n  \"Target Keyword\": \"\",\n  \"Semantic Keyword 1\": \"\",\n  \"Semantic Keyword 2\": \"\",\n  \"Blog Post Title\": \"\",\n  \"Blog Slug\": \"\",\n  \"Content Brief\": \"\",\n  \"search_intent\": \"definition|how_to|compare|choose|solution_search|category_search|local_search|product_search|service_search|support_search|educational|commercial|other\",\n  \"journey_stage\": \"ToFu|MoFu|BoFu\",\n  \"target_audience\": \"\",\n  \"reader_problem\": \"\",\n  \"unique_angle\": \"\",\n  \"why_now_hook\": \"\",\n  \"research_summary\": {\n    \"competitor_patterns\": [],\n    \"coverage_gaps\": [],\n    \"audience_questions\": [],\n    \"timing_hooks\": [],\n    \"confidence\": \"high|medium|low\"\n  }\n}\n</output_schema>\n\n<field_rules>\n- why_now_hook: empty string if you skipped tavily_news or found nothing credible\n- research_summary arrays: max 5 items each, short phrases\n- competitor_patterns and coverage_gaps must come from your actual tool findings, not assumptions\n</field_rules>\n\n<quality_check>\nBefore returning, verify: locked keywords copied 1:1; title contains the keyword naturally and reflects the angle; slug contains the keyword basis; brief is 1-2 sentences in the selected language; the angle is specific and grounded in research; no guardrail violations; the output is pure JSON.\n</quality_check>"
+          "systemMessage": "<role>Senior SEO Research Analyst and Content Plan Writer</role>\n\n<mission>\nFor ONE target keyword, research the live landscape with your tools and then write the final production-ready content-plan row.\n\nYou produce, in one pass:\n- a unique content angle no top-ranking competitor currently owns\n- Blog Post Title\n- Blog Slug\n- Content Brief\n- supporting strategy metadata\n</mission>\n\n<tools>\nYou have ONE live research tool: tavily_research. You control both the query and the topic parameter on every call. YOU decide which research will most enhance this content idea - maybe news, maybe competitors, maybe audience pain language, maybe terminology or market context. It is your call, based on the keyword, its intent, and what is missing from the input.\n\nHow to aim the tool:\n- competitor research: query for the target keyword itself, or for the strongest competitor titles from serp_competitor_intelligence, to learn what top pages cover, how they frame the topic, and what they all miss (topic: \"general\")\n- audience research: query how real buyers and operators talk about this problem; add terms like \"reddit\", \"forum\", \"problems\", \"vs\", \"worth it\" to surface real questions, frustrations, and objections (topic: \"general\")\n- recency research: query for recent developments - regulation, product launches, market shifts, official statements (topic: \"news\"). Use \"news\" ONLY when the topic could plausibly have a credible recent development. Skip it entirely for evergreen topics. Never force a news angle.\n- verification: one query to confirm a specific claim or gap before you commit to the angle (topic: \"general\")\n\nIMPORTANT CONTEXT YOU ALREADY HAVE\nThe input already contains serp_snapshot (live top results, people-also-ask, related searches) and serp_competitor_intelligence (a completed SERP analysis: dominant H2 patterns, common subtopics, coverage gaps, recurring FAQs, an angle opportunity, and a confidence level). Do NOT spend tool calls rediscovering what is already there. Start from that analysis and use tavily_research to fill what it cannot tell you.\n\nRESEARCH STRATEGY - decide first, then execute:\nStep 1. Read the input: keyword, semantic keywords, serp_snapshot, serp_competitor_intelligence, company, ICP, constraints. Form a hypothesis about which research dimension would most improve the angle for THIS keyword: audience pain? recency? a deeper competitor gap? something else?\nStep 2. Make 2 to 4 tavily_research calls maximum, highest-value first, each with a different focus and a precisely worded query. If serp_competitor_intelligence confidence is low, spend the first call re-checking the competitor landscape; otherwise go straight to what is missing.\nStep 3. Stop researching as soon as you can name a specific angle that no top result owns. Do not exceed 4 tool calls. Do not repeat a query.\n</tools>\n\n<source_of_truth_priority>\n1. locked_fields (never change them)\n2. language\n3. company context (real offer, ICP, positioning)\n4. constraints and guardrails\n5. serp_snapshot and serp_competitor_intelligence provided in the input\n6. your tavily_research findings\n</source_of_truth_priority>\n\n<language_rule>\nThe selected content plan language is RESEARCH_AGENT_INPUT.language.content_plan_language.\n\nReturn JSON keys exactly in English.\nReturn Blog Post Title, Content Brief, unique_angle, target_audience, reader_problem, and why_now_hook in the selected content plan language.\nBlog Slug must be natural for the selected language and may preserve Unicode characters.\nDo not translate brand names, product names, acronyms, or the locked keywords.\n</language_rule>\n\n<non_negotiables>\n- \"Target Keyword\" must be copied exactly from locked_fields.target_keyword\n- \"Semantic Keyword 1\" must be copied exactly from locked_fields.semantic_keyword_1\n- \"Semantic Keyword 2\" must be copied exactly from locked_fields.semantic_keyword_2\n- Never rewrite, translate, pluralize, singularize, or normalize the locked keyword fields\n- Blog Post Title must include the target keyword phrase naturally; capitalization may adapt, wording and word order may not\n- Blog Slug must contain the target keyword basis\n- Content Brief must be grounded in the company's real offer and the unique angle you researched\n- Do not invent statistics, quotes, certifications, regulations, or capabilities\n- Ground the unique angle in what you actually found with your tools; if research came back weak, set research_summary.confidence to \"low\" instead of inventing findings\n- Respect constraints.topics_to_avoid, compliance_restrictions, claims_to_qualify_or_avoid, and competitor_keyword_policy\n- Return ONLY valid JSON: no markdown fences, no commentary before or after\n</non_negotiables>\n\n<unique_angle_rules>\nThe unique angle is the reason this article deserves to exist next to the current top results.\n- It must name one specific scenario, mechanism, decision, comparison, or evaluation frame that the top results do not own\n- It must be credible for the company to write given its offer and ICP\n- It must NOT be generic filler such as \"comprehensive guide\", \"everything you need to know\", or \"ultimate\"\n- It must not contradict the guardrails\n</unique_angle_rules>\n\n<title_rules>\n- Natural, human-sounding, in the selected content plan language\n- Includes the target keyword phrase once, naturally\n- Prefer 50-72 characters\n- Sentence-style capitalization\n- No clickbait, no \"Ultimate Guide\", \"Top X\", or \"Everything You Need to Know\"\n- Must reflect the unique angle, not just restate the keyword\n</title_rules>\n\n<slug_rules>\n- Lowercase where the language has casing, hyphen-separated, 3-6 tokens preferred\n- Contains the target keyword basis\n- No generic endings like guide, complete-guide, or ultimate-guide unless truly necessary\n- No dates, no filler\n</slug_rules>\n\n<content_brief_rules>\n- 1-2 sentences, 35-70 words, no bullets, no outline\n- Must read like a concise editorial assignment\n- Must state: what the piece covers, who it is for, the unique angle, how each semantic keyword supports it naturally, and how it connects to the company's real offer\n</content_brief_rules>\n\n<output_schema>\n{\n  \"Target Keyword\": \"\",\n  \"Semantic Keyword 1\": \"\",\n  \"Semantic Keyword 2\": \"\",\n  \"Blog Post Title\": \"\",\n  \"Blog Slug\": \"\",\n  \"Content Brief\": \"\",\n  \"search_intent\": \"definition|how_to|compare|choose|solution_search|category_search|local_search|product_search|service_search|support_search|educational|commercial|other\",\n  \"journey_stage\": \"ToFu|MoFu|BoFu\",\n  \"target_audience\": \"\",\n  \"reader_problem\": \"\",\n  \"unique_angle\": \"\",\n  \"why_now_hook\": \"\",\n  \"research_summary\": {\n    \"competitor_patterns\": [],\n    \"coverage_gaps\": [],\n    \"audience_questions\": [],\n    \"timing_hooks\": [],\n    \"confidence\": \"high|medium|low\"\n  }\n}\n</output_schema>\n\n<field_rules>\n- why_now_hook: empty string if you did no news research or found nothing credible\n- research_summary arrays: max 5 items each, short phrases\n- competitor_patterns and coverage_gaps must come from your actual tool findings, not assumptions\n</field_rules>\n\n<quality_check>\nBefore returning, verify: locked keywords copied 1:1; title contains the keyword naturally and reflects the angle; slug contains the keyword basis; brief is 1-2 sentences in the selected language; the angle is specific and grounded in research; no guardrail violations; the output is pure JSON.\n</quality_check>"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        -1664,
+        -1344,
         -3168
       ],
-      "id": "98920751-c221-4ba8-9513-4ed3f15daa74",
+      "id": "060f61f4-73e7-4c53-86e2-126a44a300d6",
       "name": "Research & Plan Agent",
       "retryOnFail": true,
       "maxTries": 3,
@@ -637,10 +696,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        -1760,
+        -1424,
         -2976
       ],
-      "id": "7daff6dc-503f-4039-9735-3469337dd008",
+      "id": "ee023de6-ef43-4ee6-88d7-b530ee26fcdd",
       "name": "Research Agent Model",
       "credentials": {
         "openAiApi": {
@@ -651,48 +710,24 @@
     },
     {
       "parameters": {
-        "toolDescription": "Live web search via Tavily. Use for competitor research on a keyword (what top-ranking pages cover, how they structure the topic, what they miss), audience research (real questions, frustrations, objections, and phrasing from forums, communities, reviews, and Q&A sites), and for market context, evaluation criteria, or statistics from credible sources. Input one focused search query that names the topic and the market or language.",
+        "toolDescription": "Live web research via Tavily. You decide the focus of every call: competitor research (what top-ranking pages cover and miss), audience research (real questions, frustrations, objections, and phrasing from forums, communities, reviews, and Q&A sites), recent news and announcements, market context, evaluation criteria, or statistics from credible sources. Provide one focused query naming the topic and the market or language, and set topic to \"news\" only when checking for credible developments from the last 30 days; otherwise set topic to \"general\".",
         "method": "POST",
         "url": "https://api.tavily.com/search",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "tavilyApi",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "{\n  \"query\": \"{query}\",\n  \"search_depth\": \"advanced\",\n  \"topic\": \"general\",\n  \"max_results\": 8,\n  \"include_answer\": true,\n  \"include_raw_content\": false\n}",
+        "jsonBody": "{\n  \"query\": \"{query}\",\n  \"topic\": \"{topic}\",\n  \"days\": 30,\n  \"search_depth\": \"advanced\",\n  \"max_results\": 8,\n  \"include_answer\": true,\n  \"include_raw_content\": false\n}",
         "placeholderDefinitions": {
           "values": [
             {
               "name": "query",
-              "description": "Focused web search query including topic and market/language.",
+              "description": "One focused research query including the topic and the market/language. Vary the phrasing per research goal: the keyword itself for competitor research; buyer phrasing plus terms like reddit, forum, problems, vs for audience research; entity and development names for news.",
               "type": "string"
-            }
-          ]
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
-      "typeVersion": 1.1,
-      "position": [
-        -1616,
-        -2976
-      ],
-      "id": "0f31cdfa-a7e5-4b17-864b-7b71aaa00b90",
-      "name": "tavily_search"
-    },
-    {
-      "parameters": {
-        "toolDescription": "Live news search via Tavily, restricted to roughly the last 30 days. Use ONLY to check for credible recent developments (news, announcements, regulatory updates, official statements) that could give the article a genuine why-now hook. Skip this tool for evergreen topics. Input one focused news query naming the topic and market.",
-        "method": "POST",
-        "url": "https://api.tavily.com/search",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "tavilyApi",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "{\n  \"query\": \"{query}\",\n  \"search_depth\": \"advanced\",\n  \"topic\": \"news\",\n  \"days\": 30,\n  \"max_results\": 8,\n  \"include_answer\": true,\n  \"include_raw_content\": false\n}",
-        "placeholderDefinitions": {
-          "values": [
+            },
             {
-              "name": "query",
-              "description": "Focused recent-news query including topic and market/language.",
+              "name": "topic",
+              "description": "Search mode. Use \"news\" only when checking for recent developments from the last 30 days; use \"general\" for everything else.",
               "type": "string"
             }
           ]
@@ -701,53 +736,24 @@
       "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
       "typeVersion": 1.1,
       "position": [
-        -1472,
+        -1264,
         -2976
       ],
-      "id": "fa17dd41-9328-4722-a6cc-3b1df8626aba",
-      "name": "tavily_news"
-    },
-    {
-      "parameters": {
-        "toolDescription": "Fetch the readable content of one specific web page via Tavily Extract. Use it to read 1-2 of the most important competitor pages in depth (URLs from the serp_snapshot in your input or from tavily_search results) when you need their actual structure and coverage to find a real gap. Input a single full URL starting with http or https.",
-        "method": "POST",
-        "url": "https://api.tavily.com/extract",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "tavilyApi",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "{\n  \"urls\": [\n    \"{url}\"\n  ],\n  \"extract_depth\": \"basic\"\n}",
-        "placeholderDefinitions": {
-          "values": [
-            {
-              "name": "url",
-              "description": "Full URL of the page to read.",
-              "type": "string"
-            }
-          ]
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
-      "typeVersion": 1.1,
-      "position": [
-        -1328,
-        -2976
-      ],
-      "id": "c2eeab95-4269-43ce-92a0-6e084534b043",
-      "name": "tavily_extract"
+      "id": "16a0a139-82e8-416b-b64f-22afd4fc4dbf",
+      "name": "tavily_research"
     },
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "// Parse Research Agent Output\n// Type: Code node\n// Mode: Run Once for Each Item\n//\n// - Parses the Research & Plan Agent JSON output.\n// - Restores locked keyword fields from Prepare Research Agent Input\n//   (the agent is never trusted with them).\n// - Unicode-safe slug fallback.\n// - Emits the row shape expected by build_audit_dataset plus the\n//   research/strategy metadata used by the handoff package.\n\nconst aiResponse = $json || {};\n\nlet originalData = {};\ntry {\n  originalData = $('Prepare Research Agent Input').item.json || {};\n} catch (e) {\n  // Inside the keyword loop there is exactly one item per iteration,\n  // so the first item is always the matching row.\n  try {\n    originalData = $('Prepare Research Agent Input').first().json || {};\n  } catch (e2) {\n    originalData = {};\n  }\n}\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nfunction firstNonEmpty(...values) {\n  for (const value of values) {\n    const s = clean(value);\n    if (s) return s;\n  }\n  return null;\n}\n\nfunction safeArray(value) {\n  return Array.isArray(value) ? value : [];\n}\n\nfunction slugify(value) {\n  return clean(value)\n    .toLowerCase()\n    .normalize('NFC')\n    .replace(/&/g, ' and ')\n    .replace(/[^\\p{L}\\p{N}\\s-]/gu, '')\n    .replace(/\\s+/g, '-')\n    .replace(/-+/g, '-')\n    .replace(/^-|-$/g, '');\n}\n\nfunction extractJson(raw) {\n  if (raw && typeof raw === 'object' && !Array.isArray(raw)) {\n    if (raw.output) return extractJson(raw.output);\n    return raw;\n  }\n\n  const text = String(raw ?? '')\n    .replace(/^```(?:json)?\\s*/i, '')\n    .replace(/\\s*```$/i, '')\n    .trim();\n\n  const match = text.match(/\\{[\\s\\S]*\\}/);\n  const candidate = match ? match[0] : text;\n\n  return JSON.parse(candidate);\n}\n\nlet aiParsed = {};\nlet parseFailed = false;\nconst aiText = aiResponse.output || aiResponse.text || aiResponse.result || JSON.stringify(aiResponse);\n\ntry {\n  aiParsed = extractJson(aiText);\n} catch (error) {\n  aiParsed = {};\n  parseFailed = true;\n}\n\nconst targetKeyword = clean(originalData.core_keyword);\nconst semantic1 = clean(originalData.semantic_1_keyword);\nconst semantic2 = clean(originalData.semantic_2_keyword);\n\nconst blogTitle = clean(aiParsed['Blog Post Title']) || targetKeyword;\n\nlet blogSlug = clean(aiParsed['Blog Slug']) || slugify(targetKeyword);\nblogSlug = slugify(blogSlug) || slugify(targetKeyword);\n\nconst contentBrief = clean(aiParsed['Content Brief']);\n\nconst researchSummary =\n  aiParsed.research_summary && typeof aiParsed.research_summary === 'object'\n    ? aiParsed.research_summary\n    : {};\n\nconst searchIntent = clean(aiParsed.search_intent) || 'other';\nconst journeyStage = clean(aiParsed.journey_stage) || 'MoFu';\nconst uniqueAngle = clean(aiParsed.unique_angle);\nconst whyNowHook = clean(aiParsed.why_now_hook);\n\nconst contentPlanLanguage = firstNonEmpty(originalData.content_plan_language, 'English');\nconst contentPlanLanguageCode = firstNonEmpty(originalData.content_plan_language_code, originalData.serper_hl, 'en');\n\nreturn {\n  json: {\n    ...originalData,\n\n    'Target Keyword': targetKeyword,\n    'Semantic Keyword 1': semantic1,\n    'Semantic Keyword 2': semantic2,\n    'Blog Post Title': blogTitle,\n    'Blog Slug': blogSlug,\n    'Content Brief': contentBrief,\n\n    'Client': originalData.company_name || '',\n    'Cluster Name': originalData.cluster_label || '',\n    'Primary Intent': searchIntent,\n    'Stage': journeyStage,\n\n    search_intent: searchIntent,\n    journey_stage: journeyStage,\n    target_audience: clean(aiParsed.target_audience),\n    reader_problem: clean(aiParsed.reader_problem),\n    unique_angle: uniqueAngle,\n    title_direction: uniqueAngle,\n    slug_basis: blogSlug,\n    why_now_hook: whyNowHook,\n\n    must_cover_topics: safeArray(researchSummary.coverage_gaps).slice(0, 8),\n    faq_questions_from_research: safeArray(researchSummary.audience_questions).slice(0, 8),\n    competitor_gaps_to_exploit: safeArray(researchSummary.coverage_gaps).slice(0, 8),\n\n    competitor_intelligence: {\n      dominant_h2_patterns: safeArray(researchSummary.competitor_patterns).slice(0, 8),\n      common_subtopics: [],\n      coverage_gaps: safeArray(researchSummary.coverage_gaps).slice(0, 8),\n      recurring_faq_questions: safeArray(researchSummary.audience_questions).slice(0, 6),\n      unique_angle_opportunity: uniqueAngle,\n      confidence: clean(researchSummary.confidence) || (parseFailed ? 'low' : 'medium'),\n      confidence_note: parseFailed ? 'Research & Plan Agent output could not be parsed.' : '',\n    },\n\n    socials_research: {\n      social_signal_quality: safeArray(researchSummary.audience_questions).length ? 'medium' : 'none',\n      audience_questions: safeArray(researchSummary.audience_questions).slice(0, 8),\n      pain_patterns: [],\n      language_patterns: [],\n      research_notes: '',\n    },\n\n    news_research: {\n      recency_relevant: Boolean(whyNowHook),\n      timing_hooks: safeArray(researchSummary.timing_hooks).slice(0, 5),\n      news_items: [],\n      official_signals: [],\n      research_notes: '',\n    },\n\n    content_plan_language: contentPlanLanguage,\n    content_plan_language_code: contentPlanLanguageCode,\n\n    parse_debug: {\n      agent_output_parse_failed: parseFailed,\n      locked_keywords_restored_from_input: true,\n      slug_unicode_safe: true,\n    },\n  },\n};"
+        "jsCode": "// Parse Research Agent Output\n// Type: Code node\n// Mode: Run Once for Each Item\n//\n// - Parses the Research & Plan Agent JSON output.\n// - Restores locked keyword fields from Prepare Research Agent Input\n//   (the agent is never trusted with them).\n// - Unicode-safe slug fallback.\n// - Emits the row shape expected by build_audit_dataset plus the\n//   research/strategy metadata used by the handoff package.\n\nconst aiResponse = $json || {};\n\nlet originalData = {};\ntry {\n  originalData = $('Prepare Research Agent Input').item.json || {};\n} catch (e) {\n  // Inside the keyword loop there is exactly one item per iteration,\n  // so the first item is always the matching row.\n  try {\n    originalData = $('Prepare Research Agent Input').first().json || {};\n  } catch (e2) {\n    originalData = {};\n  }\n}\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nfunction firstNonEmpty(...values) {\n  for (const value of values) {\n    const s = clean(value);\n    if (s) return s;\n  }\n  return null;\n}\n\nfunction safeArray(value) {\n  return Array.isArray(value) ? value : [];\n}\n\nfunction slugify(value) {\n  return clean(value)\n    .toLowerCase()\n    .normalize('NFC')\n    .replace(/&/g, ' and ')\n    .replace(/[^\\p{L}\\p{N}\\s-]/gu, '')\n    .replace(/\\s+/g, '-')\n    .replace(/-+/g, '-')\n    .replace(/^-|-$/g, '');\n}\n\nfunction extractJson(raw) {\n  if (raw && typeof raw === 'object' && !Array.isArray(raw)) {\n    if (raw.output) return extractJson(raw.output);\n    return raw;\n  }\n\n  const text = String(raw ?? '')\n    .replace(/^```(?:json)?\\s*/i, '')\n    .replace(/\\s*```$/i, '')\n    .trim();\n\n  const match = text.match(/\\{[\\s\\S]*\\}/);\n  const candidate = match ? match[0] : text;\n\n  return JSON.parse(candidate);\n}\n\nlet aiParsed = {};\nlet parseFailed = false;\nconst aiText = aiResponse.output || aiResponse.text || aiResponse.result || JSON.stringify(aiResponse);\n\ntry {\n  aiParsed = extractJson(aiText);\n} catch (error) {\n  aiParsed = {};\n  parseFailed = true;\n}\n\nconst targetKeyword = clean(originalData.core_keyword);\nconst semantic1 = clean(originalData.semantic_1_keyword);\nconst semantic2 = clean(originalData.semantic_2_keyword);\n\nconst blogTitle = clean(aiParsed['Blog Post Title']) || targetKeyword;\n\nlet blogSlug = clean(aiParsed['Blog Slug']) || slugify(targetKeyword);\nblogSlug = slugify(blogSlug) || slugify(targetKeyword);\n\nconst contentBrief = clean(aiParsed['Content Brief']);\n\nconst researchSummary =\n  aiParsed.research_summary && typeof aiParsed.research_summary === 'object'\n    ? aiParsed.research_summary\n    : {};\n\nconst searchIntent = clean(aiParsed.search_intent) || 'other';\nconst journeyStage = clean(aiParsed.journey_stage) || 'MoFu';\nconst uniqueAngle = clean(aiParsed.unique_angle);\nconst whyNowHook = clean(aiParsed.why_now_hook);\n\nconst contentPlanLanguage = firstNonEmpty(originalData.content_plan_language, 'English');\nconst contentPlanLanguageCode = firstNonEmpty(originalData.content_plan_language_code, originalData.serper_hl, 'en');\n\n// Deterministic SERP analysis done before the agent (Parse Competitor\n// SERP Research). The agent findings enrich it; they never replace it.\nconst serpIntel =\n  originalData.competitor_intelligence && typeof originalData.competitor_intelligence === 'object'\n    ? originalData.competitor_intelligence\n    : null;\n\nfunction mergeUnique(a, b, limit) {\n  const out = [];\n  const seen = new Set();\n  for (const v of [...safeArray(a), ...safeArray(b)]) {\n    const s = clean(typeof v === 'string' ? v : JSON.stringify(v));\n    if (!s) continue;\n    const k = s.toLowerCase();\n    if (seen.has(k)) continue;\n    seen.add(k);\n    out.push(typeof v === 'string' ? s : v);\n  }\n  return out.slice(0, limit);\n}\n\nreturn {\n  json: {\n    ...originalData,\n\n    'Target Keyword': targetKeyword,\n    'Semantic Keyword 1': semantic1,\n    'Semantic Keyword 2': semantic2,\n    'Blog Post Title': blogTitle,\n    'Blog Slug': blogSlug,\n    'Content Brief': contentBrief,\n\n    'Client': originalData.company_name || '',\n    'Cluster Name': originalData.cluster_label || '',\n    'Primary Intent': searchIntent,\n    'Stage': journeyStage,\n\n    search_intent: searchIntent,\n    journey_stage: journeyStage,\n    target_audience: clean(aiParsed.target_audience),\n    reader_problem: clean(aiParsed.reader_problem),\n    unique_angle: uniqueAngle,\n    title_direction: uniqueAngle,\n    slug_basis: blogSlug,\n    why_now_hook: whyNowHook,\n\n    must_cover_topics: mergeUnique(serpIntel?.common_subtopics, researchSummary.coverage_gaps, 8),\n    faq_questions_from_research: mergeUnique(serpIntel?.recurring_faq_questions, researchSummary.audience_questions, 8),\n    competitor_gaps_to_exploit: mergeUnique(serpIntel?.coverage_gaps, researchSummary.coverage_gaps, 8),\n\n    competitor_intelligence: {\n      ...(serpIntel || {}),\n      dominant_h2_patterns: mergeUnique(serpIntel?.dominant_h2_patterns, researchSummary.competitor_patterns, 8),\n      common_subtopics: safeArray(serpIntel?.common_subtopics).slice(0, 8),\n      coverage_gaps: mergeUnique(serpIntel?.coverage_gaps, researchSummary.coverage_gaps, 8),\n      recurring_faq_questions: mergeUnique(serpIntel?.recurring_faq_questions, researchSummary.audience_questions, 6),\n      unique_angle_opportunity: uniqueAngle || clean(serpIntel?.unique_angle_opportunity),\n      confidence: clean(serpIntel?.confidence) || clean(researchSummary.confidence) || (parseFailed ? 'low' : 'medium'),\n      confidence_note: parseFailed\n        ? 'Research & Plan Agent output could not be parsed.'\n        : clean(serpIntel?.confidence_note),\n    },\n\n    socials_research: {\n      social_signal_quality: safeArray(researchSummary.audience_questions).length ? 'medium' : 'none',\n      audience_questions: safeArray(researchSummary.audience_questions).slice(0, 8),\n      pain_patterns: [],\n      language_patterns: [],\n      research_notes: '',\n    },\n\n    news_research: {\n      recency_relevant: Boolean(whyNowHook),\n      timing_hooks: safeArray(researchSummary.timing_hooks).slice(0, 5),\n      news_items: [],\n      official_signals: [],\n      research_notes: '',\n    },\n\n    content_plan_language: contentPlanLanguage,\n    content_plan_language_code: contentPlanLanguageCode,\n\n    parse_debug: {\n      agent_output_parse_failed: parseFailed,\n      locked_keywords_restored_from_input: true,\n      slug_unicode_safe: true,\n    },\n  },\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1392,
+        -1072,
         -3168
       ],
-      "id": "8891d9a2-23b0-4c2e-b887-2536a6c884d2",
+      "id": "3da42c2f-25db-4de4-a89e-4f70a5cea0c5",
       "name": "Parse Research Agent Output"
     }
   ],
@@ -783,6 +789,39 @@
             "index": 0
           }
         ],
+        [
+          {
+            "node": "Competitor SERP Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Competitor SERP Research": {
+      "main": [
+        [
+          {
+            "node": "Competitor SERP Researcher",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Competitor SERP Researcher": {
+      "main": [
+        [
+          {
+            "node": "Parse Competitor SERP Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Competitor SERP Research": {
+      "main": [
         [
           {
             "node": "Prepare Research Agent Input",
@@ -825,29 +864,7 @@
         ]
       ]
     },
-    "tavily_search": {
-      "ai_tool": [
-        [
-          {
-            "node": "Research & Plan Agent",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "tavily_news": {
-      "ai_tool": [
-        [
-          {
-            "node": "Research & Plan Agent",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "tavily_extract": {
+    "tavily_research": {
       "ai_tool": [
         [
           {
