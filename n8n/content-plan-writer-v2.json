@@ -584,7 +584,7 @@
         -2208,
         -3216
       ],
-      "id": "7c5c3fce-0a4a-4ffd-b3fd-4614a008db64",
+      "id": "aaf18646-fe09-484e-b550-378962aa30b3",
       "name": "Keyword Research Loop"
     },
     {
@@ -597,7 +597,7 @@
         -2032,
         -3168
       ],
-      "id": "901d5c5b-714c-4bfb-9b98-f0306ee56b45",
+      "id": "f53676ab-8e77-47a6-8c40-6f843bb6a159",
       "name": "Competitor SERP Research",
       "retryOnFail": true,
       "waitBetweenTries": 5000
@@ -621,7 +621,7 @@
         -1872,
         -3168
       ],
-      "id": "5e29877a-961d-47e3-95c0-86b9fb4d7d9c",
+      "id": "28369dcb-70fe-4daa-aa0f-e5bb59f1f10c",
       "name": "Competitor SERP Researcher",
       "retryOnFail": true,
       "maxTries": 5,
@@ -643,7 +643,7 @@
         -1712,
         -3168
       ],
-      "id": "139ddce8-c3ac-4eaa-b832-d6b3a3023dc8",
+      "id": "b45f7fbb-d67e-4cd1-8fd0-7a83b093fea1",
       "name": "Parse Competitor SERP Research"
     },
     {
@@ -657,13 +657,14 @@
         -1552,
         -3168
       ],
-      "id": "1391118d-725e-43ea-9994-f72933b7a253",
+      "id": "12e2b252-18f7-4e86-bd98-51c62f6bd4ba",
       "name": "Prepare Research Agent Input"
     },
     {
       "parameters": {
         "promptType": "define",
         "text": "=Research this keyword and produce the final content-plan row.\n\nRESEARCH_AGENT_INPUT:\n{{ JSON.stringify($json.research_agent_input) }}\n\nReturn ONLY valid JSON matching the required schema.",
+        "hasOutputParser": true,
         "options": {
           "systemMessage": "<role>Senior SEO Research Analyst and Content Plan Writer</role>\n\n<mission>\nFor ONE target keyword, research the live landscape with your tools and then write the final production-ready content-plan row.\n\nYou produce, in one pass:\n- a unique content angle no top-ranking competitor currently owns\n- Blog Post Title\n- Blog Slug\n- Content Brief\n- supporting strategy metadata\n</mission>\n\n<tools>\nYou have ONE live research tool: tavily_research. You control both the query and the topic parameter on every call. YOU decide which research will most enhance this content idea - maybe news, maybe competitors, maybe audience pain language, maybe terminology or market context. It is your call, based on the keyword, its intent, and what is missing from the input.\n\nHow to aim the tool:\n- competitor research: query for the target keyword itself, or for the strongest competitor titles from serp_competitor_intelligence, to learn what top pages cover, how they frame the topic, and what they all miss (topic: \"general\")\n- audience research: query how real buyers and operators talk about this problem; add terms like \"reddit\", \"forum\", \"problems\", \"vs\", \"worth it\" to surface real questions, frustrations, and objections (topic: \"general\")\n- recency research: query for recent developments - regulation, product launches, market shifts, official statements (topic: \"news\"). Use \"news\" ONLY when the topic could plausibly have a credible recent development. Skip it entirely for evergreen topics. Never force a news angle.\n- verification: one query to confirm a specific claim or gap before you commit to the angle (topic: \"general\")\n\nIMPORTANT CONTEXT YOU ALREADY HAVE\nThe input already contains serp_snapshot (live top results, people-also-ask, related searches) and serp_competitor_intelligence (a completed SERP analysis: dominant H2 patterns, common subtopics, coverage gaps, recurring FAQs, an angle opportunity, and a confidence level). Do NOT spend tool calls rediscovering what is already there. Start from that analysis and use tavily_research to fill what it cannot tell you.\n\nRESEARCH STRATEGY - decide first, then execute:\nStep 1. Read the input: keyword, semantic keywords, serp_snapshot, serp_competitor_intelligence, company, ICP, constraints. Form a hypothesis about which research dimension would most improve the angle for THIS keyword: audience pain? recency? a deeper competitor gap? something else?\nStep 2. Make 2 to 4 tavily_research calls maximum, highest-value first, each with a different focus and a precisely worded query. If serp_competitor_intelligence confidence is low, spend the first call re-checking the competitor landscape; otherwise go straight to what is missing.\nStep 3. Stop researching as soon as you can name a specific angle that no top result owns. Do not exceed 4 tool calls. Do not repeat a query.\n</tools>\n\n<source_of_truth_priority>\n1. locked_fields (never change them)\n2. language\n3. company context (real offer, ICP, positioning)\n4. constraints and guardrails\n5. serp_snapshot and serp_competitor_intelligence provided in the input\n6. your tavily_research findings\n</source_of_truth_priority>\n\n<language_rule>\nThe selected content plan language is RESEARCH_AGENT_INPUT.language.content_plan_language.\n\nReturn JSON keys exactly in English.\nReturn Blog Post Title, Content Brief, unique_angle, target_audience, reader_problem, and why_now_hook in the selected content plan language.\nBlog Slug must be natural for the selected language and may preserve Unicode characters.\nDo not translate brand names, product names, acronyms, or the locked keywords.\n</language_rule>\n\n<non_negotiables>\n- \"Target Keyword\" must be copied exactly from locked_fields.target_keyword\n- \"Semantic Keyword 1\" must be copied exactly from locked_fields.semantic_keyword_1\n- \"Semantic Keyword 2\" must be copied exactly from locked_fields.semantic_keyword_2\n- Never rewrite, translate, pluralize, singularize, or normalize the locked keyword fields\n- Blog Post Title must include the target keyword phrase naturally; capitalization may adapt, wording and word order may not\n- Blog Slug must contain the target keyword basis\n- Content Brief must be grounded in the company's real offer and the unique angle you researched\n- Do not invent statistics, quotes, certifications, regulations, or capabilities\n- Ground the unique angle in what you actually found with your tools; if research came back weak, set research_summary.confidence to \"low\" instead of inventing findings\n- Respect constraints.topics_to_avoid, compliance_restrictions, claims_to_qualify_or_avoid, and competitor_keyword_policy\n- Return ONLY valid JSON: no markdown fences, no commentary before or after\n</non_negotiables>\n\n<unique_angle_rules>\nThe unique angle is the reason this article deserves to exist next to the current top results.\n\nBefore settling on an angle, interrogate the obvious one:\n- What would a mediocre content writer produce if given this keyword?\n- What angle would every competitor default to?\n- What does the reader already know that makes a surface-level treatment useless to them?\n- What value or new insight can this article give that the current top results do not?\n- How specific can the angle get without deviating from the keyword intent?\n\nThen sharpen it using one or more of these techniques:\n- describe one specific scenario, condition, or context the article will address\n- name one exact mechanism, process, or variable the article will explain\n- take an opinionated stance on a single specific topic, event, publication, or finding from your research\n- the angle must be credible for the company to write given its offer and ICP\n- the angle must not contradict the guardrails\n\nStyle rules for the angle:\n- written in plain language, straightforward, under seven sentences\n- specificity must speak for itself: do NOT explain why the idea is unique\n- do NOT use content-marketing filler such as \"unique angle\", \"thought leadership\", \"in-depth\", \"comprehensive\", \"ultimate\", or \"everything you need to know\"\n- avoid special characters such as slashes, braces, brackets, quotes, and double dashes inside the angle text\n</unique_angle_rules>\n\n<uniqueness_rules>\nThe input may contain previously_created_rows: the keywords, titles, unique angles, and main points already produced for other keywords in this same content plan.\n- Read them and internalize every topic, angle, argument, and framing already covered.\n- Your angle, title, main_point, and purpose must not repeat any of them, fully or partially.\n- Before returning, compare your draft against previously_created_rows one final time. If any overlap exists in argument, mechanism, audience problem, or specific example, revise until there is zero overlap while staying true to THIS keyword's intent.\n</uniqueness_rules>\n\n<main_point_and_purpose_rules>\nmain_point is your personal stance on the subject that the article will defend:\n- one clear sentence starting with \"I think\", \"I believe\", or similar\n- explicit and under 30 words\n- never mentions the target audience (no \"marketers\", \"business owners\", \"developers\", and similar)\n- must be unique versus every main point in previously_created_rows, fully and partially\n- no special characters such as slashes, braces, brackets, quotes, or double dashes\n\npurpose tells readers what the article is trying to accomplish:\n- derives directly from main_point\n- one clear sentence, explicit and under 30 words\n- uses a specific action verb that signals teaching or guidance: to show, to explain, to teach, to guide, to instruct, to direct, or similar\n- never mentions the target audience\n- must be unique versus every purpose in previously_created_rows, fully and partially\n- no special characters such as slashes, braces, brackets, quotes, or double dashes\n</main_point_and_purpose_rules>\n\n<title_rules>\n- Natural, human-sounding, in the selected content plan language\n- Includes the target keyword phrase once, naturally\n- Prefer 50-72 characters\n- Sentence-style capitalization\n- No clickbait, no \"Ultimate Guide\", \"Top X\", or \"Everything You Need to Know\"\n- Must reflect the unique angle, not just restate the keyword\n</title_rules>\n\n<slug_rules>\n- Lowercase where the language has casing, hyphen-separated, 3-6 tokens preferred\n- Contains the target keyword basis\n- No generic endings like guide, complete-guide, or ultimate-guide unless truly necessary\n- No dates, no filler\n</slug_rules>\n\n<content_brief_rules>\n- 1-2 sentences, 35-70 words, no bullets, no outline\n- Must read like a concise editorial assignment\n- Must state: what the piece covers, who it is for, the unique angle, how each semantic keyword supports it naturally, and how it connects to the company's real offer\n</content_brief_rules>\n\n<output_schema>\n{\n  \"Target Keyword\": \"\",\n  \"Semantic Keyword 1\": \"\",\n  \"Semantic Keyword 2\": \"\",\n  \"Blog Post Title\": \"\",\n  \"Blog Slug\": \"\",\n  \"Content Brief\": \"\",\n  \"search_intent\": \"definition|how_to|compare|choose|solution_search|category_search|local_search|product_search|service_search|support_search|educational|commercial|other\",\n  \"journey_stage\": \"ToFu|MoFu|BoFu\",\n  \"target_audience\": \"\",\n  \"reader_problem\": \"\",\n  \"unique_angle\": \"\",\n  \"main_point\": \"\",\n  \"purpose\": \"\",\n  \"why_now_hook\": \"\",\n  \"research_summary\": {\n    \"competitor_patterns\": [],\n    \"coverage_gaps\": [],\n    \"audience_questions\": [],\n    \"timing_hooks\": [],\n    \"confidence\": \"high|medium|low\"\n  }\n}\n</output_schema>\n\n<field_rules>\n- why_now_hook: empty string if you did no news research or found nothing credible\n- main_point and purpose follow main_point_and_purpose_rules exactly, in the selected content plan language\n- research_summary arrays: max 5 items each, short phrases\n- competitor_patterns and coverage_gaps must come from your actual tool findings, not assumptions\n</field_rules>\n\n<quality_check>\nBefore returning, verify: locked keywords copied 1:1; title contains the keyword naturally and reflects the angle; slug contains the keyword basis; brief is 1-2 sentences in the selected language; the angle is specific, grounded in research, and free of content-marketing filler; main_point is a personal stance under 30 words and purpose derives from it with a teaching verb; zero overlap with previously_created_rows in angle, title, main_point, or purpose; no guardrail violations; the output is pure JSON.\n</quality_check>"
         }
@@ -674,11 +675,26 @@
         -1344,
         -3168
       ],
-      "id": "5ab91edc-113f-4426-b1e8-0914d9d9b0ef",
+      "id": "5b1de74b-9c6c-4630-b082-4c64fd9a219d",
       "name": "Research & Plan Agent",
       "retryOnFail": true,
       "maxTries": 3,
       "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"Target Keyword\": \"\",\n  \"Semantic Keyword 1\": \"\",\n  \"Semantic Keyword 2\": \"\",\n  \"Blog Post Title\": \"\",\n  \"Blog Slug\": \"\",\n  \"Content Brief\": \"\",\n  \"search_intent\": \"definition|how_to|compare|choose|solution_search|category_search|local_search|product_search|service_search|support_search|educational|commercial|other\",\n  \"journey_stage\": \"ToFu|MoFu|BoFu\",\n  \"target_audience\": \"\",\n  \"reader_problem\": \"\",\n  \"unique_angle\": \"\",\n  \"main_point\": \"\",\n  \"purpose\": \"\",\n  \"why_now_hook\": \"\",\n  \"research_summary\": {\n    \"competitor_patterns\": [],\n    \"coverage_gaps\": [],\n    \"audience_questions\": [],\n    \"timing_hooks\": [],\n    \"confidence\": \"high|medium|low\"\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -1136,
+        -2976
+      ],
+      "id": "15538c3a-01b7-478a-84db-2c9ec527cd2c",
+      "name": "Research Row Structure",
+      "retryOnFail": true,
+      "maxTries": 5
     },
     {
       "parameters": {
@@ -699,7 +715,7 @@
         -1424,
         -2976
       ],
-      "id": "7966d789-6237-4a65-aa39-72989024a525",
+      "id": "d23412e8-bfad-4a13-8134-3153f3b9e66d",
       "name": "Research Agent Model",
       "credentials": {
         "openAiApi": {
@@ -725,7 +741,7 @@
         -1264,
         -2976
       ],
-      "id": "ededc9c2-5a2e-4b08-a11a-b617d2fdae27",
+      "id": "7185bbb8-0060-4fdc-a4ee-21b2786ea5fb",
       "name": "tavily_research"
     },
     {
@@ -739,7 +755,7 @@
         -1072,
         -3168
       ],
-      "id": "baaf6c52-2f69-442c-a367-c8cd3db0c28b",
+      "id": "e392840c-95fa-4526-8fe5-cca221069a85",
       "name": "Parse Research Agent Output"
     }
   ],
@@ -856,6 +872,17 @@
           {
             "node": "Research & Plan Agent",
             "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research Row Structure": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Research & Plan Agent",
+            "type": "ai_outputParser",
             "index": 0
           }
         ]
