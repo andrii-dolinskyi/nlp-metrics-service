@@ -584,7 +584,7 @@
         -2208,
         -3216
       ],
-      "id": "37382298-8222-4c18-9bfe-289c78784ff8",
+      "id": "7c5c3fce-0a4a-4ffd-b3fd-4614a008db64",
       "name": "Keyword Research Loop"
     },
     {
@@ -597,7 +597,7 @@
         -2032,
         -3168
       ],
-      "id": "d976de7a-a62c-4663-bb5c-e5d8ec49799e",
+      "id": "901d5c5b-714c-4bfb-9b98-f0306ee56b45",
       "name": "Competitor SERP Research",
       "retryOnFail": true,
       "waitBetweenTries": 5000
@@ -621,7 +621,7 @@
         -1872,
         -3168
       ],
-      "id": "3c6f643e-c75e-42da-be32-54647cf133cc",
+      "id": "5e29877a-961d-47e3-95c0-86b9fb4d7d9c",
       "name": "Competitor SERP Researcher",
       "retryOnFail": true,
       "maxTries": 5,
@@ -643,7 +643,7 @@
         -1712,
         -3168
       ],
-      "id": "761557db-7486-42e7-8a70-f35c96fdff8a",
+      "id": "139ddce8-c3ac-4eaa-b832-d6b3a3023dc8",
       "name": "Parse Competitor SERP Research"
     },
     {
@@ -657,7 +657,7 @@
         -1552,
         -3168
       ],
-      "id": "22e2563d-dcaa-435f-84c0-3248bfd11818",
+      "id": "1391118d-725e-43ea-9994-f72933b7a253",
       "name": "Prepare Research Agent Input"
     },
     {
@@ -674,7 +674,7 @@
         -1344,
         -3168
       ],
-      "id": "c19e720b-7418-4fc9-a655-74e333dc47db",
+      "id": "5ab91edc-113f-4426-b1e8-0914d9d9b0ef",
       "name": "Research & Plan Agent",
       "retryOnFail": true,
       "maxTries": 3,
@@ -699,7 +699,7 @@
         -1424,
         -2976
       ],
-      "id": "b0214e51-1434-4b40-868c-94be0318c669",
+      "id": "7966d789-6237-4a65-aa39-72989024a525",
       "name": "Research Agent Model",
       "credentials": {
         "openAiApi": {
@@ -717,21 +717,7 @@
         "nodeCredentialType": "tavilyApi",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "{\n  \"query\": \"{query}\",\n  \"topic\": \"{topic}\",\n  \"days\": 30,\n  \"search_depth\": \"advanced\",\n  \"max_results\": 8,\n  \"include_answer\": true,\n  \"include_raw_content\": false\n}",
-        "placeholderDefinitions": {
-          "values": [
-            {
-              "name": "query",
-              "description": "One focused research query including the topic and the market/language. Vary the phrasing per research goal: the keyword itself for competitor research; buyer phrasing plus terms like reddit, forum, problems, vs for audience research; entity and development names for news.",
-              "type": "string"
-            },
-            {
-              "name": "topic",
-              "description": "Search mode. Use \"news\" only when checking for recent developments from the last 30 days; use \"general\" for everything else.",
-              "type": "string"
-            }
-          ]
-        }
+        "jsonBody": "={{ {\n  query: $fromAI('query', 'One focused research query including the topic and the market or language. Vary the phrasing per research goal: the keyword itself for competitor research; buyer phrasing plus terms like reddit, forum, problems, vs for audience research; entity and development names for news.', 'string'),\n  topic: $fromAI('topic', 'Search mode. Use news only when checking for credible developments from the last 30 days; use general for everything else.', 'string'),\n  days: 30,\n  search_depth: 'advanced',\n  max_results: 5,\n  include_answer: true,\n  include_raw_content: false\n} }}"
       },
       "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
       "typeVersion": 1.1,
@@ -739,7 +725,7 @@
         -1264,
         -2976
       ],
-      "id": "94108f9c-0d1c-4837-9aa6-1b1aea1ac211",
+      "id": "ededc9c2-5a2e-4b08-a11a-b617d2fdae27",
       "name": "tavily_research"
     },
     {
@@ -753,7 +739,7 @@
         -1072,
         -3168
       ],
-      "id": "bdf0fb01-2a60-4220-9928-065279e55a7c",
+      "id": "baaf6c52-2f69-442c-a367-c8cd3db0c28b",
       "name": "Parse Research Agent Output"
     }
   ],
