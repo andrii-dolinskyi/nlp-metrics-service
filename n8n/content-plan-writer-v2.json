@@ -586,7 +586,7 @@
         -2384,
         -3216
       ],
-      "id": "de97f1db-c5f6-4006-9b00-f4105e2ac390",
+      "id": "4c6d1972-3116-42af-8565-489f89dca1a1",
       "name": "Keyword Research Loop"
     },
     {
@@ -599,7 +599,7 @@
         -2208,
         -3168
       ],
-      "id": "fb10c80d-760b-4fee-b4f9-fc43584c556e",
+      "id": "65d32e84-fe11-4ce7-83b1-e9dd62ad4113",
       "name": "Competitor SERP Research",
       "retryOnFail": true,
       "waitBetweenTries": 5000
@@ -623,7 +623,7 @@
         -2048,
         -3168
       ],
-      "id": "428cb01a-7083-403f-b523-72b99b656e61",
+      "id": "297341b1-54de-49e7-93fa-dd3b62df6867",
       "name": "Competitor SERP Researcher",
       "retryOnFail": true,
       "maxTries": 5,
@@ -637,7 +637,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Parse Competitor SERP Research\n// Mode: Run Once for Each Item (one keyword per loop iteration)\n//\n// Purpose:\n// - Parse the Perplexity competitor research response.\n// - Return original row + competitor_intelligence.\n// - If parsing fails, return safe low-confidence competitor_intelligence.\n\nconst response = $input.first().json || {};\n\nlet originalRow = {};\ntry {\n  originalRow = $('Competitor SERP Research').item.json || {};\n} catch (e) {\n  try {\n    originalRow = $('Competitor SERP Research').first().json || {};\n  } catch (e2) {\n    originalRow = {};\n  }\n}\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nfunction safeArray(value) {\n  return Array.isArray(value) ? value : [];\n}\n\nfunction safeParseJson(raw) {\n  if (!raw) return null;\n\n  if (typeof raw === 'object' && !Array.isArray(raw)) return raw;\n\n  const text = String(raw)\n    .replace(/^```(?:json)?\\s*/i, '')\n    .replace(/\\s*```$/i, '')\n    .trim();\n\n  const match = text.match(/\\{[\\s\\S]*\\}/);\n  const candidate = match ? match[0] : text;\n\n  try {\n    return JSON.parse(candidate);\n  } catch (e) {\n    return null;\n  }\n}\n\nfunction defaultCompetitorIntel(reason) {\n  return {\n    dominant_h2_patterns: [],\n    common_subtopics: [],\n    content_approach_distribution: {\n      technical: 0,\n      'beginner-friendly': 0,\n      'practical-examples': 0,\n      'sales-oriented': 0,\n      mixed: 0,\n      other: 0,\n    },\n    article_types_distribution: {\n      guide: 0,\n      'how-to': 0,\n      listicle: 0,\n      comparison: 0,\n      explainer: 0,\n      'service-page': 0,\n      'landing-page': 0,\n      'case-study': 0,\n      other: 0,\n    },\n    avg_word_count: 0,\n    recommended_length: '',\n    proof_patterns: {\n      use_statistics: false,\n      use_expert_quotes: false,\n      use_case_studies: false,\n      use_named_tools: false,\n      use_step_by_step: false,\n    },\n    coverage_gaps: [],\n    recurring_faq_questions: [],\n    unique_angle_opportunity: '',\n    confidence: 'low',\n    confidence_note: reason || 'No reliable competitor intelligence returned.',\n  };\n}\n\nconst content =\n  response?.choices?.[0]?.message?.content ||\n  response?.output ||\n  response?.text ||\n  '';\n\nconst parsed = safeParseJson(content);\n\nconst rawIntel =\n  parsed?.competitor_intelligence ||\n  parsed?.competitorIntelligence ||\n  parsed ||\n  null;\n\nlet competitorIntel = rawIntel && typeof rawIntel === 'object'\n  ? rawIntel\n  : defaultCompetitorIntel('Could not parse Perplexity competitor research JSON.');\n\ncompetitorIntel = {\n  dominant_h2_patterns: safeArray(competitorIntel.dominant_h2_patterns),\n  common_subtopics: safeArray(competitorIntel.common_subtopics),\n  content_approach_distribution: competitorIntel.content_approach_distribution || {},\n  article_types_distribution: competitorIntel.article_types_distribution || {},\n  avg_word_count: Number(competitorIntel.avg_word_count || 0),\n  recommended_length: clean(competitorIntel.recommended_length),\n  proof_patterns: competitorIntel.proof_patterns || {},\n  coverage_gaps: safeArray(competitorIntel.coverage_gaps),\n  recurring_faq_questions: safeArray(competitorIntel.recurring_faq_questions),\n  unique_angle_opportunity: clean(competitorIntel.unique_angle_opportunity),\n  confidence: clean(competitorIntel.confidence || 'low'),\n  confidence_note: clean(competitorIntel.confidence_note),\n};\n\nreturn [\n  {\n    json: {\n      ...originalRow,\n      competitor_intelligence: competitorIntel,\n    },\n  },\n];"
+        "jsCode": "// Parse Competitor SERP Research\n// Mode: Run Once for Each Item (one keyword per loop iteration)\n//\n// Purpose:\n// - Parse the Perplexity competitor research response.\n// - Return original row + competitor_intelligence.\n// - If parsing fails, return safe low-confidence competitor_intelligence.\n\nconst response = $input.first().json || {};\n\n// One item per loop iteration, so .first() is the matching row.\n// Do NOT use .item here: paired-item tracing across SplitInBatches\n// iterations gets slower every loop and eventually hangs the node.\nlet originalRow = {};\ntry {\n  originalRow = $('Competitor SERP Research').first().json || {};\n} catch (e) {\n  originalRow = {};\n}\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nfunction safeArray(value) {\n  return Array.isArray(value) ? value : [];\n}\n\nfunction safeParseJson(raw) {\n  if (!raw) return null;\n\n  if (typeof raw === 'object' && !Array.isArray(raw)) return raw;\n\n  const text = String(raw)\n    .replace(/^```(?:json)?\\s*/i, '')\n    .replace(/\\s*```$/i, '')\n    .trim();\n\n  const match = text.match(/\\{[\\s\\S]*\\}/);\n  const candidate = match ? match[0] : text;\n\n  try {\n    return JSON.parse(candidate);\n  } catch (e) {\n    return null;\n  }\n}\n\nfunction defaultCompetitorIntel(reason) {\n  return {\n    dominant_h2_patterns: [],\n    common_subtopics: [],\n    content_approach_distribution: {\n      technical: 0,\n      'beginner-friendly': 0,\n      'practical-examples': 0,\n      'sales-oriented': 0,\n      mixed: 0,\n      other: 0,\n    },\n    article_types_distribution: {\n      guide: 0,\n      'how-to': 0,\n      listicle: 0,\n      comparison: 0,\n      explainer: 0,\n      'service-page': 0,\n      'landing-page': 0,\n      'case-study': 0,\n      other: 0,\n    },\n    avg_word_count: 0,\n    recommended_length: '',\n    proof_patterns: {\n      use_statistics: false,\n      use_expert_quotes: false,\n      use_case_studies: false,\n      use_named_tools: false,\n      use_step_by_step: false,\n    },\n    coverage_gaps: [],\n    recurring_faq_questions: [],\n    unique_angle_opportunity: '',\n    confidence: 'low',\n    confidence_note: reason || 'No reliable competitor intelligence returned.',\n  };\n}\n\nconst content =\n  response?.choices?.[0]?.message?.content ||\n  response?.output ||\n  response?.text ||\n  '';\n\nconst parsed = safeParseJson(content);\n\nconst rawIntel =\n  parsed?.competitor_intelligence ||\n  parsed?.competitorIntelligence ||\n  parsed ||\n  null;\n\nlet competitorIntel = rawIntel && typeof rawIntel === 'object'\n  ? rawIntel\n  : defaultCompetitorIntel('Could not parse Perplexity competitor research JSON.');\n\ncompetitorIntel = {\n  dominant_h2_patterns: safeArray(competitorIntel.dominant_h2_patterns),\n  common_subtopics: safeArray(competitorIntel.common_subtopics),\n  content_approach_distribution: competitorIntel.content_approach_distribution || {},\n  article_types_distribution: competitorIntel.article_types_distribution || {},\n  avg_word_count: Number(competitorIntel.avg_word_count || 0),\n  recommended_length: clean(competitorIntel.recommended_length),\n  proof_patterns: competitorIntel.proof_patterns || {},\n  coverage_gaps: safeArray(competitorIntel.coverage_gaps),\n  recurring_faq_questions: safeArray(competitorIntel.recurring_faq_questions),\n  unique_angle_opportunity: clean(competitorIntel.unique_angle_opportunity),\n  confidence: clean(competitorIntel.confidence || 'low'),\n  confidence_note: clean(competitorIntel.confidence_note),\n};\n\nreturn [\n  {\n    json: {\n      ...originalRow,\n      competitor_intelligence: competitorIntel,\n    },\n  },\n];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -645,7 +645,7 @@
         -1888,
         -3168
       ],
-      "id": "c08e9ade-ed4d-4118-939a-0cc143e878de",
+      "id": "6a4a1a68-d686-4fde-ae57-e8a3de904db2",
       "name": "Parse Competitor SERP Research"
     },
     {
@@ -659,7 +659,7 @@
         -1728,
         -3168
       ],
-      "id": "08f0d63a-c635-4018-8806-c6a409e0ef29",
+      "id": "cc49ac4e-13e9-417c-957d-3447ec91ee55",
       "name": "Memory Reader"
     },
     {
@@ -673,7 +673,7 @@
         -1568,
         -3168
       ],
-      "id": "32634922-372b-44b3-868b-13f7b9ce940b",
+      "id": "a447c545-34fe-4691-b32c-299b7f69bbe5",
       "name": "Prepare Research Agent Input"
     },
     {
@@ -691,7 +691,7 @@
         -1360,
         -3168
       ],
-      "id": "22f70e05-e34a-4376-9bb6-44024a796ce3",
+      "id": "57801544-ca02-47c2-9423-781b90123b9e",
       "name": "Research & Plan Agent",
       "retryOnFail": true,
       "maxTries": 3,
@@ -716,7 +716,7 @@
         -1456,
         -2976
       ],
-      "id": "506a080b-3845-48e9-bd43-9d334e031520",
+      "id": "e82fd0a2-5897-45cb-a8e4-3963f1aaff6f",
       "name": "Research Agent Model",
       "credentials": {
         "openAiApi": {
@@ -743,7 +743,7 @@
         -1296,
         -2976
       ],
-      "id": "19922b93-ed1a-4821-9a85-593185807e99",
+      "id": "ff582315-6ed9-4696-866e-6fb589747121",
       "name": "tavily_research"
     },
     {
@@ -756,7 +756,7 @@
         -1136,
         -2976
       ],
-      "id": "d16ed016-6287-4cc8-b729-bd5b1a4a42ba",
+      "id": "0a6bd118-e4a7-4d60-a986-daa317e5add7",
       "name": "Research Row Structure",
       "retryOnFail": true,
       "maxTries": 5
@@ -764,7 +764,7 @@
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "// Parse Research Agent Output\n// Type: Code node\n// Mode: Run Once for Each Item\n//\n// - Reads the structured agent output (7 final fields).\n// - Restores locked keyword fields from Prepare Research Agent Input\n//   (the agent is never trusted with them).\n// - Derives a Unicode-safe Blog Slug from the locked keyword, since the\n//   downstream audit, sheet, and callback still require a slug.\n// - Emits the row shape expected by build_audit_dataset and the\n//   handoff package.\n\nconst aiResponse = $json || {};\n\nlet originalData = {};\ntry {\n  originalData = $('Prepare Research Agent Input').item.json || {};\n} catch (e) {\n  // Inside the keyword loop there is exactly one item per iteration,\n  // so the first item is always the matching row.\n  try {\n    originalData = $('Prepare Research Agent Input').first().json || {};\n  } catch (e2) {\n    originalData = {};\n  }\n}\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nfunction firstNonEmpty(...values) {\n  for (const value of values) {\n    const s = clean(value);\n    if (s) return s;\n  }\n  return null;\n}\n\nfunction slugify(value) {\n  return clean(value)\n    .toLowerCase()\n    .normalize('NFC')\n    .replace(/&/g, ' and ')\n    .replace(/[^\\p{L}\\p{N}\\s-]/gu, '')\n    .replace(/\\s+/g, '-')\n    .replace(/-+/g, '-')\n    .replace(/^-|-$/g, '');\n}\n\nfunction extractJson(raw) {\n  if (raw && typeof raw === 'object' && !Array.isArray(raw)) {\n    if (raw.output) return extractJson(raw.output);\n    return raw;\n  }\n\n  const text = String(raw ?? '')\n    .replace(/^```(?:json)?\\s*/i, '')\n    .replace(/\\s*```$/i, '')\n    .trim();\n\n  const match = text.match(/\\{[\\s\\S]*\\}/);\n  const candidate = match ? match[0] : text;\n\n  return JSON.parse(candidate);\n}\n\nlet aiParsed = {};\nlet parseFailed = false;\nconst aiText = aiResponse.output || aiResponse.text || aiResponse.result || JSON.stringify(aiResponse);\n\ntry {\n  aiParsed = extractJson(aiText);\n} catch (error) {\n  aiParsed = {};\n  parseFailed = true;\n}\n\nconst targetKeyword = clean(originalData.core_keyword);\nconst semantic1 = clean(originalData.semantic_1_keyword);\nconst semantic2 = clean(originalData.semantic_2_keyword);\n\nconst blogTitle = clean(aiParsed['Blog Post Title']) || targetKeyword;\nconst articleType = clean(aiParsed['Article Type']);\nconst contentBrief = clean(aiParsed['Content Brief']);\nconst ctaRule = clean(aiParsed['CTA Rule']);\nconst blogSlug = slugify(targetKeyword);\n\nconst contentPlanLanguage = firstNonEmpty(originalData.content_plan_language, 'English');\nconst contentPlanLanguageCode = firstNonEmpty(originalData.content_plan_language_code, originalData.serper_hl, 'en');\n\n// Keep the row lean: the agent payload and memory list are not needed\n// downstream of this point.\nconst { previous_rows, research_agent_input, _competitor_body, ...rowBase } = originalData;\n\nreturn {\n  json: {\n    ...rowBase,\n\n    'Target Keyword': targetKeyword,\n    'Semantic Keyword 1': semantic1,\n    'Semantic Keyword 2': semantic2,\n    'Blog Post Title': blogTitle,\n    'Blog Slug': blogSlug,\n    'Article Type': articleType,\n    'Content Brief': contentBrief,\n    'CTA Rule': ctaRule,\n\n    'Client': originalData.company_name || '',\n    'Cluster Name': originalData.cluster_label || '',\n    'Primary Intent': 'other',\n    'Stage': 'MoFu',\n\n    article_type: articleType,\n    cta_rule: ctaRule,\n    unique_angle: contentBrief,\n    slug_basis: blogSlug,\n\n    content_plan_language: contentPlanLanguage,\n    content_plan_language_code: contentPlanLanguageCode,\n\n    parse_debug: {\n      agent_output_parse_failed: parseFailed,\n      locked_keywords_restored_from_input: true,\n      slug_derived_from_locked_keyword: true,\n    },\n  },\n};"
+        "jsCode": "// Parse Research Agent Output\n// Type: Code node\n// Mode: Run Once for Each Item\n//\n// - Reads the structured agent output (7 final fields).\n// - Restores locked keyword fields from Prepare Research Agent Input\n//   (the agent is never trusted with them).\n// - Derives a Unicode-safe Blog Slug from the locked keyword, since the\n//   downstream audit, sheet, and callback still require a slug.\n// - Emits the row shape expected by build_audit_dataset and the\n//   handoff package.\n\nconst aiResponse = $json || {};\n\n// One item per loop iteration, so .first() is the matching row.\n// Do NOT use .item here: paired-item tracing across SplitInBatches\n// iterations gets slower every loop and eventually hangs the node.\nlet originalData = {};\ntry {\n  originalData = $('Prepare Research Agent Input').first().json || {};\n} catch (e) {\n  originalData = {};\n}\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nfunction firstNonEmpty(...values) {\n  for (const value of values) {\n    const s = clean(value);\n    if (s) return s;\n  }\n  return null;\n}\n\nfunction slugify(value) {\n  return clean(value)\n    .toLowerCase()\n    .normalize('NFC')\n    .replace(/&/g, ' and ')\n    .replace(/[^\\p{L}\\p{N}\\s-]/gu, '')\n    .replace(/\\s+/g, '-')\n    .replace(/-+/g, '-')\n    .replace(/^-|-$/g, '');\n}\n\nfunction extractJson(raw) {\n  if (raw && typeof raw === 'object' && !Array.isArray(raw)) {\n    if (raw.output) return extractJson(raw.output);\n    return raw;\n  }\n\n  const text = String(raw ?? '')\n    .replace(/^```(?:json)?\\s*/i, '')\n    .replace(/\\s*```$/i, '')\n    .trim();\n\n  const match = text.match(/\\{[\\s\\S]*\\}/);\n  const candidate = match ? match[0] : text;\n\n  return JSON.parse(candidate);\n}\n\nlet aiParsed = {};\nlet parseFailed = false;\nconst aiText = aiResponse.output || aiResponse.text || aiResponse.result || JSON.stringify(aiResponse);\n\ntry {\n  aiParsed = extractJson(aiText);\n} catch (error) {\n  aiParsed = {};\n  parseFailed = true;\n}\n\nconst targetKeyword = clean(originalData.core_keyword);\nconst semantic1 = clean(originalData.semantic_1_keyword);\nconst semantic2 = clean(originalData.semantic_2_keyword);\n\nconst blogTitle = clean(aiParsed['Blog Post Title']) || targetKeyword;\nconst articleType = clean(aiParsed['Article Type']);\nconst contentBrief = clean(aiParsed['Content Brief']);\nconst ctaRule = clean(aiParsed['CTA Rule']);\nconst blogSlug = slugify(targetKeyword);\n\nconst contentPlanLanguage = firstNonEmpty(originalData.content_plan_language, 'English');\nconst contentPlanLanguageCode = firstNonEmpty(originalData.content_plan_language_code, originalData.serper_hl, 'en');\n\n// Keep the row lean: the agent payload and memory list are not needed\n// downstream of this point.\nconst { previous_rows, research_agent_input, _competitor_body, ...rowBase } = originalData;\n\nreturn {\n  json: {\n    ...rowBase,\n\n    'Target Keyword': targetKeyword,\n    'Semantic Keyword 1': semantic1,\n    'Semantic Keyword 2': semantic2,\n    'Blog Post Title': blogTitle,\n    'Blog Slug': blogSlug,\n    'Article Type': articleType,\n    'Content Brief': contentBrief,\n    'CTA Rule': ctaRule,\n\n    'Client': originalData.company_name || '',\n    'Cluster Name': originalData.cluster_label || '',\n    'Primary Intent': 'other',\n    'Stage': 'MoFu',\n\n    article_type: articleType,\n    cta_rule: ctaRule,\n    unique_angle: contentBrief,\n    slug_basis: blogSlug,\n\n    content_plan_language: contentPlanLanguage,\n    content_plan_language_code: contentPlanLanguageCode,\n\n    parse_debug: {\n      agent_output_parse_failed: parseFailed,\n      locked_keywords_restored_from_input: true,\n      slug_derived_from_locked_keyword: true,\n    },\n  },\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -772,7 +772,7 @@
         -1072,
         -3168
       ],
-      "id": "838307b8-7b6e-4b6e-b2df-40033f6b21d2",
+      "id": "16153f27-0a43-4bb2-8c50-016b4ece96be",
       "name": "Parse Research Agent Output"
     },
     {
@@ -786,7 +786,7 @@
         -912,
         -3168
       ],
-      "id": "8a262e7d-def8-4e07-aa1b-2fee84714beb",
+      "id": "106407fb-29b8-41c3-9f88-985867a0fd72",
       "name": "Memory Recorder"
     },
     {
@@ -799,7 +799,7 @@
         -464,
         -3600
       ],
-      "id": "f7db4458-953f-4510-aa56-8dbcc1bf5dbb",
+      "id": "818ec31f-a591-48e6-bcf2-1d1a4e93610a",
       "name": "Audit Structure",
       "retryOnFail": true,
       "maxTries": 5
@@ -814,7 +814,7 @@
         432,
         -3456
       ],
-      "id": "e4841e15-c7bb-4b3d-b262-dbc5e30cf7ad",
+      "id": "ab171efd-b3f1-4482-a0ac-0090e9393e77",
       "name": "Rewrite Structure",
       "retryOnFail": true,
       "maxTries": 5
