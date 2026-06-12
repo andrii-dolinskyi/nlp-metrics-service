@@ -27,229 +27,6 @@
     },
     {
       "parameters": {
-        "jsCode": "// build_audit_dataset\n// Type: Code node\n// Mode: Run Once for All Items\n\nconst allItems = $input.all().map(item => item.json || {});\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nfunction firstNonEmpty(...values) {\n  for (const value of values) {\n    const s = clean(value);\n    if (s) return s;\n  }\n  return null;\n}\n\nconst first = allItems[0] || {};\n\nconst LANGUAGE = {\n  content_plan_language: firstNonEmpty(first.content_plan_language, 'English'),\n  content_plan_language_code: firstNonEmpty(first.content_plan_language_code, first.serper_hl, 'en'),\n  content_plan_language_key: firstNonEmpty(first.content_plan_language_key, first.content_plan_language, 'english'),\n  serper_hl: firstNonEmpty(first.serper_hl, first.content_plan_language_code, 'en'),\n};\n\nconst rowsWithIds = allItems.map((item, index) => ({\n  row_id: `row_${index + 1}`,\n  'Client': item['Client'] || '',\n  'Cluster Name': item['Cluster Name'] || '',\n  'Primary Intent': item['Primary Intent'] || '',\n  'Stage': item['Stage'] || '',\n  'Target Keyword': item['Target Keyword'] || '',\n  'Semantic Keyword 1': item['Semantic Keyword 1'] || '',\n  'Semantic Keyword 2': item['Semantic Keyword 2'] || '',\n  'Blog Post Title': item['Blog Post Title'] || '',\n  'Blog Slug': item['Blog Slug'] || '',\n  'Content Brief': item['Content Brief'] || '',\n  'Article Type': item['Article Type'] || '',\n  'CTA Rule': item['CTA Rule'] || '',\n\n  content_plan_language: item.content_plan_language || LANGUAGE.content_plan_language,\n  content_plan_language_code: item.content_plan_language_code || LANGUAGE.content_plan_language_code,\n  content_plan_language_key: item.content_plan_language_key || LANGUAGE.content_plan_language_key,\n  serper_hl: item.serper_hl || LANGUAGE.serper_hl,\n}));\n\nreturn [{\n  json: {\n    LANGUAGE,\n    CONTENT_PLAN_ROWS: rowsWithIds,\n    POLICY: {\n      keywords_locked: true,\n      title_must_be_natural: true,\n      title_must_match_content_plan_language: true,\n      slug_must_contain_target_keyword: true,\n      brief_must_be_specific: true,\n      brief_must_match_content_plan_language: true,\n      brief_must_use_semantics_naturally: true,\n      brief_must_be_short: true\n    },\n    CONSTRAINTS: {\n      max_rows: rowsWithIds.length,\n      max_rewrites: 20\n    }\n  }\n}];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -1008,
-        -3728
-      ],
-      "id": "9663947b-1c7f-47c4-8ab4-50e56db7e5a6",
-      "name": "build_audit_dataset"
-    },
-    {
-      "parameters": {
-        "jsCode": "// slim_for_evaluate\n// Type: Code node\n// Mode: Run Once for All Items\n//\n// Purpose:\n// - Build compact audit payload.\n// - Preserve full Content Brief exactly as generated.\n// - Do NOT artificially truncate, rewrite, normalize, shorten, or summarize final fields.\n// - Keep only the columns the audit agent needs.\n// - Preserve language metadata.\n\nconst data = $input.first().json || {};\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nfunction firstNonEmpty(...values) {\n  for (const value of values) {\n    const s = clean(value);\n    if (s) return s;\n  }\n  return null;\n}\n\nconst languageDefaults = {\n  content_plan_language:\n    firstNonEmpty(\n      data.LANGUAGE?.content_plan_language,\n      'English'\n    ),\n\n  content_plan_language_code:\n    firstNonEmpty(\n      data.LANGUAGE?.content_plan_language_code,\n      data.LANGUAGE?.serper_hl,\n      'en'\n    ),\n\n  content_plan_language_key:\n    firstNonEmpty(\n      data.LANGUAGE?.content_plan_language_key,\n      data.LANGUAGE?.content_plan_language,\n      'english'\n    ),\n\n  serper_hl:\n    firstNonEmpty(\n      data.LANGUAGE?.serper_hl,\n      data.LANGUAGE?.content_plan_language_code,\n      'en'\n    ),\n};\n\nconst slimRows = (data.CONTENT_PLAN_ROWS || []).map(row => ({\n  row_id: row.row_id,\n\n  'Cluster Name': clean(row['Cluster Name']),\n  'Primary Intent': clean(row['Primary Intent']),\n  'Stage': clean(row['Stage']),\n\n  'Target Keyword': clean(row['Target Keyword']),\n  'Semantic Keyword 1': clean(row['Semantic Keyword 1']),\n  'Semantic Keyword 2': clean(row['Semantic Keyword 2']),\n\n  'Blog Post Title': clean(row['Blog Post Title']),\n  'Blog Slug': clean(row['Blog Slug']),\n\n  // IMPORTANT:\n  // Full brief is preserved.\n  // No trimBrief(), no slice(), no max character limit.\n  'Content Brief': clean(row['Content Brief']),\n\n  content_plan_language:\n    row.content_plan_language ||\n    languageDefaults.content_plan_language,\n\n  content_plan_language_code:\n    row.content_plan_language_code ||\n    languageDefaults.content_plan_language_code,\n\n  content_plan_language_key:\n    row.content_plan_language_key ||\n    languageDefaults.content_plan_language_key,\n\n  serper_hl:\n    row.serper_hl ||\n    languageDefaults.serper_hl,\n}));\n\nreturn [{\n  json: {\n    LANGUAGE: data.LANGUAGE || languageDefaults,\n    CONTENT_PLAN_ROWS: slimRows,\n    POLICY: data.POLICY,\n    CONSTRAINTS: data.CONSTRAINTS,\n\n    debug: {\n      content_brief_truncated: false,\n      final_fields_modified: false,\n      audit_payload_compact_by_columns_only: true,\n    },\n  }\n}];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -816,
-        -3728
-      ],
-      "id": "ede2abb3-9a55-417f-82d4-65a1159ac571",
-      "name": "slim_for_evaluate"
-    },
-    {
-      "parameters": {
-        "promptType": "define",
-        "text": "=CONTENT_PLAN_LANGUAGE:\n{{ JSON.stringify($json.LANGUAGE) }}\n\nCONTENT_PLAN_ROWS:\n{{ JSON.stringify($json.CONTENT_PLAN_ROWS) }}\n\nPOLICY:\n{{ JSON.stringify($json.POLICY) }}\n\nCONSTRAINTS:\n{{ JSON.stringify($json.CONSTRAINTS) }}\n\nTASK:\nAudit the plan for duplicate or overlapping intent, duplicate or overlapping slugs, weak title differentiation, unnatural keyword insertion, wrong-language output, generic or insufficient content briefs, content briefs that are too long or too detailed for a content plan sheet, and rows that do not appear grounded in onboarding/company context.\n\nPay special attention to:\n- title naturalness in the selected content plan language\n- brief language matching the selected content plan language\n- generic repeated title shapes across sibling rows\n- slugs that are longer than necessary\n- slugs that use generic guide-style endings instead of a sharper angle\n- briefs that read like compressed outlines instead of concise editorial assignments\n\nReturn ONLY valid JSON matching the required schema.",
-        "options": {
-          "systemMessage": "<role>SEO Content Plan Auditor</role>\n\n<mission>\nAudit a content plan made of final rows.\n\nYou are evaluating quality only.\nYou are NOT rewriting the rows.\nYou are identifying where rewrite is needed.\n</mission>\n\n<language_rule>\nThe selected content plan language is CONTENT_PLAN_LANGUAGE.content_plan_language.\n\nEvaluate title and brief naturalness in that language.\nDo not penalize non-English grammar, word order, capitalization, accents, or local phrasing when it is natural in the selected language.\n\nFlag rows when:\n- Blog Post Title is clearly in the wrong language\n- Content Brief is clearly in the wrong language\n- the title mixes languages unnaturally\n- the brief mixes languages unnaturally\n- the slug destroys meaning in the target language\n\nDo not require English title style for non-English languages.\nDo not translate anything.\n</language_rule>\n\n<scope>\nEvaluate only:\n- Target Keyword\n- Semantic Keyword 1\n- Semantic Keyword 2\n- Blog Post Title\n- Blog Slug\n- Content Brief\nplus helper fields:\n- Cluster Name\n- Primary Intent\n- Stage\n- language metadata\n</scope>\n\n<non_negotiables>\n- No browsing\n- No invented facts\n- If POLICY.keywords_locked=true, Target Keyword and semantic keywords must stay unchanged\n- Focus on title/slug/brief quality, differentiation, overlap, and language fit\n- Return valid JSON only\n</non_negotiables>\n\n<audit_dimensions>\n1. exact duplicates\n2. near-duplicates\n3. intent cannibalization\n4. duplicate or overlapping slugs\n5. weak title differentiation\n6. unnatural keyword insertion in title\n7. wrong-language title or brief\n8. generic / vague / weak content brief\n9. semantic keywords not meaningfully reflected in brief\n10. brief too long for sheet use\n11. brief reads like an outline instead of a content-plan summary\n12. row not sufficiently grounded in likely onboarding/company-context relevance\n13. title has generic shape even if technically valid\n</audit_dimensions>\n\n<action_rules>\nKEEP = row is acceptable\nDIFFERENTIATE = row should stay, but title/slug/brief need stronger differentiation, language correction, or compression\nDROP = exact duplicate or clearly redundant row with no unique value\n\nDo not use MERGE_INTO.\nDo not rewrite full fields here.\nOnly provide compact fix directions.\n</action_rules>\n\n<fix_direction_rules>\nFor DIFFERENTIATE rows, provide:\n- title_direction\n- slug_direction\n- brief_direction\n\nThese are short directional instructions only.\nNot full rewrites.\n</fix_direction_rules>\n\n<how_to_judge_titles>\nFlag titles when they:\n- are in the wrong language\n- insert the keyword awkwardly\n- sound templated or generic\n- overlap too much with sibling rows\n- do not clearly express a distinct angle\n- read unnaturally in the selected content plan language\n</how_to_judge_titles>\n\n<how_to_judge_briefs>\nFlag briefs when they:\n- are in the wrong language\n- are generic enough to fit many companies\n- do not reflect offer / ICP / product reality\n- barely use the semantic keywords meaningfully\n- are too long for a sheet row\n- read like a mini-outline instead of a concise editorial instruction\n</how_to_judge_briefs>"
-        },
-        "hasOutputParser": true
-      },
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 3.1,
-      "position": [
-        -624,
-        -3728
-      ],
-      "id": "a366119a-a1cf-4158-b6c1-eace9e156b84",
-      "name": "evaluate_content_plan",
-      "retryOnFail": true,
-      "maxTries": 5,
-      "waitBetweenTries": 5000
-    },
-    {
-      "parameters": {
-        "model": {
-          "__rl": true,
-          "value": "gpt-5.4-mini",
-          "mode": "list",
-          "cachedResultName": "gpt-5.4-mini"
-        },
-        "responsesApiEnabled": false,
-        "options": {
-          "timeout": 300000
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-      "typeVersion": 1.3,
-      "position": [
-        -608,
-        -3600
-      ],
-      "id": "9a1200a5-fa36-4713-b694-b2a379b81242",
-      "name": "Auditor Model",
-      "credentials": {
-        "openAiApi": {
-          "id": "6UPkFuEKJN6lJbgb",
-          "name": "yehor-main-content-plan-api-key-only-for-content-plans"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "const originalData = $('build_audit_dataset').first().json.CONTENT_PLAN_ROWS;\n\nlet auditResult;\ntry {\n  const rawOutput = $input.first().json.output;\n  auditResult = typeof rawOutput === 'string' ? JSON.parse(rawOutput) : rawOutput;\n} catch (e) {\n  auditResult = { row_actions: [] };\n}\n\nconst actions = auditResult.row_actions || [];\nconst actionsMap = {};\nactions.forEach(act => {\n  actionsMap[act.row_id] = act;\n});\n\nconst finalRows = [];\n\nfor (const row of originalData) {\n  const action = actionsMap[row.row_id];\n\n  if (action && action.action === 'DROP') continue;\n\n  finalRows.push({\n    json: {\n      ...row,\n      'Audit Action': action?.action || 'KEEP',\n      'Audit Notes': Array.isArray(action?.notes) ? action.notes.join('; ') : '',\n      'Fix Title Direction': action?.fix_direction?.title_direction || '',\n      'Fix Slug Direction': action?.fix_direction?.slug_direction || '',\n      'Fix Brief Direction': action?.fix_direction?.brief_direction || '',\n    }\n  });\n}\n\nreturn finalRows;"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -320,
-        -3728
-      ],
-      "id": "094a3ab3-1087-4d42-83a2-d3006080d862",
-      "name": "Apply Auditor Changes"
-    },
-    {
-      "parameters": {
-        "jsCode": "const rows = $('Apply Auditor Changes').all().map(i => i.json || {});\n\nconst differentiateRows = rows.filter(\n  row => row['Audit Action'] === 'DIFFERENTIATE'\n);\n\nreturn [{\n  json: {\n    needs_rewrite: differentiateRows.length > 0,\n    total_rows: rows.length,\n    differentiate_count: differentiateRows.length\n  }\n}];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -208,
-        -3424
-      ],
-      "id": "ab4e3d8b-8f01-4edc-ac91-ebf09bd5e455",
-      "name": "Check Rewrite Needed"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "171f4d68-c239-41ce-8167-3473e70aacf8",
-              "leftValue": "={{ $json.needs_rewrite }}",
-              "rightValue": "",
-              "operator": {
-                "type": "boolean",
-                "operation": "true",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        -48,
-        -3424
-      ],
-      "id": "be3c1608-fbd7-4506-b002-0ced5bf2ee27",
-      "name": "Needs Rewrite"
-    },
-    {
-      "parameters": {
-        "jsCode": "const rows = $('Apply Auditor Changes').all().map(i => i.json || {});\n\nif (!rows.length) {\n  throw new Error('Pass Through: no rows found from Apply Auditor Changes.');\n}\n\nreturn rows.map(row => ({ json: row }));"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        144,
-        -3296
-      ],
-      "id": "f5a381f8-fd23-4b87-b922-ae6c7564117b",
-      "name": "Pass Through"
-    },
-    {
-      "parameters": {
-        "jsCode": "// Prepare Payload\n// Type: Code node\n// Mode: Run Once for All Items\n\nconst allItems = $('Apply Auditor Changes').all().map(i => i.json || {});\nconst auditDataset = $('build_audit_dataset').first().json || {};\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nconst LANGUAGE = auditDataset.LANGUAGE || {\n  content_plan_language: allItems[0]?.content_plan_language || 'English',\n  content_plan_language_code: allItems[0]?.content_plan_language_code || 'en',\n};\n\nconst rowsToProcess = allItems\n  .filter(r => r['Audit Action'] === 'DIFFERENTIATE')\n  .map(r => ({\n    'Row ID': r['Row ID'] || r.row_id,\n    'Cluster Name': r['Cluster Name'] || '',\n    'Primary Intent': r['Primary Intent'] || '',\n    'Stage': r['Stage'] || '',\n    'Target Keyword': r['Target Keyword'] || '',\n    'Semantic Keyword 1': r['Semantic Keyword 1'] || '',\n    'Semantic Keyword 2': r['Semantic Keyword 2'] || '',\n    'Blog Post Title': r['Blog Post Title'] || '',\n    'Blog Slug': r['Blog Slug'] || '',\n    'Content Brief': r['Content Brief'] || '',\n    'Fix Title Direction': r['Fix Title Direction'] || '',\n    'Fix Slug Direction': r['Fix Slug Direction'] || '',\n    'Fix Brief Direction': r['Fix Brief Direction'] || '',\n    content_plan_language: r.content_plan_language || LANGUAGE.content_plan_language,\n    content_plan_language_code: r.content_plan_language_code || LANGUAGE.content_plan_language_code,\n  }));\n\nconst fullPlanSlim = allItems.map(r => ({\n  'Row ID': r['Row ID'] || r.row_id,\n  'Audit Action': r['Audit Action'] || 'KEEP',\n  'Cluster Name': r['Cluster Name'] || '',\n  'Primary Intent': r['Primary Intent'] || '',\n  'Target Keyword': r['Target Keyword'] || '',\n  'Blog Post Title': r['Blog Post Title'] || '',\n  'Blog Slug': r['Blog Slug'] || '',\n}));\n\nreturn [{\n  json: {\n    LANGUAGE,\n    rows_to_process: rowsToProcess,\n    full_plan: fullPlanSlim\n  }\n}];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        112,
-        -3504
-      ],
-      "id": "c5caf4e0-a0b6-4f5e-91e8-a6b5cdc814bd",
-      "name": "Prepare Payload"
-    },
-    {
-      "parameters": {
-        "promptType": "define",
-        "text": "=CONTENT_PLAN_LANGUAGE:\n{{ JSON.stringify($json.LANGUAGE) }}\n\nROWS_TO_PROCESS:\n{{ JSON.stringify($json.rows_to_process) }}\n\nFULL_PLAN:\n{{ JSON.stringify($json.full_plan) }}\n\nTASK:\nRewrite ONLY DIFFERENTIATE rows so they become clearly distinct while keeping the locked keyword fields unchanged.\n\nReturn ONLY valid JSON matching the required schema.",
-        "options": {
-          "systemMessage": "<role>Senior SEO Content Differentiation Writer</role>\n\n<context>\nYou receive:\n- CONTENT_PLAN_LANGUAGE: selected language for the final content plan\n- ROWS_TO_PROCESS: only rows marked DIFFERENTIATE\n- FULL_PLAN: reference plan to avoid collisions\n</context>\n\n<language_rule>\nRewrite Blog Post Title and Content Brief in CONTENT_PLAN_LANGUAGE.content_plan_language.\n\nKeep JSON keys exactly as specified in English.\n\nDo not translate, rewrite, shorten, pluralize, singularize, normalize, or edit:\n- Target Keyword\n- Semantic Keyword 1\n- Semantic Keyword 2\n\nDo not awkwardly translate brand names, product names, acronyms, URLs, or technical terms.\nBlog Slug should be natural for the selected language and may preserve Unicode characters.\n</language_rule>\n\n<mission>\nYour job is surgical differentiation and compression.\n\nYou are not expanding the row.\nYou are not writing an outline.\nYou are not creating a long strategy memo.\n\nYou are rewriting only enough to:\n- make the row distinct\n- improve title naturalness\n- fix language mismatch if present\n- tighten the slug\n- compress the brief into a clean content-plan summary\n</mission>\n\n<non_negotiables>\n- Target Keyword must remain unchanged\n- Semantic Keyword 1 must remain unchanged\n- Semantic Keyword 2 must remain unchanged\n- Rewrite only:\n  - Blog Post Title\n  - Blog Slug\n  - Content Brief\n- The title must include the target keyword phrase naturally\n- You may adjust capitalization for natural grammar or title case, but do not change the keyword wording or word order\n- The slug must contain the target keyword basis\n- The brief must remain specific and editor-ready\n- The brief must remain 1–2 sentences only\n- The brief must remain under 60 words\n- No bullets\n- No numbered sections\n- No mini-outline\n- No section-by-section instructions\n- Return valid JSON only\n</non_negotiables>\n\n<title_naturalness_rules>\nA strong rewritten title must:\n- sound like a real article title written by a human editor in the selected language\n- read naturally when spoken aloud\n- avoid awkward literal insertion of the keyword\n- avoid stacked nouns and clunky phrasing\n- avoid repetitive templates when sibling rows use the same structure\n- avoid over-explaining the scope\n- prefer one sharp angle over two or three competing angles\n- stay concise where possible\n</title_naturalness_rules>\n\n<slug_rules>\n- Slug must be shorter and cleaner than the original when possible\n- Slug must contain the target keyword basis\n- Prefer 3–6 tokens after normalization when possible\n- Unicode characters are allowed when natural for the language\n- Avoid generic endings like:\n  - guide\n  - complete-guide\n  - ultimate-guide\nunless truly necessary\n- Avoid long chained modifiers\n- Avoid repeating the same semantic idea twice\n</slug_rules>\n\n<brief_rules>\nA strong rewritten brief must:\n- stay short\n- be in the selected content plan language\n- sound like a sharp editorial assignment\n- preserve business relevance and onboarding context\n- preserve the differentiated angle\n- mention the semantic support role naturally\n- avoid trying to cover every subtopic\n- avoid reading like a compressed outline\n- avoid consultant-style fluff\n- focus on one clear buyer/problem/outcome frame\n</brief_rules>\n\n<priority_order>\nWhen tradeoffs happen, prioritize:\n1. correct selected language\n2. title naturalness\n3. row differentiation\n4. brief compression\n5. slug cleanliness\n6. preserving secondary nuance\n</priority_order>"
-        },
-        "hasOutputParser": true
-      },
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 3.1,
-      "position": [
-        288,
-        -3632
-      ],
-      "id": "a49a02b6-aa3c-4171-9a5f-010a5b92f9b5",
-      "name": "rewrite_plan",
-      "retryOnFail": true,
-      "maxTries": 5,
-      "waitBetweenTries": 5000
-    },
-    {
-      "parameters": {
-        "model": {
-          "__rl": true,
-          "value": "gpt-5.4",
-          "mode": "list",
-          "cachedResultName": "gpt-5.4"
-        },
-        "responsesApiEnabled": false,
-        "options": {
-          "timeout": 300000
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-      "typeVersion": 1.3,
-      "position": [
-        288,
-        -3456
-      ],
-      "id": "2d74bef9-60b1-44a9-ac7a-3a03dcf01757",
-      "name": "Rewrite Model",
-      "credentials": {
-        "openAiApi": {
-          "id": "6UPkFuEKJN6lJbgb",
-          "name": "yehor-main-content-plan-api-key-only-for-content-plans"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "const originalItems = $('Apply Auditor Changes').all();\nconst originalMap = {};\n\noriginalItems.forEach(item => {\n  const id = item.json['Row ID'] || item.json.row_id;\n  if (id) originalMap[id] = item.json;\n});\n\nconst raw = $input.first().json.output;\nlet agentResult;\n\ntry {\n  agentResult = typeof raw === 'string' ? JSON.parse(raw) : raw;\n} catch (e) {\n  const match = String(raw).match(/\\{[\\s\\S]*\\}/);\n  if (match) {\n    agentResult = JSON.parse(match[0]);\n  } else {\n    throw new Error('No valid JSON in rewrite_plan output.');\n  }\n}\n\nconst patches = agentResult.patches || [];\nconst patchMap = {};\npatches.forEach(p => {\n  patchMap[p.row_id] = p;\n});\n\nconst result = [];\n\nfor (const item of originalItems) {\n  const row = { ...item.json };\n  const rowId = row['Row ID'] || row.row_id;\n  const action = row['Audit Action'];\n  const patch = patchMap[rowId];\n\n  if (action === 'DIFFERENTIATE' && patch) {\n    if (patch['Blog Post Title']) row['Blog Post Title'] = patch['Blog Post Title'];\n    if (patch['Blog Slug']) row['Blog Slug'] = patch['Blog Slug'];\n    if (patch['Content Brief']) row['Content Brief'] = patch['Content Brief'];\n\n    row['Audit Action'] = 'KEEP';\n    row['_rewrite_applied'] = true;\n  }\n\n  result.push({ json: row });\n}\n\nreturn result;"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        544,
-        -3728
-      ],
-      "id": "8b1b7380-0804-416c-942d-4609b31be8da",
-      "name": "Apply Rewrites"
-    },
-    {
-      "parameters": {
         "jsCode": "// Filter Output Fields\n// Type: Code node\n// Mode: Run Once for All Items\n//\n// Purpose:\n// - Keep final 6 visible content plan fields.\n// - Preserve hidden metadata for callback / downstream package.\n// - Preserve language metadata.\n// - Do not add extra visible Google Sheet columns downstream.\n\nconst items = $input.all();\n\nfunction firstJson(nodeName) {\n  try {\n    return $(nodeName).first().json || {};\n  } catch (e) {\n    return {};\n  }\n}\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nfunction firstNonEmpty(...values) {\n  for (const value of values) {\n    const s = clean(value);\n    if (s) return s;\n  }\n  return null;\n}\n\nconst trigger = firstJson('When Executed by Another Workflow');\nconst normalizeWriter = firstJson('Normalize Writer Input');\n\nconst callbackUrl = firstNonEmpty(trigger.callback_url, normalizeWriter.callback_url);\nconst taskId = firstNonEmpty(trigger.taskId, normalizeWriter.taskId);\nconst brandId = firstNonEmpty(trigger.brandId, normalizeWriter.brandId);\nconst userId = firstNonEmpty(trigger.userId, normalizeWriter.userId);\n\nconst clientName =\n  firstNonEmpty(\n    trigger.client_name,\n    trigger.company_name,\n    normalizeWriter.client_name,\n    normalizeWriter.company_name\n  );\n\nconst spreadsheetId =\n  firstNonEmpty(\n    trigger.spreadsheet_id,\n    trigger.spreadsheetId,\n    normalizeWriter.spreadsheet_id\n  );\n\nconst spreadsheetUrl =\n  firstNonEmpty(\n    trigger.spreadsheet_url,\n    normalizeWriter.spreadsheet_url,\n    spreadsheetId ? `https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit` : ''\n  );\n\nconst languageDefaults = {\n  content_plan_language: firstNonEmpty(trigger.content_plan_language, normalizeWriter.content_plan_language, 'English'),\n  content_plan_language_code: firstNonEmpty(trigger.content_plan_language_code, normalizeWriter.content_plan_language_code, trigger.serper_hl, normalizeWriter.serper_hl, 'en'),\n  content_plan_language_key: firstNonEmpty(trigger.content_plan_language_key, normalizeWriter.content_plan_language_key, 'english'),\n  google_ads_language: firstNonEmpty(trigger.google_ads_language, normalizeWriter.google_ads_language, trigger.language, normalizeWriter.language, 'languageConstants/1000'),\n  google_ads_language_id: firstNonEmpty(trigger.google_ads_language_id, normalizeWriter.google_ads_language_id, '1000'),\n  google_ads_language_code: firstNonEmpty(trigger.google_ads_language_code, normalizeWriter.google_ads_language_code, trigger.content_plan_language_code, normalizeWriter.content_plan_language_code, 'en'),\n  planner_language_scope: firstNonEmpty(trigger.planner_language_scope, normalizeWriter.planner_language_scope, trigger.content_plan_language_code, normalizeWriter.content_plan_language_code, 'en'),\n  serper_hl: firstNonEmpty(trigger.serper_hl, normalizeWriter.serper_hl, trigger.content_plan_language_code, normalizeWriter.content_plan_language_code, 'en'),\n  serper_gl: firstNonEmpty(trigger.serper_gl, normalizeWriter.serper_gl),\n};\n\nreturn items.map(item => {\n  const d = item.json || {};\n\n  return {\n    json: {\n      'Target Keyword': clean(d['Target Keyword']),\n      'Semantic Keyword 1': clean(d['Semantic Keyword 1']),\n      'Semantic Keyword 2': clean(d['Semantic Keyword 2']),\n      'Blog Post Title': clean(d['Blog Post Title']),\n      'Blog Slug': clean(d['Blog Slug']),\n      'Content Brief': clean(d['Content Brief']),\n\n      article_type: clean(d['Article Type'] || d.article_type),\n      cta_rule: clean(d['CTA Rule'] || d.cta_rule),\n\n      callback_url: callbackUrl,\n      taskId,\n      brandId,\n      userId,\n      client_name: clientName,\n      spreadsheet_id: spreadsheetId,\n      spreadsheet_url: spreadsheetUrl,\n\n      content_plan_language: d.content_plan_language || languageDefaults.content_plan_language,\n      content_plan_language_code: d.content_plan_language_code || languageDefaults.content_plan_language_code,\n      content_plan_language_key: d.content_plan_language_key || languageDefaults.content_plan_language_key,\n      google_ads_language: d.google_ads_language || languageDefaults.google_ads_language,\n      google_ads_language_id: d.google_ads_language_id || languageDefaults.google_ads_language_id,\n      google_ads_language_code: d.google_ads_language_code || languageDefaults.google_ads_language_code,\n      planner_language_scope: d.planner_language_scope || languageDefaults.planner_language_scope,\n      serper_hl: d.serper_hl || languageDefaults.serper_hl,\n      serper_gl: d.serper_gl || languageDefaults.serper_gl,\n      language: d.language || d.google_ads_language || languageDefaults.google_ads_language,\n    },\n  };\n});"
       },
       "type": "n8n-nodes-base.code",
@@ -535,7 +312,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Build AI Content Plan Handoff Package\n// Type: Code node\n// Mode: Run Once for All Items\n//\n// Purpose:\n// - Collect the full content-plan writer workflow output.\n// - Preserve sheet/table info, final SEO content plan rows, keyword metadata,\n//   cluster labels, metrics, audit/rewrite data, callback IDs, language metadata,\n//   and ClickUp result.\n// - Send one complete package into the next workflow: Ai-content-plan.\n// - Google Sheet SEO content plan stays 6 visible columns.\n// - AI workflow payload preserves metadata for downstream AI content planning.\n// - Universal for any business type, industry, and content plan language.\n//\n// Important fix:\n// - Selected keyword metadata MUST come from the final selected keyword rows,\n//   preferably the \"Final Selected Keywords\" node.\n// - Do NOT use \"Normalize Writer Input\" as the primary keyword metadata source.\n//   That node can contain only workflow/input metadata and may not contain selected keywords.\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nfunction cleanOrNull(value) {\n  const s = clean(value);\n  return s || null;\n}\n\nfunction arr(value) {\n  return Array.isArray(value) ? value : [];\n}\n\nfunction take(value, limit) {\n  return arr(value).slice(0, limit);\n}\n\nfunction num(value, fallback = null) {\n  if (value === null || value === undefined || value === '') return fallback;\n  const n = Number(value);\n  return Number.isFinite(n) ? n : fallback;\n}\n\nfunction normalizeKey(value) {\n  return clean(value).normalize('NFC').toLowerCase();\n}\n\nfunction uniq(values) {\n  const seen = new Set();\n  const out = [];\n\n  for (const value of arr(values)) {\n    const s = clean(value);\n    if (!s) continue;\n\n    const key = s.normalize('NFC').toLowerCase();\n    if (seen.has(key)) continue;\n\n    seen.add(key);\n    out.push(s);\n  }\n\n  return out;\n}\n\nfunction firstNonEmpty(...values) {\n  for (const value of values) {\n    const s = clean(value);\n    if (s) return s;\n  }\n  return null;\n}\n\nfunction compactText(value, maxChars = 2500) {\n  const s = clean(value);\n  if (!s) return '';\n  return s.length > maxChars ? s.slice(0, maxChars) : s;\n}\n\nfunction firstJson(nodeName) {\n  try {\n    return $(nodeName).first().json || {};\n  } catch (e) {\n    return {};\n  }\n}\n\nfunction allJson(nodeName) {\n  try {\n    return $(nodeName).all().map(i => i.json || {});\n  } catch (e) {\n    return [];\n  }\n}\n\nfunction safeParseJson(raw, fallback = null) {\n  if (!raw) return fallback;\n  if (typeof raw === 'object' && !Array.isArray(raw)) return raw;\n\n  const text = String(raw)\n    .replace(/^```(?:json)?\\s*/i, '')\n    .replace(/\\s*```$/i, '')\n    .trim();\n\n  const match = text.match(/\\{[\\s\\S]*\\}/);\n  const candidate = match ? match[0] : text;\n\n  try {\n    return JSON.parse(candidate);\n  } catch (e) {\n    return fallback;\n  }\n}\n\nfunction getAgentJson(nodeName) {\n  const row = firstJson(nodeName);\n  return safeParseJson(row.output || row.text || row.result || row, {});\n}\n\nfunction rowHasKeyword(row) {\n  if (!row || typeof row !== 'object') return false;\n\n  const meta = row.keyword_metadata || {};\n\n  return Boolean(\n    clean(\n      row.core_keyword ||\n      row.keyword ||\n      row['Target Keyword'] ||\n      row.target_keyword ||\n      meta.keyword\n    )\n  );\n}\n\nfunction firstKeywordRowsSource(candidates) {\n  for (const candidate of candidates) {\n    const rows = arr(candidate.rows).filter(rowHasKeyword);\n\n    if (rows.length) {\n      return {\n        source: candidate.source,\n        rows,\n      };\n    }\n  }\n\n  return {\n    source: 'none',\n    rows: [],\n  };\n}\n\nfunction compactCompanyContext(ctx) {\n  if (!ctx || typeof ctx !== 'object') return null;\n\n  const company = ctx.company || {};\n  const seo = ctx.seo_context || {};\n  const positioning = ctx.positioning || {};\n  const guardrails = ctx.guardrails || {};\n  const missing = ctx.missing_or_unclear || {};\n\n  return {\n    company: {\n      name: cleanOrNull(company.name),\n      site_url: cleanOrNull(company.site_url),\n      business_summary: compactText(company.business_summary, 1600),\n      primary_offers: take(company.primary_offers, 12).map(clean).filter(Boolean),\n      strategic_focus: take(company.strategic_focus, 10).map(clean).filter(Boolean),\n    },\n\n    seo_context: {\n      explicit_keywords: take(seo.explicit_keywords, 30).map(clean).filter(Boolean),\n      topic_themes: take(seo.topic_themes, 30).map(clean).filter(Boolean),\n      best_fit_intents: take(seo.best_fit_intents, 16).map(clean).filter(Boolean),\n      industry_modifiers: take(seo.industry_modifiers, 16).map(clean).filter(Boolean),\n      geo_modifiers: take(seo.geo_modifiers, 16).map(clean).filter(Boolean),\n      commercial_modifiers: take(seo.commercial_modifiers, 16).map(clean).filter(Boolean),\n      audience_modifiers: take(seo.audience_modifiers, 16).map(clean).filter(Boolean),\n      page_types_to_create: take(seo.page_types_to_create, 16).map(clean).filter(Boolean),\n      programmatic_assets: take(seo.programmatic_assets, 16).map(clean).filter(Boolean),\n      competitor_or_alternative_terms: take(seo.competitor_or_alternative_terms, 12).map(clean).filter(Boolean),\n    },\n\n    positioning: {\n      core_narrative: take(positioning.core_narrative, 8).map(clean).filter(Boolean),\n      value_props: take(positioning.value_props, 12).map(clean).filter(Boolean),\n      messages_hooks: take(positioning.messages_hooks, 12).map(clean).filter(Boolean),\n      differentiators: take(positioning.differentiators, 12).map(clean).filter(Boolean),\n      comparison_safe_framing: take(positioning.comparison_safe_framing, 8).map(clean).filter(Boolean),\n    },\n\n    icp_segments_summary: take(ctx.icp_segments_summary, 8),\n    offer_keyword_map: take(ctx.offer_keyword_map, 10),\n    icp_keyword_map: take(ctx.icp_keyword_map, 10),\n\n    guardrails: {\n      tone_of_voice: take(guardrails.tone_of_voice, 8).map(clean).filter(Boolean),\n      source_preferences: take(guardrails.source_preferences, 8).map(clean).filter(Boolean),\n      compliance_restrictions: take(guardrails.compliance_restrictions, 12).map(clean).filter(Boolean),\n      topics_to_avoid: take(guardrails.topics_to_avoid, 12).map(clean).filter(Boolean),\n      claims_to_qualify_or_avoid: take(guardrails.claims_to_qualify_or_avoid, 12).map(clean).filter(Boolean),\n      keyword_compliance_filters: take(guardrails.keyword_compliance_filters, 12).map(clean).filter(Boolean),\n      deprioritize_keyword_themes: take(guardrails.deprioritize_keyword_themes, 12).map(clean).filter(Boolean),\n      competitor_keyword_policy: cleanOrNull(guardrails.competitor_keyword_policy),\n      competitor_mention_rules: take(guardrails.competitor_mention_rules, 8).map(clean).filter(Boolean),\n    },\n\n    missing_or_unclear: {\n      missing: take(missing.missing, 10).map(clean).filter(Boolean),\n      unclear: take(missing.unclear, 10).map(clean).filter(Boolean),\n      downstream_risks: take(missing.downstream_risks, 10).map(clean).filter(Boolean),\n    },\n  };\n}\n\nfunction getLanguageInfo(...sources) {\n  const contentPlanLanguage =\n    firstNonEmpty(\n      ...sources.map(s => s?.content_plan_language),\n      ...sources.map(s => s?.language?.content_plan_language),\n      ...sources.map(s => s?.['Content Plan Language']),\n      'English'\n    );\n\n  const contentPlanLanguageCode =\n    firstNonEmpty(\n      ...sources.map(s => s?.content_plan_language_code),\n      ...sources.map(s => s?.language?.content_plan_language_code),\n      ...sources.map(s => s?.planner_language_scope),\n      ...sources.map(s => s?.language?.planner_language_scope),\n      ...sources.map(s => s?.serper_hl),\n      ...sources.map(s => s?.language?.serper_hl),\n      'en'\n    );\n\n  const googleAdsLanguage =\n    firstNonEmpty(\n      ...sources.map(s => s?.google_ads_language),\n      ...sources.map(s => s?.language?.google_ads_language),\n      ...sources.map(s => s?.language),\n      'languageConstants/1000'\n    );\n\n  return {\n    content_plan_language: contentPlanLanguage,\n    content_plan_language_code: contentPlanLanguageCode,\n    content_plan_language_key:\n      firstNonEmpty(\n        ...sources.map(s => s?.content_plan_language_key),\n        ...sources.map(s => s?.language?.content_plan_language_key),\n        contentPlanLanguage.toLowerCase()\n      ),\n\n    google_ads_language: googleAdsLanguage,\n    google_ads_language_id:\n      firstNonEmpty(\n        ...sources.map(s => s?.google_ads_language_id),\n        ...sources.map(s => s?.language?.google_ads_language_id),\n        googleAdsLanguage.replace(/^languageConstants\\//, ''),\n        '1000'\n      ),\n\n    google_ads_language_code:\n      firstNonEmpty(\n        ...sources.map(s => s?.google_ads_language_code),\n        ...sources.map(s => s?.language?.google_ads_language_code),\n        contentPlanLanguageCode\n      ),\n\n    planner_language_scope:\n      firstNonEmpty(\n        ...sources.map(s => s?.planner_language_scope),\n        ...sources.map(s => s?.language?.planner_language_scope),\n        contentPlanLanguageCode\n      ),\n\n    serper_hl:\n      firstNonEmpty(\n        ...sources.map(s => s?.serper_hl),\n        ...sources.map(s => s?.language?.serper_hl),\n        contentPlanLanguageCode\n      ),\n\n    serper_gl:\n      firstNonEmpty(\n        ...sources.map(s => s?.serper_gl),\n        ...sources.map(s => s?.language?.serper_gl)\n      ),\n\n    language: googleAdsLanguage,\n  };\n}\n\nfunction compactKeywordInput(row) {\n  const meta = row.keyword_metadata || {};\n  const languageInfo = getLanguageInfo(row, meta);\n\n  const keyword = cleanOrNull(\n    row.core_keyword ||\n    row.keyword ||\n    row['Target Keyword'] ||\n    row.target_keyword ||\n    meta.keyword\n  );\n\n  const clusterLabel = cleanOrNull(\n    row.cluster_label ||\n    row.cluster_name ||\n    row['Cluster Name'] ||\n    row.cluster ||\n    meta.cluster_label ||\n    'Unclustered'\n  );\n\n  return {\n    execution_id: cleanOrNull(row.execution_id),\n\n    keyword,\n    core_keyword: keyword,\n    cluster_label: clusterLabel,\n\n    search_volume: num(row.core_search_volume ?? row.search_volume ?? meta.search_volume),\n    competition: cleanOrNull(row.core_competition ?? row.competition ?? meta.competition),\n    competition_index: num(row.core_competition_index ?? row.competition_index ?? meta.competition_index),\n    yoy_6_v6: num(row.core_yoy_6_v6 ?? row.yoy_6_v6 ?? meta.yoy_6_v6),\n    strategy_name: cleanOrNull(row.strategy_name || row.core_strategy_name || meta.strategy_name),\n    strategy_names: arr(row.strategy_names || row.core_strategy_names || meta.strategy_names),\n\n    semantic_1_keyword: cleanOrNull(\n      row.semantic_1_keyword ||\n      row.semantic_1 ||\n      row['Semantic Keyword 1'] ||\n      meta.semantic_1_keyword\n    ),\n\n    semantic_2_keyword: cleanOrNull(\n      row.semantic_2_keyword ||\n      row.semantic_2 ||\n      row['Semantic Keyword 2'] ||\n      meta.semantic_2_keyword\n    ),\n\n    source: cleanOrNull(row.source ?? meta.source),\n    source_domain: cleanOrNull(row.source_domain ?? meta.source_domain),\n\n    content_plan_language: languageInfo.content_plan_language,\n    content_plan_language_code: languageInfo.content_plan_language_code,\n    content_plan_language_key: languageInfo.content_plan_language_key,\n    google_ads_language: languageInfo.google_ads_language,\n    google_ads_language_id: languageInfo.google_ads_language_id,\n    google_ads_language_code: languageInfo.google_ads_language_code,\n    planner_language_scope: languageInfo.planner_language_scope,\n    serper_hl: languageInfo.serper_hl,\n    serper_gl: languageInfo.serper_gl,\n    language: languageInfo.language,\n  };\n}\n\nfunction getKeywordMetadataMap(rows) {\n  const map = {};\n\n  for (const row of rows) {\n    const compact = compactKeywordInput(row);\n    const key = normalizeKey(compact.keyword);\n\n    if (!key) continue;\n\n    map[key] = {\n      keyword: compact.keyword,\n      cluster_label: compact.cluster_label,\n      search_volume: compact.search_volume,\n      competition: compact.competition,\n      competition_index: compact.competition_index,\n      yoy_6_v6: compact.yoy_6_v6,\n      strategy_name: compact.strategy_name,\n      strategy_names: compact.strategy_names,\n      source: compact.source,\n      source_domain: compact.source_domain,\n      semantic_1_keyword: compact.semantic_1_keyword,\n      semantic_2_keyword: compact.semantic_2_keyword,\n\n      content_plan_language: compact.content_plan_language,\n      content_plan_language_code: compact.content_plan_language_code,\n      content_plan_language_key: compact.content_plan_language_key,\n      google_ads_language: compact.google_ads_language,\n      google_ads_language_id: compact.google_ads_language_id,\n      google_ads_language_code: compact.google_ads_language_code,\n      planner_language_scope: compact.planner_language_scope,\n      serper_hl: compact.serper_hl,\n      serper_gl: compact.serper_gl,\n      language: compact.language,\n    };\n  }\n\n  return map;\n}\n\nfunction compactFinalRowWithMetadata(row, keywordMetadataMap, index = 0) {\n  const existingMeta = row.keyword_metadata || {};\n\n  const targetKeyword = clean(\n    row['Target Keyword'] ||\n    row.target_keyword ||\n    row.core_keyword ||\n    row.keyword ||\n    existingMeta.keyword\n  );\n\n  const metaFromMap = keywordMetadataMap[normalizeKey(targetKeyword)] || {};\n  const meta = {\n    ...existingMeta,\n    ...metaFromMap,\n  };\n\n  const languageInfo = getLanguageInfo(row, meta);\n\n  const semantic1 = clean(\n    row['Semantic Keyword 1'] ||\n    row.semantic_keyword_1 ||\n    row.semantic_1_keyword ||\n    row.semantic_1 ||\n    meta.semantic_1_keyword\n  );\n\n  const semantic2 = clean(\n    row['Semantic Keyword 2'] ||\n    row.semantic_keyword_2 ||\n    row.semantic_2_keyword ||\n    row.semantic_2 ||\n    meta.semantic_2_keyword\n  );\n\n  const clusterLabel =\n    cleanOrNull(\n      row['Cluster Name'] ||\n      row.cluster_label ||\n      row.cluster_name ||\n      row.cluster ||\n      meta.cluster_label\n    ) || 'Unclustered';\n\n  return {\n    row_id: cleanOrNull(row.row_id || row['Row ID']) || `seo_row_${index + 1}`,\n\n    'Target Keyword': targetKeyword,\n    'Semantic Keyword 1': semantic1,\n    'Semantic Keyword 2': semantic2,\n    'Blog Post Title': clean(row['Blog Post Title'] || row.blog_post_title || row.title),\n    'Blog Slug': clean(row['Blog Slug'] || row['Blog  Slug'] || row.blog_slug || row.slug),\n    'Content Brief': clean(row['Content Brief'] || row.content_brief || row.brief),\n\n    target_keyword: targetKeyword,\n    semantic_keyword_1: semantic1,\n    semantic_keyword_2: semantic2,\n    blog_post_title: clean(row['Blog Post Title'] || row.blog_post_title || row.title),\n    blog_slug: clean(row['Blog Slug'] || row['Blog  Slug'] || row.blog_slug || row.slug),\n    content_brief: clean(row['Content Brief'] || row.content_brief || row.brief),\n\n    cluster_label: clusterLabel,\n\n    primary_intent: cleanOrNull(row['Primary Intent'] || row.primary_intent || row.search_intent),\n    stage: cleanOrNull(row.Stage || row.stage || row.journey_stage),\n\n    keyword_metadata: {\n      keyword: targetKeyword,\n      cluster_label: clusterLabel,\n      search_volume: num(meta.search_volume ?? row.core_search_volume ?? row.search_volume),\n      competition: cleanOrNull(meta.competition ?? row.core_competition ?? row.competition),\n      competition_index: num(meta.competition_index ?? row.core_competition_index ?? row.competition_index),\n      yoy_6_v6: num(meta.yoy_6_v6 ?? row.core_yoy_6_v6 ?? row.yoy_6_v6),\n      strategy_name: cleanOrNull(meta.strategy_name ?? row.strategy_name),\n      strategy_names: arr(meta.strategy_names ?? row.strategy_names),\n      source: cleanOrNull(meta.source ?? row.source),\n      source_domain: cleanOrNull(meta.source_domain ?? row.source_domain),\n      semantic_1_keyword: cleanOrNull(meta.semantic_1_keyword ?? semantic1),\n      semantic_2_keyword: cleanOrNull(meta.semantic_2_keyword ?? semantic2),\n    },\n\n    content_plan_language: languageInfo.content_plan_language,\n    content_plan_language_code: languageInfo.content_plan_language_code,\n    content_plan_language_key: languageInfo.content_plan_language_key,\n    google_ads_language: languageInfo.google_ads_language,\n    google_ads_language_id: languageInfo.google_ads_language_id,\n    google_ads_language_code: languageInfo.google_ads_language_code,\n    planner_language_scope: languageInfo.planner_language_scope,\n    serper_hl: languageInfo.serper_hl,\n    serper_gl: languageInfo.serper_gl,\n    language: languageInfo.language,\n\n    audit_action: cleanOrNull(row['Audit Action'] || row.audit_action),\n    audit_notes: cleanOrNull(row['Audit Notes'] || row.audit_notes),\n  };\n}\n\nfunction compactResearchRow(row) {\n  const languageInfo = getLanguageInfo(row);\n\n  return {\n    core_keyword: cleanOrNull(row.core_keyword),\n    cluster_label: cleanOrNull(row.cluster_label),\n\n    semantic_1_keyword: cleanOrNull(row.semantic_1_keyword || row.semantic_1),\n    semantic_2_keyword: cleanOrNull(row.semantic_2_keyword || row.semantic_2),\n\n    search_intent: cleanOrNull(row.search_intent),\n    journey_stage: cleanOrNull(row.journey_stage),\n    target_audience: compactText(row.target_audience, 600),\n    reader_problem: compactText(row.reader_problem, 600),\n    article_type: cleanOrNull(row.article_type),\n    title_direction: compactText(row.title_direction, 600),\n    slug_basis: cleanOrNull(row.slug_basis),\n    unique_angle: compactText(row.unique_angle, 800),\n    article_type_creative: compactText(row.article_type, 200),\n    cta_rule: compactText(row.cta_rule, 400),\n\n    must_cover_topics: take(row.must_cover_topics, 8),\n    recommended_h2s: take(row.recommended_h2s, 8),\n    faq_questions_from_research: take(row.faq_questions_from_research, 8),\n    evidence_priorities: take(row.evidence_priorities, 8),\n    competitor_gaps_to_exploit: take(row.competitor_gaps_to_exploit, 8),\n    why_now_hook: compactText(row.why_now_hook, 700),\n    writer_mandates: take(row.writer_mandates, 8),\n    strategy_warnings: take(row.strategy_warnings, 8),\n\n    competitor_intelligence: row.competitor_intelligence ? {\n      dominant_h2_patterns: take(row.competitor_intelligence.dominant_h2_patterns, 8),\n      common_subtopics: take(row.competitor_intelligence.common_subtopics, 8),\n      coverage_gaps: take(row.competitor_intelligence.coverage_gaps, 8),\n      recurring_faq_questions: take(row.competitor_intelligence.recurring_faq_questions, 8),\n      unique_angle_opportunity: compactText(row.competitor_intelligence.unique_angle_opportunity, 800),\n      confidence: cleanOrNull(row.competitor_intelligence.confidence),\n      confidence_note: compactText(row.competitor_intelligence.confidence_note, 500),\n    } : null,\n\n    socials_research: row.socials_research ? {\n      social_signal_quality: cleanOrNull(row.socials_research.social_signal_quality),\n      audience_questions: take(row.socials_research.audience_questions, 5),\n      pain_patterns: take(row.socials_research.pain_patterns, 6),\n      language_patterns: take(row.socials_research.language_patterns, 6),\n      research_notes: compactText(row.socials_research.research_notes, 500),\n    } : null,\n\n    news_research: row.news_research ? {\n      recency_relevant: row.news_research.recency_relevant === true,\n      timing_hooks: take(row.news_research.timing_hooks, 5),\n      news_items: take(row.news_research.news_items, 4),\n      official_signals: take(row.news_research.official_signals, 4),\n      research_notes: compactText(row.news_research.research_notes, 500),\n    } : null,\n\n    content_plan_language: languageInfo.content_plan_language,\n    content_plan_language_code: languageInfo.content_plan_language_code,\n    serper_hl: languageInfo.serper_hl,\n  };\n}\n\nfunction compactAuditDataset(dataset) {\n  if (!dataset || typeof dataset !== 'object') return null;\n\n  return {\n    LANGUAGE: dataset.LANGUAGE || null,\n    row_count: arr(dataset.CONTENT_PLAN_ROWS).length,\n    POLICY: dataset.POLICY || null,\n    CONSTRAINTS: dataset.CONSTRAINTS || null,\n  };\n}\n\nfunction compactAuditResult(result) {\n  if (!result || typeof result !== 'object') return null;\n\n  return {\n    audit_summary: result.audit_summary || null,\n    exact_duplicate_groups: take(result.exact_duplicate_groups, 20),\n    near_duplicate_pairs: take(result.near_duplicate_pairs, 30),\n    cannibalization_clusters: take(result.cannibalization_clusters, 20),\n    row_actions: take(result.row_actions, 200),\n    policy_flags: take(result.policy_flags, 200),\n    confidence: cleanOrNull(result.confidence),\n    warnings: take(result.warnings, 20),\n  };\n}\n\nfunction compactRewriteResult(result) {\n  if (!result || typeof result !== 'object') return null;\n\n  return {\n    patches: take(result.patches, 200),\n  };\n}\n\nfunction buildClusterSummary(selectedKeywordRows, finalRows) {\n  const map = {};\n\n  for (const row of selectedKeywordRows) {\n    const cluster = clean(row.cluster_label || row.cluster_name || 'Unclustered') || 'Unclustered';\n\n    if (!map[cluster]) {\n      map[cluster] = {\n        cluster_label: cluster,\n        selected_keyword_count: 0,\n        final_content_row_count: 0,\n        keywords: [],\n        final_titles: [],\n        final_slugs: [],\n      };\n    }\n\n    map[cluster].selected_keyword_count += 1;\n\n    if (row.keyword) {\n      map[cluster].keywords.push({\n        keyword: row.keyword,\n        search_volume: row.search_volume,\n        competition: row.competition,\n        competition_index: row.competition_index,\n        yoy_6_v6: row.yoy_6_v6,\n        strategy_name: row.strategy_name,\n        source: row.source,\n        source_domain: row.source_domain,\n      });\n    }\n  }\n\n  for (const row of finalRows) {\n    const cluster = clean(row.cluster_label || row['Cluster Name'] || 'Unclustered') || 'Unclustered';\n\n    if (!map[cluster]) {\n      map[cluster] = {\n        cluster_label: cluster,\n        selected_keyword_count: 0,\n        final_content_row_count: 0,\n        keywords: [],\n        final_titles: [],\n        final_slugs: [],\n      };\n    }\n\n    map[cluster].final_content_row_count += 1;\n\n    if (row['Blog Post Title']) map[cluster].final_titles.push(row['Blog Post Title']);\n    if (row['Blog Slug']) map[cluster].final_slugs.push(row['Blog Slug']);\n  }\n\n  return Object.values(map).map(cluster => ({\n    ...cluster,\n    final_titles: uniq(cluster.final_titles),\n    final_slugs: uniq(cluster.final_slugs),\n  }));\n}\n\nfunction buildRowsForSheet(rows) {\n  return rows.map(row => ({\n    'Target Keyword': clean(row['Target Keyword']),\n    'Semantic Keyword 1': clean(row['Semantic Keyword 1']),\n    'Semantic Keyword 2': clean(row['Semantic Keyword 2']),\n    'Blog Post Title': clean(row['Blog Post Title']),\n    'Blog Slug': clean(row['Blog Slug']),\n    'Content Brief': clean(row['Content Brief']),\n  }));\n}\n\n// ─────────────────────────────────────────────\n// Read workflow data safely\n// ─────────────────────────────────────────────\n\nconst inputItems = $input.all().map(i => i.json || {});\n\nconst trigger = firstJson('When Executed by Another Workflow');\n\nconst normalizeWriterRows = allJson('Normalize Writer Input');\nconst normalizedResearchRows = allJson('Parser');\nconst articleOutlineRows = [];\nconst contentAgentInputRows = allJson('Prepare Research Agent');\nconst contentAgentRows = allJson('Parser');\n\nconst auditDataset = firstJson('build_audit_dataset');\nconst slimAuditDataset = firstJson('slim_for_evaluate');\nconst auditResult = getAgentJson('evaluate_content_plan');\nconst rewritePayload = firstJson('Prepare Payload');\nconst rewriteResult = getAgentJson('rewrite_plan');\n\nconst applyAuditorRows = allJson('Apply Auditor Changes');\nconst finalFilteredRows = allJson('Filter Output Fields');\n\nconst sheetPackageBeforeCreate = firstJson('Prepare Content Plan Sheet Package');\nconst sheetPackage = firstJson('Restore Content Plan Package After Tab Create');\nconst headerPackage = firstJson('Prepare Content Plan Header Row');\nconst clickupMessagePackage = firstJson('Build ClickUp Content Plan Message');\nconst clickupResponse = firstJson('ClickUp - Send Chat Message');\n\nconst firstNormalizeWriter = normalizeWriterRows[0] || {};\nconst firstFinalFiltered = finalFilteredRows[0] || {};\nconst firstSheetPackage = sheetPackage || {};\nconst firstSheetBeforeCreate = sheetPackageBeforeCreate || {};\n\nconst languageInfo = getLanguageInfo(\n  trigger,\n  firstNormalizeWriter,\n  firstFinalFiltered,\n  firstSheetPackage,\n  firstSheetBeforeCreate\n);\n\n// ─────────────────────────────────────────────\n// Select real keyword metadata source\n// ─────────────────────────────────────────────\n//\n// Priority:\n// 1. Final Selected Keywords — canonical final selected keywords.\n// 2. normalize_openai Retry — fallback if the retry path produced final selected rows.\n// 3. normalize_openai — fallback for old non-QA flow.\n// 4. Restore Selected Keywords After ClickUp — optional older fallback.\n// 5. Normalize Writer Input — last resort only.\n\nconst keywordRowsSource = firstKeywordRowsSource([\n  {\n    source: 'Final Selected Keywords',\n    rows: allJson('Final Selected Keywords'),\n  },\n  {\n    source: 'normalize_openai Retry',\n    rows: allJson('normalize_openai Retry'),\n  },\n  {\n    source: 'normalize_openai',\n    rows: allJson('normalize_openai'),\n  },\n  {\n    source: 'Restore Selected Keywords After ClickUp',\n    rows: allJson('Restore Selected Keywords After ClickUp'),\n  },\n  {\n    source: 'Normalize Writer Input',\n    rows: normalizeWriterRows,\n  },\n]);\n\nconst selectedKeywordSourceRows = keywordRowsSource.rows;\n\n// ─────────────────────────────────────────────\n// Build core metadata\n// ─────────────────────────────────────────────\n\nconst keywordMetadataMap = getKeywordMetadataMap(selectedKeywordSourceRows);\n\nconst selectedKeywordRows = selectedKeywordSourceRows\n  .map(row => {\n    const compact = compactKeywordInput(row);\n\n    return {\n      selected_at: cleanOrNull(row.selected_at || row.semantic_selected_at),\n      client_name: cleanOrNull(row.client_name || row.company_name),\n\n      keyword: compact.keyword,\n      cluster_label: compact.cluster_label,\n\n      search_volume: compact.search_volume,\n      competition: compact.competition,\n      competition_index: compact.competition_index,\n      yoy_6_v6: compact.yoy_6_v6,\n\n      strategy_name: compact.strategy_name,\n      strategy_names: compact.strategy_names,\n\n      source: compact.source,\n      source_domain: compact.source_domain,\n\n      semantic_1_keyword: compact.semantic_1_keyword,\n      semantic_2_keyword: compact.semantic_2_keyword,\n\n      content_plan_language: compact.content_plan_language,\n      content_plan_language_code: compact.content_plan_language_code,\n      content_plan_language_key: compact.content_plan_language_key,\n      google_ads_language: compact.google_ads_language,\n      google_ads_language_id: compact.google_ads_language_id,\n      google_ads_language_code: compact.google_ads_language_code,\n      planner_language_scope: compact.planner_language_scope,\n      serper_hl: compact.serper_hl,\n      serper_gl: compact.serper_gl,\n      language: compact.language,\n    };\n  })\n  .filter(row => row.keyword);\n\nconst rawFinalRows =\n  finalFilteredRows.length\n    ? finalFilteredRows\n    : applyAuditorRows.length\n      ? applyAuditorRows\n      : contentAgentRows.length\n        ? contentAgentRows\n        : inputItems;\n\nconst finalRows = rawFinalRows\n  .map((row, index) => compactFinalRowWithMetadata(row, keywordMetadataMap, index))\n  .filter(row => row['Target Keyword']);\n\nconst finalSheetRows = buildRowsForSheet(finalRows);\n\nconst keywordInputs = selectedKeywordSourceRows\n  .map(compactKeywordInput)\n  .filter(row => row.keyword);\n\nconst clusterSummary = buildClusterSummary(selectedKeywordRows, finalRows);\n\n// ─────────────────────────────────────────────\n// Sheet / client metadata\n// ─────────────────────────────────────────────\n\nconst spreadsheetId =\n  firstNonEmpty(\n    sheetPackage.spreadsheet_id,\n    sheetPackageBeforeCreate.spreadsheet_id,\n    headerPackage.spreadsheet_id,\n    trigger.spreadsheet_id,\n    trigger.spreadsheetId,\n    firstNormalizeWriter.spreadsheet_id\n  );\n\nconst spreadsheetUrl =\n  firstNonEmpty(\n    sheetPackage.spreadsheet_url,\n    sheetPackageBeforeCreate.spreadsheet_url,\n    headerPackage.spreadsheet_url,\n    trigger.spreadsheet_url,\n    firstNormalizeWriter.spreadsheet_url,\n    spreadsheetId ? `https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit` : ''\n  );\n\nconst selectedSheetId =\n  firstNonEmpty(\n    sheetPackage.selected_sheet_id,\n    sheetPackageBeforeCreate.selected_sheet_id,\n    trigger.selected_sheet_id,\n    firstNormalizeWriter.selected_sheet_id\n  );\n\nconst selectedSheetUrl =\n  firstNonEmpty(\n    sheetPackage.selected_sheet_url,\n    sheetPackageBeforeCreate.selected_sheet_url,\n    trigger.selected_sheet_url,\n    firstNormalizeWriter.selected_sheet_url\n  );\n\nconst selectedSheetTabName =\n  firstNonEmpty(\n    sheetPackage.selected_sheet_tab_name,\n    sheetPackageBeforeCreate.selected_sheet_tab_name,\n    trigger.selected_sheet_tab_name,\n    firstNormalizeWriter.selected_sheet_tab_name\n  );\n\nconst contentPlanTabName =\n  firstNonEmpty(\n    sheetPackage.sheet_tab_name,\n    sheetPackageBeforeCreate.sheet_tab_name,\n    headerPackage.sheet_tab_name\n  );\n\nconst contentPlanSheetUrl =\n  firstNonEmpty(\n    sheetPackage.sheet_url,\n    headerPackage.sheet_url,\n    clickupMessagePackage.sheet_url\n  );\n\nconst contentPlanSheetId =\n  firstNonEmpty(\n    sheetPackage.sheet_id,\n    headerPackage.sheet_id\n  );\n\nconst clientName =\n  firstNonEmpty(\n    trigger.client_name,\n    trigger.company_name,\n    firstNormalizeWriter.client_name,\n    firstNormalizeWriter.company_name,\n    sheetPackage.client_name,\n    sheetPackageBeforeCreate.client_name,\n    selectedKeywordRows[0]?.client_name,\n    'Client'\n  );\n\nconst clientUrl =\n  firstNonEmpty(\n    trigger.client_url,\n    firstNormalizeWriter.client_url,\n    firstNormalizeWriter.company_context?.company?.site_url\n  );\n\nconst companyContext = compactCompanyContext(\n  trigger.company_context ||\n  firstNormalizeWriter.company_context ||\n  firstNormalizeWriter.company_context_compact ||\n  {}\n);\n\nconst callbackUrl =\n  firstNonEmpty(\n    trigger.callback_url,\n    firstNormalizeWriter.callback_url,\n    finalRows[0]?.callback_url\n  );\n\nconst taskId =\n  firstNonEmpty(\n    trigger.taskId,\n    firstNormalizeWriter.taskId,\n    finalRows[0]?.taskId\n  );\n\nconst brandId =\n  firstNonEmpty(\n    trigger.brandId,\n    firstNormalizeWriter.brandId,\n    finalRows[0]?.brandId\n  );\n\nconst userId =\n  firstNonEmpty(\n    trigger.userId,\n    firstNormalizeWriter.userId,\n    finalRows[0]?.userId\n  );\n\nconst executionId =\n  firstNonEmpty(\n    trigger.execution_id,\n    sheetPackage.execution_id,\n    sheetPackageBeforeCreate.execution_id,\n    firstNormalizeWriter.execution_id,\n    $execution?.id\n  );\n\n// ─────────────────────────────────────────────\n// Build final handoff\n// ─────────────────────────────────────────────\n\nconst metadataLostWarning =\n  finalRows.length > 3 &&\n  selectedKeywordRows.length === 0 &&\n  finalRows.filter(row => row.cluster_label === 'Unclustered').length >= Math.ceil(finalRows.length * 0.8);\n\nconst handoffPackage = {\n  payload_type: 'ai_content_plan_handoff_v2_multilingual',\n  generated_at: new Date().toISOString(),\n\n  workflow: {\n    source_workflow_name: 'Yehor_content_plan_writer',\n    next_workflow_name: 'Ai-content-plan',\n    handoff_node: 'Build AI Content Plan Handoff Package',\n  },\n\n  ids: {\n    execution_id: executionId || null,\n    taskId: taskId || null,\n    brandId: brandId || null,\n    userId: userId || null,\n  },\n\n  language: languageInfo,\n\n  content_plan_language: languageInfo.content_plan_language,\n  content_plan_language_code: languageInfo.content_plan_language_code,\n  content_plan_language_key: languageInfo.content_plan_language_key,\n  google_ads_language: languageInfo.google_ads_language,\n  google_ads_language_id: languageInfo.google_ads_language_id,\n  google_ads_language_code: languageInfo.google_ads_language_code,\n  planner_language_scope: languageInfo.planner_language_scope,\n  serper_hl: languageInfo.serper_hl,\n  serper_gl: languageInfo.serper_gl,\n\n  client: {\n    client_name: clientName,\n    company_name: clientName,\n    client_url: clientUrl || '',\n\n    language: languageInfo,\n\n    company_context: companyContext,\n\n    onboarding_overview:\n      companyContext ||\n      trigger.onboarding_overview ||\n      firstNormalizeWriter.onboarding_overview ||\n      null,\n\n    perplexity_overview:\n      compactText(\n        trigger.perplexity_overview ||\n        firstNormalizeWriter.perplexity_overview ||\n        '',\n        1800\n      ),\n  },\n\n  source_keyword_sheet: {\n    spreadsheet_id: spreadsheetId || null,\n    spreadsheet_url: spreadsheetUrl || null,\n    selected_sheet_id: selectedSheetId || null,\n    selected_sheet_url: selectedSheetUrl || '',\n    selected_sheet_tab_name: selectedSheetTabName || '',\n  },\n\n  content_plan_sheet: {\n    spreadsheet_id: spreadsheetId || null,\n    spreadsheet_url: spreadsheetUrl || null,\n\n    sheet_id: contentPlanSheetId || null,\n    sheet_tab_name: contentPlanTabName || '',\n    sheet_url: contentPlanSheetUrl || '',\n\n    headers:\n      sheetPackage.headers ||\n      sheetPackageBeforeCreate.headers ||\n      [\n        'Target Keyword',\n        'Semantic Keyword 1',\n        'Semantic Keyword 2',\n        'Blog Post Title',\n        'Blog Slug',\n        'Content Brief',\n      ],\n\n    row_count: finalRows.length,\n\n    exported_at:\n      sheetPackage.exported_at ||\n      sheetPackageBeforeCreate.exported_at ||\n      new Date().toISOString(),\n  },\n\n  selected_keyword_rows: selectedKeywordRows,\n  keyword_cluster_summary: clusterSummary,\n  keyword_inputs: keywordInputs,\n\n  research: {\n    normalized_research_rows: normalizedResearchRows.map(compactResearchRow),\n    article_outline_rows: articleOutlineRows.map(compactResearchRow),\n  },\n\n  content_generation: {\n    content_agent_input_rows: contentAgentInputRows.map(row => ({\n      core_keyword: cleanOrNull(row.core_keyword),\n      cluster_label: cleanOrNull(row.cluster_label),\n      content_agent_input: row.research_agent_input || null,\n      content_plan_language: row.content_plan_language || languageInfo.content_plan_language,\n      content_plan_language_code: row.content_plan_language_code || languageInfo.content_plan_language_code,\n    })),\n\n    content_agent_rows: finalRows,\n  },\n\n  audit: {\n    build_audit_dataset: compactAuditDataset(auditDataset),\n    slim_for_evaluate: compactAuditDataset(slimAuditDataset),\n    evaluate_result: compactAuditResult(auditResult),\n    applied_rows_count: applyAuditorRows.length,\n    rewrite_payload: {\n      LANGUAGE: rewritePayload.LANGUAGE || languageInfo,\n      rows_to_process_count: arr(rewritePayload.rows_to_process).length,\n      rows_to_process: take(rewritePayload.rows_to_process, 200),\n    },\n    rewrite_result: compactRewriteResult(rewriteResult),\n  },\n\n  final_content_plan: {\n    row_count: finalRows.length,\n    visible_columns: [\n      'Target Keyword',\n      'Semantic Keyword 1',\n      'Semantic Keyword 2',\n      'Blog Post Title',\n      'Blog Slug',\n      'Content Brief',\n    ],\n    rows: finalRows,\n    sheet_rows: finalSheetRows,\n  },\n\n  clickup: {\n    message_package: clickupMessagePackage || null,\n    response: clickupResponse || null,\n    message_sent:\n      clickupMessagePackage.clickup_message ||\n      clickupMessagePackage.message ||\n      null,\n  },\n\n  callback: {\n    callback_url: callbackUrl || null,\n    taskId: taskId || null,\n    brandId: brandId || null,\n    userId: userId || null,\n  },\n\n  output_contract: {\n    ai_prompts_columns: ['AI Prompt', 'Topic Cluster'],\n    ai_content_plan_columns: [\n      'AI Prompt',\n      'Topic Cluster',\n      'SEO Title',\n      'Blog Slug',\n      'Content Brief',\n    ],\n    source_seo_content_plan_columns: [\n      'Target Keyword',\n      'Semantic Keyword 1',\n      'Semantic Keyword 2',\n      'Blog Post Title',\n      'Blog Slug',\n      'Content Brief',\n    ],\n    target_language: languageInfo.content_plan_language,\n    target_language_code: languageInfo.content_plan_language_code,\n    must_preserve_language: true,\n    must_preserve_locked_keywords: true,\n    must_preserve_source_sheet_links: true,\n  },\n\n  debug_counts: {\n    input_items: inputItems.length,\n\n    keyword_metadata_source_node: keywordRowsSource.source,\n    keyword_metadata_source_rows: selectedKeywordSourceRows.length,\n\n    normalize_writer_rows: normalizeWriterRows.length,\n    selected_keyword_rows: selectedKeywordRows.length,\n    keyword_inputs: keywordInputs.length,\n\n    normalized_research_rows: normalizedResearchRows.length,\n    article_outline_rows: articleOutlineRows.length,\n    content_agent_input_rows: contentAgentInputRows.length,\n    content_agent_rows: contentAgentRows.length,\n    apply_auditor_rows: applyAuditorRows.length,\n    final_filtered_rows: finalFilteredRows.length,\n    final_content_plan_rows: finalRows.length,\n\n    metadata_lost_warning: metadataLostWarning,\n  },\n\n  warnings: [\n    ...(metadataLostWarning\n      ? [\n          'Selected keyword metadata appears missing. Most final rows are Unclustered. Check that Final Selected Keywords is available before Build AI Content Plan Handoff Package.',\n        ]\n      : []),\n  ],\n\n  final_ready:\n    finalRows.length > 0 &&\n    Boolean(spreadsheetId) &&\n    Boolean(contentPlanTabName || contentPlanSheetUrl),\n};\n\nconsole.log('✅ Build AI Content Plan Handoff Package:', {\n  rows: finalRows.length,\n  client_name: clientName,\n  language: languageInfo.content_plan_language,\n  language_code: languageInfo.content_plan_language_code,\n  spreadsheet_id: spreadsheetId,\n  content_plan_tab: contentPlanTabName,\n  final_ready: handoffPackage.final_ready,\n  keyword_metadata_source_node: keywordRowsSource.source,\n  selected_keyword_rows: selectedKeywordRows.length,\n  metadata_lost_warning: metadataLostWarning,\n});\n\nreturn [\n  {\n    json: handoffPackage,\n  },\n];"
+        "jsCode": "// Build AI Content Plan Handoff Package\n// Type: Code node\n// Mode: Run Once for All Items\n//\n// Purpose:\n// - Collect the full content-plan writer workflow output.\n// - Preserve sheet/table info, final SEO content plan rows, keyword metadata,\n//   cluster labels, metrics, audit/rewrite data, callback IDs, language metadata,\n//   and ClickUp result.\n// - Send one complete package into the next workflow: Ai-content-plan.\n// - Google Sheet SEO content plan stays 6 visible columns.\n// - AI workflow payload preserves metadata for downstream AI content planning.\n// - Universal for any business type, industry, and content plan language.\n//\n// Important fix:\n// - Selected keyword metadata MUST come from the final selected keyword rows,\n//   preferably the \"Final Selected Keywords\" node.\n// - Do NOT use \"Normalize Writer Input\" as the primary keyword metadata source.\n//   That node can contain only workflow/input metadata and may not contain selected keywords.\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nfunction cleanOrNull(value) {\n  const s = clean(value);\n  return s || null;\n}\n\nfunction arr(value) {\n  return Array.isArray(value) ? value : [];\n}\n\nfunction take(value, limit) {\n  return arr(value).slice(0, limit);\n}\n\nfunction num(value, fallback = null) {\n  if (value === null || value === undefined || value === '') return fallback;\n  const n = Number(value);\n  return Number.isFinite(n) ? n : fallback;\n}\n\nfunction normalizeKey(value) {\n  return clean(value).normalize('NFC').toLowerCase();\n}\n\nfunction uniq(values) {\n  const seen = new Set();\n  const out = [];\n\n  for (const value of arr(values)) {\n    const s = clean(value);\n    if (!s) continue;\n\n    const key = s.normalize('NFC').toLowerCase();\n    if (seen.has(key)) continue;\n\n    seen.add(key);\n    out.push(s);\n  }\n\n  return out;\n}\n\nfunction firstNonEmpty(...values) {\n  for (const value of values) {\n    const s = clean(value);\n    if (s) return s;\n  }\n  return null;\n}\n\nfunction compactText(value, maxChars = 2500) {\n  const s = clean(value);\n  if (!s) return '';\n  return s.length > maxChars ? s.slice(0, maxChars) : s;\n}\n\nfunction firstJson(nodeName) {\n  try {\n    return $(nodeName).first().json || {};\n  } catch (e) {\n    return {};\n  }\n}\n\nfunction allJson(nodeName) {\n  try {\n    return $(nodeName).all().map(i => i.json || {});\n  } catch (e) {\n    return [];\n  }\n}\n\nfunction safeParseJson(raw, fallback = null) {\n  if (!raw) return fallback;\n  if (typeof raw === 'object' && !Array.isArray(raw)) return raw;\n\n  const text = String(raw)\n    .replace(/^```(?:json)?\\s*/i, '')\n    .replace(/\\s*```$/i, '')\n    .trim();\n\n  const match = text.match(/\\{[\\s\\S]*\\}/);\n  const candidate = match ? match[0] : text;\n\n  try {\n    return JSON.parse(candidate);\n  } catch (e) {\n    return fallback;\n  }\n}\n\nfunction getAgentJson(nodeName) {\n  const row = firstJson(nodeName);\n  return safeParseJson(row.output || row.text || row.result || row, {});\n}\n\nfunction rowHasKeyword(row) {\n  if (!row || typeof row !== 'object') return false;\n\n  const meta = row.keyword_metadata || {};\n\n  return Boolean(\n    clean(\n      row.core_keyword ||\n      row.keyword ||\n      row['Target Keyword'] ||\n      row.target_keyword ||\n      meta.keyword\n    )\n  );\n}\n\nfunction firstKeywordRowsSource(candidates) {\n  for (const candidate of candidates) {\n    const rows = arr(candidate.rows).filter(rowHasKeyword);\n\n    if (rows.length) {\n      return {\n        source: candidate.source,\n        rows,\n      };\n    }\n  }\n\n  return {\n    source: 'none',\n    rows: [],\n  };\n}\n\nfunction compactCompanyContext(ctx) {\n  if (!ctx || typeof ctx !== 'object') return null;\n\n  const company = ctx.company || {};\n  const seo = ctx.seo_context || {};\n  const positioning = ctx.positioning || {};\n  const guardrails = ctx.guardrails || {};\n  const missing = ctx.missing_or_unclear || {};\n\n  return {\n    company: {\n      name: cleanOrNull(company.name),\n      site_url: cleanOrNull(company.site_url),\n      business_summary: compactText(company.business_summary, 1600),\n      primary_offers: take(company.primary_offers, 12).map(clean).filter(Boolean),\n      strategic_focus: take(company.strategic_focus, 10).map(clean).filter(Boolean),\n    },\n\n    seo_context: {\n      explicit_keywords: take(seo.explicit_keywords, 30).map(clean).filter(Boolean),\n      topic_themes: take(seo.topic_themes, 30).map(clean).filter(Boolean),\n      best_fit_intents: take(seo.best_fit_intents, 16).map(clean).filter(Boolean),\n      industry_modifiers: take(seo.industry_modifiers, 16).map(clean).filter(Boolean),\n      geo_modifiers: take(seo.geo_modifiers, 16).map(clean).filter(Boolean),\n      commercial_modifiers: take(seo.commercial_modifiers, 16).map(clean).filter(Boolean),\n      audience_modifiers: take(seo.audience_modifiers, 16).map(clean).filter(Boolean),\n      page_types_to_create: take(seo.page_types_to_create, 16).map(clean).filter(Boolean),\n      programmatic_assets: take(seo.programmatic_assets, 16).map(clean).filter(Boolean),\n      competitor_or_alternative_terms: take(seo.competitor_or_alternative_terms, 12).map(clean).filter(Boolean),\n    },\n\n    positioning: {\n      core_narrative: take(positioning.core_narrative, 8).map(clean).filter(Boolean),\n      value_props: take(positioning.value_props, 12).map(clean).filter(Boolean),\n      messages_hooks: take(positioning.messages_hooks, 12).map(clean).filter(Boolean),\n      differentiators: take(positioning.differentiators, 12).map(clean).filter(Boolean),\n      comparison_safe_framing: take(positioning.comparison_safe_framing, 8).map(clean).filter(Boolean),\n    },\n\n    icp_segments_summary: take(ctx.icp_segments_summary, 8),\n    offer_keyword_map: take(ctx.offer_keyword_map, 10),\n    icp_keyword_map: take(ctx.icp_keyword_map, 10),\n\n    guardrails: {\n      tone_of_voice: take(guardrails.tone_of_voice, 8).map(clean).filter(Boolean),\n      source_preferences: take(guardrails.source_preferences, 8).map(clean).filter(Boolean),\n      compliance_restrictions: take(guardrails.compliance_restrictions, 12).map(clean).filter(Boolean),\n      topics_to_avoid: take(guardrails.topics_to_avoid, 12).map(clean).filter(Boolean),\n      claims_to_qualify_or_avoid: take(guardrails.claims_to_qualify_or_avoid, 12).map(clean).filter(Boolean),\n      keyword_compliance_filters: take(guardrails.keyword_compliance_filters, 12).map(clean).filter(Boolean),\n      deprioritize_keyword_themes: take(guardrails.deprioritize_keyword_themes, 12).map(clean).filter(Boolean),\n      competitor_keyword_policy: cleanOrNull(guardrails.competitor_keyword_policy),\n      competitor_mention_rules: take(guardrails.competitor_mention_rules, 8).map(clean).filter(Boolean),\n    },\n\n    missing_or_unclear: {\n      missing: take(missing.missing, 10).map(clean).filter(Boolean),\n      unclear: take(missing.unclear, 10).map(clean).filter(Boolean),\n      downstream_risks: take(missing.downstream_risks, 10).map(clean).filter(Boolean),\n    },\n  };\n}\n\nfunction getLanguageInfo(...sources) {\n  const contentPlanLanguage =\n    firstNonEmpty(\n      ...sources.map(s => s?.content_plan_language),\n      ...sources.map(s => s?.language?.content_plan_language),\n      ...sources.map(s => s?.['Content Plan Language']),\n      'English'\n    );\n\n  const contentPlanLanguageCode =\n    firstNonEmpty(\n      ...sources.map(s => s?.content_plan_language_code),\n      ...sources.map(s => s?.language?.content_plan_language_code),\n      ...sources.map(s => s?.planner_language_scope),\n      ...sources.map(s => s?.language?.planner_language_scope),\n      ...sources.map(s => s?.serper_hl),\n      ...sources.map(s => s?.language?.serper_hl),\n      'en'\n    );\n\n  const googleAdsLanguage =\n    firstNonEmpty(\n      ...sources.map(s => s?.google_ads_language),\n      ...sources.map(s => s?.language?.google_ads_language),\n      ...sources.map(s => s?.language),\n      'languageConstants/1000'\n    );\n\n  return {\n    content_plan_language: contentPlanLanguage,\n    content_plan_language_code: contentPlanLanguageCode,\n    content_plan_language_key:\n      firstNonEmpty(\n        ...sources.map(s => s?.content_plan_language_key),\n        ...sources.map(s => s?.language?.content_plan_language_key),\n        contentPlanLanguage.toLowerCase()\n      ),\n\n    google_ads_language: googleAdsLanguage,\n    google_ads_language_id:\n      firstNonEmpty(\n        ...sources.map(s => s?.google_ads_language_id),\n        ...sources.map(s => s?.language?.google_ads_language_id),\n        googleAdsLanguage.replace(/^languageConstants\\//, ''),\n        '1000'\n      ),\n\n    google_ads_language_code:\n      firstNonEmpty(\n        ...sources.map(s => s?.google_ads_language_code),\n        ...sources.map(s => s?.language?.google_ads_language_code),\n        contentPlanLanguageCode\n      ),\n\n    planner_language_scope:\n      firstNonEmpty(\n        ...sources.map(s => s?.planner_language_scope),\n        ...sources.map(s => s?.language?.planner_language_scope),\n        contentPlanLanguageCode\n      ),\n\n    serper_hl:\n      firstNonEmpty(\n        ...sources.map(s => s?.serper_hl),\n        ...sources.map(s => s?.language?.serper_hl),\n        contentPlanLanguageCode\n      ),\n\n    serper_gl:\n      firstNonEmpty(\n        ...sources.map(s => s?.serper_gl),\n        ...sources.map(s => s?.language?.serper_gl)\n      ),\n\n    language: googleAdsLanguage,\n  };\n}\n\nfunction compactKeywordInput(row) {\n  const meta = row.keyword_metadata || {};\n  const languageInfo = getLanguageInfo(row, meta);\n\n  const keyword = cleanOrNull(\n    row.core_keyword ||\n    row.keyword ||\n    row['Target Keyword'] ||\n    row.target_keyword ||\n    meta.keyword\n  );\n\n  const clusterLabel = cleanOrNull(\n    row.cluster_label ||\n    row.cluster_name ||\n    row['Cluster Name'] ||\n    row.cluster ||\n    meta.cluster_label ||\n    'Unclustered'\n  );\n\n  return {\n    execution_id: cleanOrNull(row.execution_id),\n\n    keyword,\n    core_keyword: keyword,\n    cluster_label: clusterLabel,\n\n    search_volume: num(row.core_search_volume ?? row.search_volume ?? meta.search_volume),\n    competition: cleanOrNull(row.core_competition ?? row.competition ?? meta.competition),\n    competition_index: num(row.core_competition_index ?? row.competition_index ?? meta.competition_index),\n    yoy_6_v6: num(row.core_yoy_6_v6 ?? row.yoy_6_v6 ?? meta.yoy_6_v6),\n    strategy_name: cleanOrNull(row.strategy_name || row.core_strategy_name || meta.strategy_name),\n    strategy_names: arr(row.strategy_names || row.core_strategy_names || meta.strategy_names),\n\n    semantic_1_keyword: cleanOrNull(\n      row.semantic_1_keyword ||\n      row.semantic_1 ||\n      row['Semantic Keyword 1'] ||\n      meta.semantic_1_keyword\n    ),\n\n    semantic_2_keyword: cleanOrNull(\n      row.semantic_2_keyword ||\n      row.semantic_2 ||\n      row['Semantic Keyword 2'] ||\n      meta.semantic_2_keyword\n    ),\n\n    source: cleanOrNull(row.source ?? meta.source),\n    source_domain: cleanOrNull(row.source_domain ?? meta.source_domain),\n\n    content_plan_language: languageInfo.content_plan_language,\n    content_plan_language_code: languageInfo.content_plan_language_code,\n    content_plan_language_key: languageInfo.content_plan_language_key,\n    google_ads_language: languageInfo.google_ads_language,\n    google_ads_language_id: languageInfo.google_ads_language_id,\n    google_ads_language_code: languageInfo.google_ads_language_code,\n    planner_language_scope: languageInfo.planner_language_scope,\n    serper_hl: languageInfo.serper_hl,\n    serper_gl: languageInfo.serper_gl,\n    language: languageInfo.language,\n  };\n}\n\nfunction getKeywordMetadataMap(rows) {\n  const map = {};\n\n  for (const row of rows) {\n    const compact = compactKeywordInput(row);\n    const key = normalizeKey(compact.keyword);\n\n    if (!key) continue;\n\n    map[key] = {\n      keyword: compact.keyword,\n      cluster_label: compact.cluster_label,\n      search_volume: compact.search_volume,\n      competition: compact.competition,\n      competition_index: compact.competition_index,\n      yoy_6_v6: compact.yoy_6_v6,\n      strategy_name: compact.strategy_name,\n      strategy_names: compact.strategy_names,\n      source: compact.source,\n      source_domain: compact.source_domain,\n      semantic_1_keyword: compact.semantic_1_keyword,\n      semantic_2_keyword: compact.semantic_2_keyword,\n\n      content_plan_language: compact.content_plan_language,\n      content_plan_language_code: compact.content_plan_language_code,\n      content_plan_language_key: compact.content_plan_language_key,\n      google_ads_language: compact.google_ads_language,\n      google_ads_language_id: compact.google_ads_language_id,\n      google_ads_language_code: compact.google_ads_language_code,\n      planner_language_scope: compact.planner_language_scope,\n      serper_hl: compact.serper_hl,\n      serper_gl: compact.serper_gl,\n      language: compact.language,\n    };\n  }\n\n  return map;\n}\n\nfunction compactFinalRowWithMetadata(row, keywordMetadataMap, index = 0) {\n  const existingMeta = row.keyword_metadata || {};\n\n  const targetKeyword = clean(\n    row['Target Keyword'] ||\n    row.target_keyword ||\n    row.core_keyword ||\n    row.keyword ||\n    existingMeta.keyword\n  );\n\n  const metaFromMap = keywordMetadataMap[normalizeKey(targetKeyword)] || {};\n  const meta = {\n    ...existingMeta,\n    ...metaFromMap,\n  };\n\n  const languageInfo = getLanguageInfo(row, meta);\n\n  const semantic1 = clean(\n    row['Semantic Keyword 1'] ||\n    row.semantic_keyword_1 ||\n    row.semantic_1_keyword ||\n    row.semantic_1 ||\n    meta.semantic_1_keyword\n  );\n\n  const semantic2 = clean(\n    row['Semantic Keyword 2'] ||\n    row.semantic_keyword_2 ||\n    row.semantic_2_keyword ||\n    row.semantic_2 ||\n    meta.semantic_2_keyword\n  );\n\n  const clusterLabel =\n    cleanOrNull(\n      row['Cluster Name'] ||\n      row.cluster_label ||\n      row.cluster_name ||\n      row.cluster ||\n      meta.cluster_label\n    ) || 'Unclustered';\n\n  return {\n    row_id: cleanOrNull(row.row_id || row['Row ID']) || `seo_row_${index + 1}`,\n\n    'Target Keyword': targetKeyword,\n    'Semantic Keyword 1': semantic1,\n    'Semantic Keyword 2': semantic2,\n    'Blog Post Title': clean(row['Blog Post Title'] || row.blog_post_title || row.title),\n    'Blog Slug': clean(row['Blog Slug'] || row['Blog  Slug'] || row.blog_slug || row.slug),\n    'Content Brief': clean(row['Content Brief'] || row.content_brief || row.brief),\n\n    target_keyword: targetKeyword,\n    semantic_keyword_1: semantic1,\n    semantic_keyword_2: semantic2,\n    blog_post_title: clean(row['Blog Post Title'] || row.blog_post_title || row.title),\n    blog_slug: clean(row['Blog Slug'] || row['Blog  Slug'] || row.blog_slug || row.slug),\n    content_brief: clean(row['Content Brief'] || row.content_brief || row.brief),\n\n    cluster_label: clusterLabel,\n\n    primary_intent: cleanOrNull(row['Primary Intent'] || row.primary_intent || row.search_intent),\n    stage: cleanOrNull(row.Stage || row.stage || row.journey_stage),\n\n    keyword_metadata: {\n      keyword: targetKeyword,\n      cluster_label: clusterLabel,\n      search_volume: num(meta.search_volume ?? row.core_search_volume ?? row.search_volume),\n      competition: cleanOrNull(meta.competition ?? row.core_competition ?? row.competition),\n      competition_index: num(meta.competition_index ?? row.core_competition_index ?? row.competition_index),\n      yoy_6_v6: num(meta.yoy_6_v6 ?? row.core_yoy_6_v6 ?? row.yoy_6_v6),\n      strategy_name: cleanOrNull(meta.strategy_name ?? row.strategy_name),\n      strategy_names: arr(meta.strategy_names ?? row.strategy_names),\n      source: cleanOrNull(meta.source ?? row.source),\n      source_domain: cleanOrNull(meta.source_domain ?? row.source_domain),\n      semantic_1_keyword: cleanOrNull(meta.semantic_1_keyword ?? semantic1),\n      semantic_2_keyword: cleanOrNull(meta.semantic_2_keyword ?? semantic2),\n    },\n\n    content_plan_language: languageInfo.content_plan_language,\n    content_plan_language_code: languageInfo.content_plan_language_code,\n    content_plan_language_key: languageInfo.content_plan_language_key,\n    google_ads_language: languageInfo.google_ads_language,\n    google_ads_language_id: languageInfo.google_ads_language_id,\n    google_ads_language_code: languageInfo.google_ads_language_code,\n    planner_language_scope: languageInfo.planner_language_scope,\n    serper_hl: languageInfo.serper_hl,\n    serper_gl: languageInfo.serper_gl,\n    language: languageInfo.language,\n\n    audit_action: cleanOrNull(row['Audit Action'] || row.audit_action),\n    audit_notes: cleanOrNull(row['Audit Notes'] || row.audit_notes),\n  };\n}\n\nfunction compactResearchRow(row) {\n  const languageInfo = getLanguageInfo(row);\n\n  return {\n    core_keyword: cleanOrNull(row.core_keyword),\n    cluster_label: cleanOrNull(row.cluster_label),\n\n    semantic_1_keyword: cleanOrNull(row.semantic_1_keyword || row.semantic_1),\n    semantic_2_keyword: cleanOrNull(row.semantic_2_keyword || row.semantic_2),\n\n    search_intent: cleanOrNull(row.search_intent),\n    journey_stage: cleanOrNull(row.journey_stage),\n    target_audience: compactText(row.target_audience, 600),\n    reader_problem: compactText(row.reader_problem, 600),\n    article_type: cleanOrNull(row.article_type),\n    title_direction: compactText(row.title_direction, 600),\n    slug_basis: cleanOrNull(row.slug_basis),\n    unique_angle: compactText(row.unique_angle, 800),\n    article_type_creative: compactText(row.article_type, 200),\n    cta_rule: compactText(row.cta_rule, 400),\n\n    must_cover_topics: take(row.must_cover_topics, 8),\n    recommended_h2s: take(row.recommended_h2s, 8),\n    faq_questions_from_research: take(row.faq_questions_from_research, 8),\n    evidence_priorities: take(row.evidence_priorities, 8),\n    competitor_gaps_to_exploit: take(row.competitor_gaps_to_exploit, 8),\n    why_now_hook: compactText(row.why_now_hook, 700),\n    writer_mandates: take(row.writer_mandates, 8),\n    strategy_warnings: take(row.strategy_warnings, 8),\n\n    competitor_intelligence: row.competitor_intelligence ? {\n      dominant_h2_patterns: take(row.competitor_intelligence.dominant_h2_patterns, 8),\n      common_subtopics: take(row.competitor_intelligence.common_subtopics, 8),\n      coverage_gaps: take(row.competitor_intelligence.coverage_gaps, 8),\n      recurring_faq_questions: take(row.competitor_intelligence.recurring_faq_questions, 8),\n      unique_angle_opportunity: compactText(row.competitor_intelligence.unique_angle_opportunity, 800),\n      confidence: cleanOrNull(row.competitor_intelligence.confidence),\n      confidence_note: compactText(row.competitor_intelligence.confidence_note, 500),\n    } : null,\n\n    socials_research: row.socials_research ? {\n      social_signal_quality: cleanOrNull(row.socials_research.social_signal_quality),\n      audience_questions: take(row.socials_research.audience_questions, 5),\n      pain_patterns: take(row.socials_research.pain_patterns, 6),\n      language_patterns: take(row.socials_research.language_patterns, 6),\n      research_notes: compactText(row.socials_research.research_notes, 500),\n    } : null,\n\n    news_research: row.news_research ? {\n      recency_relevant: row.news_research.recency_relevant === true,\n      timing_hooks: take(row.news_research.timing_hooks, 5),\n      news_items: take(row.news_research.news_items, 4),\n      official_signals: take(row.news_research.official_signals, 4),\n      research_notes: compactText(row.news_research.research_notes, 500),\n    } : null,\n\n    content_plan_language: languageInfo.content_plan_language,\n    content_plan_language_code: languageInfo.content_plan_language_code,\n    serper_hl: languageInfo.serper_hl,\n  };\n}\n\nfunction compactAuditDataset(dataset) {\n  if (!dataset || typeof dataset !== 'object') return null;\n\n  return {\n    LANGUAGE: dataset.LANGUAGE || null,\n    row_count: arr(dataset.CONTENT_PLAN_ROWS).length,\n    POLICY: dataset.POLICY || null,\n    CONSTRAINTS: dataset.CONSTRAINTS || null,\n  };\n}\n\nfunction compactAuditResult(result) {\n  if (!result || typeof result !== 'object') return null;\n\n  return {\n    audit_summary: result.audit_summary || null,\n    exact_duplicate_groups: take(result.exact_duplicate_groups, 20),\n    near_duplicate_pairs: take(result.near_duplicate_pairs, 30),\n    cannibalization_clusters: take(result.cannibalization_clusters, 20),\n    row_actions: take(result.row_actions, 200),\n    policy_flags: take(result.policy_flags, 200),\n    confidence: cleanOrNull(result.confidence),\n    warnings: take(result.warnings, 20),\n  };\n}\n\nfunction compactRewriteResult(result) {\n  if (!result || typeof result !== 'object') return null;\n\n  return {\n    patches: take(result.patches, 200),\n  };\n}\n\nfunction buildClusterSummary(selectedKeywordRows, finalRows) {\n  const map = {};\n\n  for (const row of selectedKeywordRows) {\n    const cluster = clean(row.cluster_label || row.cluster_name || 'Unclustered') || 'Unclustered';\n\n    if (!map[cluster]) {\n      map[cluster] = {\n        cluster_label: cluster,\n        selected_keyword_count: 0,\n        final_content_row_count: 0,\n        keywords: [],\n        final_titles: [],\n        final_slugs: [],\n      };\n    }\n\n    map[cluster].selected_keyword_count += 1;\n\n    if (row.keyword) {\n      map[cluster].keywords.push({\n        keyword: row.keyword,\n        search_volume: row.search_volume,\n        competition: row.competition,\n        competition_index: row.competition_index,\n        yoy_6_v6: row.yoy_6_v6,\n        strategy_name: row.strategy_name,\n        source: row.source,\n        source_domain: row.source_domain,\n      });\n    }\n  }\n\n  for (const row of finalRows) {\n    const cluster = clean(row.cluster_label || row['Cluster Name'] || 'Unclustered') || 'Unclustered';\n\n    if (!map[cluster]) {\n      map[cluster] = {\n        cluster_label: cluster,\n        selected_keyword_count: 0,\n        final_content_row_count: 0,\n        keywords: [],\n        final_titles: [],\n        final_slugs: [],\n      };\n    }\n\n    map[cluster].final_content_row_count += 1;\n\n    if (row['Blog Post Title']) map[cluster].final_titles.push(row['Blog Post Title']);\n    if (row['Blog Slug']) map[cluster].final_slugs.push(row['Blog Slug']);\n  }\n\n  return Object.values(map).map(cluster => ({\n    ...cluster,\n    final_titles: uniq(cluster.final_titles),\n    final_slugs: uniq(cluster.final_slugs),\n  }));\n}\n\nfunction buildRowsForSheet(rows) {\n  return rows.map(row => ({\n    'Target Keyword': clean(row['Target Keyword']),\n    'Semantic Keyword 1': clean(row['Semantic Keyword 1']),\n    'Semantic Keyword 2': clean(row['Semantic Keyword 2']),\n    'Blog Post Title': clean(row['Blog Post Title']),\n    'Blog Slug': clean(row['Blog Slug']),\n    'Content Brief': clean(row['Content Brief']),\n  }));\n}\n\n// ─────────────────────────────────────────────\n// Read workflow data safely\n// ─────────────────────────────────────────────\n\nconst inputItems = $input.all().map(i => i.json || {});\n\nconst trigger = firstJson('When Executed by Another Workflow');\n\nconst normalizeWriterRows = allJson('Normalize Writer Input');\nconst normalizedResearchRows = allJson('Parser');\nconst articleOutlineRows = [];\nconst contentAgentInputRows = allJson('Prepare Research Agent');\nconst contentAgentRows = allJson('Parser');\n\nconst auditDataset = {};\nconst slimAuditDataset = {};\nconst auditResult = {};\nconst rewritePayload = {};\nconst rewriteResult = {};\n\nconst applyAuditorRows = [];\nconst finalFilteredRows = allJson('Filter Output Fields');\n\nconst sheetPackageBeforeCreate = firstJson('Prepare Content Plan Sheet Package');\nconst sheetPackage = firstJson('Restore Content Plan Package After Tab Create');\nconst headerPackage = firstJson('Prepare Content Plan Header Row');\nconst clickupMessagePackage = firstJson('Build ClickUp Content Plan Message');\nconst clickupResponse = firstJson('ClickUp - Send Chat Message');\n\nconst firstNormalizeWriter = normalizeWriterRows[0] || {};\nconst firstFinalFiltered = finalFilteredRows[0] || {};\nconst firstSheetPackage = sheetPackage || {};\nconst firstSheetBeforeCreate = sheetPackageBeforeCreate || {};\n\nconst languageInfo = getLanguageInfo(\n  trigger,\n  firstNormalizeWriter,\n  firstFinalFiltered,\n  firstSheetPackage,\n  firstSheetBeforeCreate\n);\n\n// ─────────────────────────────────────────────\n// Select real keyword metadata source\n// ─────────────────────────────────────────────\n//\n// Priority:\n// 1. Final Selected Keywords — canonical final selected keywords.\n// 2. normalize_openai Retry — fallback if the retry path produced final selected rows.\n// 3. normalize_openai — fallback for old non-QA flow.\n// 4. Restore Selected Keywords After ClickUp — optional older fallback.\n// 5. Normalize Writer Input — last resort only.\n\nconst keywordRowsSource = firstKeywordRowsSource([\n  {\n    source: 'Final Selected Keywords',\n    rows: allJson('Final Selected Keywords'),\n  },\n  {\n    source: 'normalize_openai Retry',\n    rows: allJson('normalize_openai Retry'),\n  },\n  {\n    source: 'normalize_openai',\n    rows: allJson('normalize_openai'),\n  },\n  {\n    source: 'Restore Selected Keywords After ClickUp',\n    rows: allJson('Restore Selected Keywords After ClickUp'),\n  },\n  {\n    source: 'Normalize Writer Input',\n    rows: normalizeWriterRows,\n  },\n]);\n\nconst selectedKeywordSourceRows = keywordRowsSource.rows;\n\n// ─────────────────────────────────────────────\n// Build core metadata\n// ─────────────────────────────────────────────\n\nconst keywordMetadataMap = getKeywordMetadataMap(selectedKeywordSourceRows);\n\nconst selectedKeywordRows = selectedKeywordSourceRows\n  .map(row => {\n    const compact = compactKeywordInput(row);\n\n    return {\n      selected_at: cleanOrNull(row.selected_at || row.semantic_selected_at),\n      client_name: cleanOrNull(row.client_name || row.company_name),\n\n      keyword: compact.keyword,\n      cluster_label: compact.cluster_label,\n\n      search_volume: compact.search_volume,\n      competition: compact.competition,\n      competition_index: compact.competition_index,\n      yoy_6_v6: compact.yoy_6_v6,\n\n      strategy_name: compact.strategy_name,\n      strategy_names: compact.strategy_names,\n\n      source: compact.source,\n      source_domain: compact.source_domain,\n\n      semantic_1_keyword: compact.semantic_1_keyword,\n      semantic_2_keyword: compact.semantic_2_keyword,\n\n      content_plan_language: compact.content_plan_language,\n      content_plan_language_code: compact.content_plan_language_code,\n      content_plan_language_key: compact.content_plan_language_key,\n      google_ads_language: compact.google_ads_language,\n      google_ads_language_id: compact.google_ads_language_id,\n      google_ads_language_code: compact.google_ads_language_code,\n      planner_language_scope: compact.planner_language_scope,\n      serper_hl: compact.serper_hl,\n      serper_gl: compact.serper_gl,\n      language: compact.language,\n    };\n  })\n  .filter(row => row.keyword);\n\nconst rawFinalRows =\n  finalFilteredRows.length\n    ? finalFilteredRows\n    : applyAuditorRows.length\n      ? applyAuditorRows\n      : contentAgentRows.length\n        ? contentAgentRows\n        : inputItems;\n\nconst finalRows = rawFinalRows\n  .map((row, index) => compactFinalRowWithMetadata(row, keywordMetadataMap, index))\n  .filter(row => row['Target Keyword']);\n\nconst finalSheetRows = buildRowsForSheet(finalRows);\n\nconst keywordInputs = selectedKeywordSourceRows\n  .map(compactKeywordInput)\n  .filter(row => row.keyword);\n\nconst clusterSummary = buildClusterSummary(selectedKeywordRows, finalRows);\n\n// ─────────────────────────────────────────────\n// Sheet / client metadata\n// ─────────────────────────────────────────────\n\nconst spreadsheetId =\n  firstNonEmpty(\n    sheetPackage.spreadsheet_id,\n    sheetPackageBeforeCreate.spreadsheet_id,\n    headerPackage.spreadsheet_id,\n    trigger.spreadsheet_id,\n    trigger.spreadsheetId,\n    firstNormalizeWriter.spreadsheet_id\n  );\n\nconst spreadsheetUrl =\n  firstNonEmpty(\n    sheetPackage.spreadsheet_url,\n    sheetPackageBeforeCreate.spreadsheet_url,\n    headerPackage.spreadsheet_url,\n    trigger.spreadsheet_url,\n    firstNormalizeWriter.spreadsheet_url,\n    spreadsheetId ? `https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit` : ''\n  );\n\nconst selectedSheetId =\n  firstNonEmpty(\n    sheetPackage.selected_sheet_id,\n    sheetPackageBeforeCreate.selected_sheet_id,\n    trigger.selected_sheet_id,\n    firstNormalizeWriter.selected_sheet_id\n  );\n\nconst selectedSheetUrl =\n  firstNonEmpty(\n    sheetPackage.selected_sheet_url,\n    sheetPackageBeforeCreate.selected_sheet_url,\n    trigger.selected_sheet_url,\n    firstNormalizeWriter.selected_sheet_url\n  );\n\nconst selectedSheetTabName =\n  firstNonEmpty(\n    sheetPackage.selected_sheet_tab_name,\n    sheetPackageBeforeCreate.selected_sheet_tab_name,\n    trigger.selected_sheet_tab_name,\n    firstNormalizeWriter.selected_sheet_tab_name\n  );\n\nconst contentPlanTabName =\n  firstNonEmpty(\n    sheetPackage.sheet_tab_name,\n    sheetPackageBeforeCreate.sheet_tab_name,\n    headerPackage.sheet_tab_name\n  );\n\nconst contentPlanSheetUrl =\n  firstNonEmpty(\n    sheetPackage.sheet_url,\n    headerPackage.sheet_url,\n    clickupMessagePackage.sheet_url\n  );\n\nconst contentPlanSheetId =\n  firstNonEmpty(\n    sheetPackage.sheet_id,\n    headerPackage.sheet_id\n  );\n\nconst clientName =\n  firstNonEmpty(\n    trigger.client_name,\n    trigger.company_name,\n    firstNormalizeWriter.client_name,\n    firstNormalizeWriter.company_name,\n    sheetPackage.client_name,\n    sheetPackageBeforeCreate.client_name,\n    selectedKeywordRows[0]?.client_name,\n    'Client'\n  );\n\nconst clientUrl =\n  firstNonEmpty(\n    trigger.client_url,\n    firstNormalizeWriter.client_url,\n    firstNormalizeWriter.company_context?.company?.site_url\n  );\n\nconst companyContext = compactCompanyContext(\n  trigger.company_context ||\n  firstNormalizeWriter.company_context ||\n  firstNormalizeWriter.company_context_compact ||\n  {}\n);\n\nconst callbackUrl =\n  firstNonEmpty(\n    trigger.callback_url,\n    firstNormalizeWriter.callback_url,\n    finalRows[0]?.callback_url\n  );\n\nconst taskId =\n  firstNonEmpty(\n    trigger.taskId,\n    firstNormalizeWriter.taskId,\n    finalRows[0]?.taskId\n  );\n\nconst brandId =\n  firstNonEmpty(\n    trigger.brandId,\n    firstNormalizeWriter.brandId,\n    finalRows[0]?.brandId\n  );\n\nconst userId =\n  firstNonEmpty(\n    trigger.userId,\n    firstNormalizeWriter.userId,\n    finalRows[0]?.userId\n  );\n\nconst executionId =\n  firstNonEmpty(\n    trigger.execution_id,\n    sheetPackage.execution_id,\n    sheetPackageBeforeCreate.execution_id,\n    firstNormalizeWriter.execution_id,\n    $execution?.id\n  );\n\n// ─────────────────────────────────────────────\n// Build final handoff\n// ─────────────────────────────────────────────\n\nconst metadataLostWarning =\n  finalRows.length > 3 &&\n  selectedKeywordRows.length === 0 &&\n  finalRows.filter(row => row.cluster_label === 'Unclustered').length >= Math.ceil(finalRows.length * 0.8);\n\nconst handoffPackage = {\n  payload_type: 'ai_content_plan_handoff_v2_multilingual',\n  generated_at: new Date().toISOString(),\n\n  workflow: {\n    source_workflow_name: 'Yehor_content_plan_writer',\n    next_workflow_name: 'Ai-content-plan',\n    handoff_node: 'Build AI Content Plan Handoff Package',\n  },\n\n  ids: {\n    execution_id: executionId || null,\n    taskId: taskId || null,\n    brandId: brandId || null,\n    userId: userId || null,\n  },\n\n  language: languageInfo,\n\n  content_plan_language: languageInfo.content_plan_language,\n  content_plan_language_code: languageInfo.content_plan_language_code,\n  content_plan_language_key: languageInfo.content_plan_language_key,\n  google_ads_language: languageInfo.google_ads_language,\n  google_ads_language_id: languageInfo.google_ads_language_id,\n  google_ads_language_code: languageInfo.google_ads_language_code,\n  planner_language_scope: languageInfo.planner_language_scope,\n  serper_hl: languageInfo.serper_hl,\n  serper_gl: languageInfo.serper_gl,\n\n  client: {\n    client_name: clientName,\n    company_name: clientName,\n    client_url: clientUrl || '',\n\n    language: languageInfo,\n\n    company_context: companyContext,\n\n    onboarding_overview:\n      companyContext ||\n      trigger.onboarding_overview ||\n      firstNormalizeWriter.onboarding_overview ||\n      null,\n\n    perplexity_overview:\n      compactText(\n        trigger.perplexity_overview ||\n        firstNormalizeWriter.perplexity_overview ||\n        '',\n        1800\n      ),\n  },\n\n  source_keyword_sheet: {\n    spreadsheet_id: spreadsheetId || null,\n    spreadsheet_url: spreadsheetUrl || null,\n    selected_sheet_id: selectedSheetId || null,\n    selected_sheet_url: selectedSheetUrl || '',\n    selected_sheet_tab_name: selectedSheetTabName || '',\n  },\n\n  content_plan_sheet: {\n    spreadsheet_id: spreadsheetId || null,\n    spreadsheet_url: spreadsheetUrl || null,\n\n    sheet_id: contentPlanSheetId || null,\n    sheet_tab_name: contentPlanTabName || '',\n    sheet_url: contentPlanSheetUrl || '',\n\n    headers:\n      sheetPackage.headers ||\n      sheetPackageBeforeCreate.headers ||\n      [\n        'Target Keyword',\n        'Semantic Keyword 1',\n        'Semantic Keyword 2',\n        'Blog Post Title',\n        'Blog Slug',\n        'Content Brief',\n      ],\n\n    row_count: finalRows.length,\n\n    exported_at:\n      sheetPackage.exported_at ||\n      sheetPackageBeforeCreate.exported_at ||\n      new Date().toISOString(),\n  },\n\n  selected_keyword_rows: selectedKeywordRows,\n  keyword_cluster_summary: clusterSummary,\n  keyword_inputs: keywordInputs,\n\n  research: {\n    normalized_research_rows: normalizedResearchRows.map(compactResearchRow),\n    article_outline_rows: articleOutlineRows.map(compactResearchRow),\n  },\n\n  content_generation: {\n    content_agent_input_rows: contentAgentInputRows.map(row => ({\n      core_keyword: cleanOrNull(row.core_keyword),\n      cluster_label: cleanOrNull(row.cluster_label),\n      content_agent_input: row.research_agent_input || null,\n      content_plan_language: row.content_plan_language || languageInfo.content_plan_language,\n      content_plan_language_code: row.content_plan_language_code || languageInfo.content_plan_language_code,\n    })),\n\n    content_agent_rows: finalRows,\n  },\n\n  audit: {\n    build_audit_dataset: compactAuditDataset(auditDataset),\n    slim_for_evaluate: compactAuditDataset(slimAuditDataset),\n    evaluate_result: compactAuditResult(auditResult),\n    applied_rows_count: applyAuditorRows.length,\n    rewrite_payload: {\n      LANGUAGE: rewritePayload.LANGUAGE || languageInfo,\n      rows_to_process_count: arr(rewritePayload.rows_to_process).length,\n      rows_to_process: take(rewritePayload.rows_to_process, 200),\n    },\n    rewrite_result: compactRewriteResult(rewriteResult),\n  },\n\n  final_content_plan: {\n    row_count: finalRows.length,\n    visible_columns: [\n      'Target Keyword',\n      'Semantic Keyword 1',\n      'Semantic Keyword 2',\n      'Blog Post Title',\n      'Blog Slug',\n      'Content Brief',\n    ],\n    rows: finalRows,\n    sheet_rows: finalSheetRows,\n  },\n\n  clickup: {\n    message_package: clickupMessagePackage || null,\n    response: clickupResponse || null,\n    message_sent:\n      clickupMessagePackage.clickup_message ||\n      clickupMessagePackage.message ||\n      null,\n  },\n\n  callback: {\n    callback_url: callbackUrl || null,\n    taskId: taskId || null,\n    brandId: brandId || null,\n    userId: userId || null,\n  },\n\n  output_contract: {\n    ai_prompts_columns: ['AI Prompt', 'Topic Cluster'],\n    ai_content_plan_columns: [\n      'AI Prompt',\n      'Topic Cluster',\n      'SEO Title',\n      'Blog Slug',\n      'Content Brief',\n    ],\n    source_seo_content_plan_columns: [\n      'Target Keyword',\n      'Semantic Keyword 1',\n      'Semantic Keyword 2',\n      'Blog Post Title',\n      'Blog Slug',\n      'Content Brief',\n    ],\n    target_language: languageInfo.content_plan_language,\n    target_language_code: languageInfo.content_plan_language_code,\n    must_preserve_language: true,\n    must_preserve_locked_keywords: true,\n    must_preserve_source_sheet_links: true,\n  },\n\n  debug_counts: {\n    input_items: inputItems.length,\n\n    keyword_metadata_source_node: keywordRowsSource.source,\n    keyword_metadata_source_rows: selectedKeywordSourceRows.length,\n\n    normalize_writer_rows: normalizeWriterRows.length,\n    selected_keyword_rows: selectedKeywordRows.length,\n    keyword_inputs: keywordInputs.length,\n\n    normalized_research_rows: normalizedResearchRows.length,\n    article_outline_rows: articleOutlineRows.length,\n    content_agent_input_rows: contentAgentInputRows.length,\n    content_agent_rows: contentAgentRows.length,\n    apply_auditor_rows: applyAuditorRows.length,\n    final_filtered_rows: finalFilteredRows.length,\n    final_content_plan_rows: finalRows.length,\n\n    metadata_lost_warning: metadataLostWarning,\n  },\n\n  warnings: [\n    ...(metadataLostWarning\n      ? [\n          'Selected keyword metadata appears missing. Most final rows are Unclustered. Check that Final Selected Keywords is available before Build AI Content Plan Handoff Package.',\n        ]\n      : []),\n  ],\n\n  final_ready:\n    finalRows.length > 0 &&\n    Boolean(spreadsheetId) &&\n    Boolean(contentPlanTabName || contentPlanSheetUrl),\n};\n\nconsole.log('✅ Build AI Content Plan Handoff Package:', {\n  rows: finalRows.length,\n  client_name: clientName,\n  language: languageInfo.content_plan_language,\n  language_code: languageInfo.content_plan_language_code,\n  spreadsheet_id: spreadsheetId,\n  content_plan_tab: contentPlanTabName,\n  final_ready: handoffPackage.final_ready,\n  keyword_metadata_source_node: keywordRowsSource.source,\n  selected_keyword_rows: selectedKeywordRows.length,\n  metadata_lost_warning: metadataLostWarning,\n});\n\nreturn [\n  {\n    json: handoffPackage,\n  },\n];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -586,7 +363,7 @@
         -2384,
         -3216
       ],
-      "id": "a7c383c7-5960-4965-b72a-b9c4f32d3643",
+      "id": "d7e1fdbf-798c-4f2d-9843-6a79208e5da3",
       "name": "Keyword Research Loop"
     },
     {
@@ -599,7 +376,7 @@
         -2208,
         -3168
       ],
-      "id": "5330d185-849f-406a-962a-60d614721aa1",
+      "id": "bcc3f1ea-4f32-4dab-9c16-5ab5d5438187",
       "name": "Competitor SERP Research",
       "retryOnFail": true,
       "waitBetweenTries": 5000
@@ -623,7 +400,7 @@
         -2048,
         -3168
       ],
-      "id": "f668e313-3470-4703-a562-b4498a810769",
+      "id": "2df5c4c3-09b7-45d5-ad83-34726c45f980",
       "name": "Competitor SERP Researcher",
       "retryOnFail": true,
       "maxTries": 5,
@@ -645,7 +422,7 @@
         -1888,
         -3168
       ],
-      "id": "e659b7ea-67fb-42bf-b449-bd93008ddbd8",
+      "id": "c0d96081-0c83-429a-be42-900b36b993fb",
       "name": "Parse Competitor SERP Research"
     },
     {
@@ -659,7 +436,7 @@
         -1728,
         -3168
       ],
-      "id": "2ccac357-bf0a-4208-ba05-ce23f8eab732",
+      "id": "34bc41e5-f9c2-401d-adc8-64fabb359b2e",
       "name": "Memory Reader"
     },
     {
@@ -673,7 +450,7 @@
         -1568,
         -3168
       ],
-      "id": "ef570321-1856-4825-b586-9a43baab5957",
+      "id": "a4aa9922-e804-4e21-85a8-eb5e026df634",
       "name": "Prepare Research Agent"
     },
     {
@@ -691,7 +468,7 @@
         -1360,
         -3168
       ],
-      "id": "27d522d8-c00e-4631-9e42-bef85981e757",
+      "id": "661d2a89-df79-495a-9e9e-1fc1b332ae0e",
       "name": "Brief Planner",
       "retryOnFail": true,
       "maxTries": 3,
@@ -713,7 +490,7 @@
         -1456,
         -2976
       ],
-      "id": "eae5606f-6b20-4819-836d-16850ef8917a",
+      "id": "2f6ed81d-79f2-4bff-ab75-40b0f69f3956",
       "name": "Thinker",
       "credentials": {
         "anthropicApi": {
@@ -740,7 +517,7 @@
         -1296,
         -2976
       ],
-      "id": "9b3e0915-7208-4e17-95aa-02813b758658",
+      "id": "29cd032c-88a4-4c1e-be8c-dd42e18ebba8",
       "name": "Researcher",
       "credentials": {
         "tavilyApi": {
@@ -759,7 +536,7 @@
         -1136,
         -2976
       ],
-      "id": "1b57a109-ef0c-4ad3-a1ec-3d14b07a9a4d",
+      "id": "ba183745-b28c-4cfd-be51-dd3947325e49",
       "name": "Research Structure",
       "retryOnFail": true,
       "maxTries": 5
@@ -775,38 +552,236 @@
         -1072,
         -3168
       ],
-      "id": "81bfba2b-4d37-4b06-8e0b-dd65afbd3c54",
+      "id": "b2aaa683-b59e-4055-a509-fa64090702db",
       "name": "Parser"
     },
     {
       "parameters": {
-        "jsonSchemaExample": "{\n  \"audit_summary\": {\n    \"rows_in\": 0,\n    \"exact_duplicate_groups\": 0,\n    \"near_duplicate_pairs\": 0,\n    \"cannibalization_clusters\": 0,\n    \"rows_keep\": 0,\n    \"rows_differentiate\": 0,\n    \"rows_drop\": 0\n  },\n  \"exact_duplicate_groups\": [\n    {\n      \"field\": \"Target Keyword|Blog Slug|Blog Post Title|cross_field\",\n      \"row_ids\": [],\n      \"note\": \"\"\n    }\n  ],\n  \"near_duplicate_pairs\": [\n    {\n      \"row_id_a\": \"\",\n      \"row_id_b\": \"\",\n      \"reason\": \"\",\n      \"confidence\": \"high|medium|low\"\n    }\n  ],\n  \"cannibalization_clusters\": [\n    {\n      \"cluster_id\": \"C1\",\n      \"row_ids\": [],\n      \"reason\": \"\",\n      \"recommended_action\": \"differentiate|drop|ok\"\n    }\n  ],\n  \"row_actions\": [\n    {\n      \"row_id\": \"\",\n      \"action\": \"KEEP|DIFFERENTIATE|DROP\",\n      \"notes\": [],\n      \"fix_direction\": {\n        \"title_direction\": \"\",\n        \"slug_direction\": \"\",\n        \"brief_direction\": \"\"\n      }\n    }\n  ],\n  \"policy_flags\": [\n    {\n      \"row_id\": \"\",\n      \"type\": \"title_naturalness|wrong_language|slug_overlap|intent_overlap|brief_generic|brief_too_long|semantic_support|other\",\n      \"issue\": \"\",\n      \"fix\": \"\"\n    }\n  ],\n  \"confidence\": \"high|medium|low\",\n  \"warnings\": []\n}"
+        "jsCode": "const items = $input.all();\n\nreturn items.map((item, index) => ({\n  json: {\n    ...item.json,\n    row_id: item.json.row_id || `row_${index + 1}`,\n  },\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -688,
+        -3728
+      ],
+      "id": "2fc1fdaa-e25d-4b58-87fe-ee9ef9d92b22",
+      "name": "Collect Final Rows"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nconst first = items[0]?.json || {};\n\nconst rows = items.map(item => {\n  const j = item.json || {};\n  return {\n    row_id: j.row_id,\n    'Blog Post Title': clean(j['Blog Post Title']),\n    'Content Brief': clean(j['Content Brief']),\n    'CTA Rule': clean(j['CTA Rule']),\n  };\n});\n\nreturn [{\n  json: {\n    target_language: clean(first.content_plan_language) || 'English',\n    target_language_code: clean(first.content_plan_language_code) || 'en',\n    rows,\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -512,
+        -3728
+      ],
+      "id": "b19c08e3-79fb-49be-b54b-104c98c7ca96",
+      "name": "Prepare Language Audit"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=TARGET_LANGUAGE: {{ $json.target_language }} ({{ $json.target_language_code }})\n\nROWS:\n{{ JSON.stringify($json.rows) }}\n\nClassify each row.",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "<persona>You are a meticulous language QA specialist for an automated content-plan pipeline. Your only job is to verify that content-plan rows are written in the required content plan language.</persona>\n\n<context>\nThe user message contains TARGET_LANGUAGE and ROWS. Each row has row_id, Blog Post Title, Content Brief, and CTA Rule.\n</context>\n\n<rules>\n- For each row, judge whether Blog Post Title, Content Brief, and CTA Rule are all written in TARGET_LANGUAGE\n- language_ok is true only when all three fields are written in TARGET_LANGUAGE\n- language_ok is false when any field is written in a different language or unnaturally mixes languages\n- Brand names, product names, acronyms, URLs, and SEO keywords inside the text may legitimately stay in their original language and must NOT count as a violation\n- Loanwords that are normal in TARGET_LANGUAGE are acceptable\n- Judge the prose, not individual borrowed terms\n- Do not evaluate quality, style, or content. Language match is the only criterion\n- Return a verdict for every row_id you received, in the same order\n</rules>\n\n<output>\nProvide the output in JSON format as explained in the output parser.\n</output>"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -336,
+        -3728
+      ],
+      "id": "8d5cbcb0-e73a-4e6b-8713-20ba2db656f0",
+      "name": "Language Auditor",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.4-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5.4-mini"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "timeout": 300000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -400,
+        -3552
+      ],
+      "id": "1688bc50-e80e-46cd-8742-9bfe3b196cfe",
+      "name": "Language Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "6UPkFuEKJN6lJbgb",
+          "name": "yehor-main-content-plan-api-key-only-for-content-plans"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"rows\": [\n    {\n      \"row_id\": \"row_1\",\n      \"language_ok\": true\n    }\n  ]\n}"
       },
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        -464,
-        -3600
+        -240,
+        -3552
       ],
-      "id": "ac4832b1-846c-468c-85c3-d30c4c6f3111",
-      "name": "Audit Structure",
+      "id": "b934347b-ea21-401e-b8b2-f7f3ad591872",
+      "name": "Language Audit Structure",
       "retryOnFail": true,
       "maxTries": 5
     },
     {
       "parameters": {
-        "jsonSchemaExample": "{\n  \"patches\": [\n    {\n      \"row_id\": \"row_1\",\n      \"Blog Post Title\": \"\",\n      \"Blog Slug\": \"\",\n      \"Content Brief\": \"\"\n    }\n  ]\n}"
+        "jsCode": "const raw = $input.first().json.output;\n\nlet parsed;\ntry {\n  parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;\n} catch (e) {\n  parsed = { rows: [] };\n}\n\nconst verdicts = Array.isArray(parsed.rows) ? parsed.rows : [];\nconst wrongRowIds = verdicts\n  .filter(v => v && v.language_ok === false && v.row_id)\n  .map(v => String(v.row_id));\n\nreturn [{\n  json: {\n    needs_translation: wrongRowIds.length > 0,\n    wrong_row_ids: wrongRowIds,\n    total_rows: verdicts.length,\n  },\n}];"
       },
-      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
-      "typeVersion": 1.3,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
-        432,
-        -3456
+        -96,
+        -3728
       ],
-      "id": "b435485b-3d04-42ed-87b0-243e0e60f7f9",
-      "name": "Rewrite Structure",
+      "id": "bce2d146-9d29-4458-aa4f-a1cd4f75e0a5",
+      "name": "Check Translation Needed"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8d6f7903-0b6a-4f18-9e37-f5f62d645375",
+              "leftValue": "={{ $json.needs_translation }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        64,
+        -3728
+      ],
+      "id": "372c5d6f-91d6-425a-b5fb-3ad6a7f532ca",
+      "name": "Needs Translation"
+    },
+    {
+      "parameters": {
+        "jsCode": "const wrongRowIds = $input.first().json.wrong_row_ids || [];\nconst allRows = $('Collect Final Rows').all().map(i => i.json || {});\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nconst FIELDS = ['Blog Post Title', 'Content Brief', 'CTA Rule'];\n\nconst DEEPL_TARGETS = {\n  en: 'EN-GB',\n  pt: 'PT-PT',\n  no: 'NB',\n};\n\nconst first = allRows[0] || {};\nconst code = clean(first.content_plan_language_code).toLowerCase() || 'en';\nconst targetSource = DEEPL_TARGETS[code] || code.toUpperCase();\n\nconst wrongRows = allRows.filter(r => wrongRowIds.includes(String(r.row_id)));\n\nif (!wrongRows.length) {\n  throw new Error('Translation Prep: no rows matched wrong_row_ids.');\n}\n\nconst fieldNames = [];\nconst fieldTexts = [];\n\nfor (const row of wrongRows) {\n  for (const field of FIELDS) {\n    fieldNames.push(`${row.row_id}::${field}`);\n    fieldTexts.push(clean(row[field]) || ' ');\n  }\n}\n\nreturn [{\n  json: {\n    fieldNames,\n    fieldTexts,\n    targetSource,\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        -3792
+      ],
+      "id": "b691a11d-b349-490d-8de0-959c43be1264",
+      "name": "Translation Prep"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.deepl.com/v2/translate",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  \"text\": $json.fieldTexts,\n  \"target_lang\": $json.targetSource,\n  \"preserve_formatting\": true\n} }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        -3792
+      ],
+      "id": "72359835-548d-4364-9491-cda996d457ab",
+      "name": "DeepL Translation",
       "retryOnFail": true,
-      "maxTries": 5
+      "maxTries": 5,
+      "waitBetweenTries": 2000,
+      "executeOnce": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "NZs3fXsgNTeG2dFs",
+          "name": "DeepL API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const deeplResponse = $input.first().json;\nconst prep = $('Translation Prep').first().json;\n\nif (!deeplResponse.translations || !Array.isArray(deeplResponse.translations)) {\n  throw new Error(`DeepL response missing translations array. Response: ${JSON.stringify(deeplResponse)}`);\n}\nif (deeplResponse.translations.length !== prep.fieldNames.length) {\n  throw new Error(`DeepL returned ${deeplResponse.translations.length} translations but expected ${prep.fieldNames.length}`);\n}\n\nconst decodeEntities = (str) =>\n  typeof str === 'string'\n    ? str\n        .replace(/&amp;/g, '&')\n        .replace(/&lt;/g, '<')\n        .replace(/&gt;/g, '>')\n        .replace(/&quot;/g, '\"')\n        .replace(/&#39;/g, \"'\")\n        .replace(/&#x2F;/g, '/')\n    : str;\n\nconst translations = {};\nprep.fieldNames.forEach((name, idx) => {\n  const sep = name.indexOf('::');\n  const rowId = name.slice(0, sep);\n  const field = name.slice(sep + 2);\n  if (!translations[rowId]) translations[rowId] = {};\n  translations[rowId][field] = decodeEntities(deeplResponse.translations[idx].text).trim();\n});\n\nreturn [{ json: { translations } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        -3792
+      ],
+      "id": "4c498fad-78cf-4869-b990-599710849b08",
+      "name": "Unwrapper"
+    },
+    {
+      "parameters": {
+        "jsCode": "const translations = $input.first().json.translations || {};\nconst allRows = $('Collect Final Rows').all().map(i => i.json || {});\n\nreturn allRows.map(row => {\n  const patch = translations[String(row.row_id)];\n  if (!patch) return { json: row };\n  return {\n    json: {\n      ...row,\n      'Blog Post Title': patch['Blog Post Title'] || row['Blog Post Title'],\n      'Content Brief': patch['Content Brief'] || row['Content Brief'],\n      'CTA Rule': patch['CTA Rule'] || row['CTA Rule'],\n      unique_angle: patch['Content Brief'] || row.unique_angle,\n      cta_rule: patch['CTA Rule'] || row.cta_rule,\n      _translated: true,\n    },\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        -3792
+      ],
+      "id": "5ba0ad21-92a2-4c42-b48a-64102b79052f",
+      "name": "Apply Translations"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $('Collect Final Rows').all().map(i => i.json || {});\n\nif (!rows.length) {\n  throw new Error('Pass Rows: no rows found from Collect Final Rows.');\n}\n\nreturn rows.map(row => ({ json: row }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        -3600
+      ],
+      "id": "18312a60-b2b7-445d-877e-3090e6c74d07",
+      "name": "Pass Rows"
     }
   ],
   "connections": {
@@ -836,7 +811,7 @@
       "main": [
         [
           {
-            "node": "build_audit_dataset",
+            "node": "Collect Final Rows",
             "type": "main",
             "index": 0
           }
@@ -960,146 +935,124 @@
         ]
       ]
     },
-    "build_audit_dataset": {
+    "Collect Final Rows": {
       "main": [
         [
           {
-            "node": "slim_for_evaluate",
+            "node": "Prepare Language Audit",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "slim_for_evaluate": {
+    "Prepare Language Audit": {
       "main": [
         [
           {
-            "node": "evaluate_content_plan",
+            "node": "Language Auditor",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "evaluate_content_plan": {
-      "main": [
-        [
-          {
-            "node": "Apply Auditor Changes",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Auditor Model": {
+    "Language Model": {
       "ai_languageModel": [
         [
           {
-            "node": "evaluate_content_plan",
+            "node": "Language Auditor",
             "type": "ai_languageModel",
             "index": 0
           }
         ]
       ]
     },
-    "Audit Structure": {
+    "Language Audit Structure": {
       "ai_outputParser": [
         [
           {
-            "node": "evaluate_content_plan",
+            "node": "Language Auditor",
             "type": "ai_outputParser",
             "index": 0
           }
         ]
       ]
     },
-    "Apply Auditor Changes": {
+    "Language Auditor": {
       "main": [
         [
           {
-            "node": "Check Rewrite Needed",
+            "node": "Check Translation Needed",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Check Rewrite Needed": {
+    "Check Translation Needed": {
       "main": [
         [
           {
-            "node": "Needs Rewrite",
+            "node": "Needs Translation",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Needs Rewrite": {
+    "Needs Translation": {
       "main": [
         [
           {
-            "node": "Prepare Payload",
+            "node": "Translation Prep",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Pass Through",
+            "node": "Pass Rows",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Prepare Payload": {
+    "Translation Prep": {
       "main": [
         [
           {
-            "node": "rewrite_plan",
+            "node": "DeepL Translation",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "rewrite_plan": {
+    "DeepL Translation": {
       "main": [
         [
           {
-            "node": "Apply Rewrites",
+            "node": "Unwrapper",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Rewrite Model": {
-      "ai_languageModel": [
+    "Unwrapper": {
+      "main": [
         [
           {
-            "node": "rewrite_plan",
-            "type": "ai_languageModel",
+            "node": "Apply Translations",
+            "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Rewrite Structure": {
-      "ai_outputParser": [
-        [
-          {
-            "node": "rewrite_plan",
-            "type": "ai_outputParser",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Apply Rewrites": {
+    "Apply Translations": {
       "main": [
         [
           {
@@ -1110,7 +1063,7 @@
         ]
       ]
     },
-    "Pass Through": {
+    "Pass Rows": {
       "main": [
         [
           {
