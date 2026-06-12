@@ -363,7 +363,7 @@
         -2384,
         -3216
       ],
-      "id": "bbca75a7-d1dc-42b8-ac59-081ec63a1f4d",
+      "id": "8c58902c-cee1-458f-ad0a-eee103d7dde2",
       "name": "Keyword Research Loop"
     },
     {
@@ -376,7 +376,7 @@
         -2208,
         -3168
       ],
-      "id": "95552c87-6b47-4e47-b823-db83ffcd4e1d",
+      "id": "e05afb63-5eec-4f39-bddc-1f2759a205f8",
       "name": "Competitor SERP Research",
       "retryOnFail": true,
       "waitBetweenTries": 5000
@@ -400,7 +400,7 @@
         -2048,
         -3168
       ],
-      "id": "ff909b6e-dc02-4f4b-923d-8781f91cbc74",
+      "id": "a64da380-5788-4253-8b5b-ea617c13f5ca",
       "name": "Competitor SERP Researcher",
       "retryOnFail": true,
       "maxTries": 5,
@@ -422,7 +422,7 @@
         -1888,
         -3168
       ],
-      "id": "b3b2452d-2f77-462a-9d9e-09a7313bbd4c",
+      "id": "bcb01b5c-d6c0-421f-b1f8-4ccc1a71fc07",
       "name": "Parse Competitor SERP Research"
     },
     {
@@ -436,7 +436,7 @@
         -1728,
         -3168
       ],
-      "id": "5399a967-28a7-4b22-a616-34e5be871201",
+      "id": "972b710b-93de-4385-aa40-09cf2afa4bcd",
       "name": "Memory Reader"
     },
     {
@@ -450,7 +450,7 @@
         -1568,
         -3168
       ],
-      "id": "ad88c6da-0394-4e91-be67-34cc89862bcd",
+      "id": "045fd862-7a30-4ad0-8e0c-52faea759559",
       "name": "Prepare Research Agent"
     },
     {
@@ -468,7 +468,7 @@
         -1360,
         -3168
       ],
-      "id": "034cdf8b-af61-4750-9820-a90f3f6fadc1",
+      "id": "1dff53b2-4b0f-465b-947d-0c070a828f81",
       "name": "Brief Planner",
       "retryOnFail": true,
       "maxTries": 3,
@@ -490,7 +490,7 @@
         -1456,
         -2976
       ],
-      "id": "54b8a2fc-8b99-42f3-aa69-1ffd73c743c8",
+      "id": "62a1a2aa-8f3d-42b2-ab24-bd953cf25951",
       "name": "Thinker",
       "credentials": {
         "anthropicApi": {
@@ -517,7 +517,7 @@
         -1296,
         -2976
       ],
-      "id": "25b4bd94-a93a-4d7c-bb29-1e035bcebe1a",
+      "id": "8a73a582-49d3-4ab9-8579-ab8e0b05b761",
       "name": "Researcher",
       "credentials": {
         "tavilyApi": {
@@ -536,7 +536,7 @@
         -1136,
         -2976
       ],
-      "id": "7704dcff-0786-4ee8-ac43-6ef81739127a",
+      "id": "5001b83f-3748-49b1-86cc-f95076a8a68e",
       "name": "Research Structure",
       "retryOnFail": true,
       "maxTries": 5
@@ -552,7 +552,7 @@
         -1072,
         -3168
       ],
-      "id": "2ed13477-6270-49fb-a0e5-e65a92cd5e8b",
+      "id": "6388fb8b-6f56-4114-a221-c6d729741532",
       "name": "Parser"
     },
     {
@@ -565,12 +565,12 @@
         -688,
         -3728
       ],
-      "id": "82175d62-a0f2-49c6-bf25-6d0a2e379f82",
+      "id": "afcac462-f758-40b8-b01a-3a621b2505f7",
       "name": "Collect Final Rows"
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nconst first = items[0]?.json || {};\n\nconst rows = items.map(item => {\n  const j = item.json || {};\n  return {\n    row_id: j.row_id,\n    'Blog Post Title': clean(j['Blog Post Title']),\n    'Content Brief': clean(j['Content Brief']),\n    'CTA Rule': clean(j['CTA Rule']),\n  };\n});\n\nreturn [{\n  json: {\n    target_language: clean(first.content_plan_language) || 'English',\n    target_language_code: clean(first.content_plan_language_code) || 'en',\n    rows,\n  },\n}];"
+        "jsCode": "const items = $input.all();\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nconst first = items[0]?.json || {};\n\nconst rows = items.map(item => {\n  const j = item.json || {};\n  return {\n    row_id: j.row_id,\n    'Blog Post Title': clean(j['Blog Post Title']),\n    'Article Type': clean(j['Article Type'] || j.article_type),\n    'Content Brief': clean(j['Content Brief']),\n    'CTA Rule': clean(j['CTA Rule']),\n  };\n});\n\nreturn [{\n  json: {\n    target_language: clean(first.content_plan_language) || 'English',\n    target_language_code: clean(first.content_plan_language_code) || 'en',\n    rows,\n  },\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -578,7 +578,7 @@
         -512,
         -3728
       ],
-      "id": "a89d04c6-ccd6-473c-9865-0360adbbbab3",
+      "id": "bc85a9d4-5824-4b5e-8c2a-93ae98d6fbe3",
       "name": "Prepare Language Audit"
     },
     {
@@ -587,7 +587,7 @@
         "text": "=TARGET_LANGUAGE: {{ $json.target_language }} ({{ $json.target_language_code }})\n\nROWS:\n{{ JSON.stringify($json.rows) }}\n\nClassify each row.",
         "hasOutputParser": true,
         "options": {
-          "systemMessage": "<persona>You are a meticulous language QA specialist for an automated content-plan pipeline. Your only job is to verify that content-plan rows are written in the required content plan language.</persona>\n\n<context>\nThe user message contains TARGET_LANGUAGE and ROWS. Each row has row_id, Blog Post Title, Content Brief, and CTA Rule.\n</context>\n\n<rules>\n- For each row, judge whether Blog Post Title, Content Brief, and CTA Rule are all written in TARGET_LANGUAGE\n- language_ok is true only when all three fields are written in TARGET_LANGUAGE\n- language_ok is false when any field is written in a different language or unnaturally mixes languages\n- Brand names, product names, acronyms, URLs, and SEO keywords inside the text may legitimately stay in their original language and must NOT count as a violation\n- Loanwords that are normal in TARGET_LANGUAGE are acceptable\n- Judge the prose, not individual borrowed terms\n- Do not evaluate quality, style, or content. Language match is the only criterion\n- Return a verdict for every row_id you received, in the same order\n</rules>\n\n<output>\nProvide the output in JSON format as explained in the output parser.\n</output>"
+          "systemMessage": "<persona>You are a meticulous language QA specialist for an automated content-plan pipeline. Your only job is to verify that content-plan rows are written in the required content plan language.</persona>\n\n<context>\nThe user message contains TARGET_LANGUAGE and ROWS. Each row has row_id, Blog Post Title, Article Type, Content Brief, and CTA Rule.\n</context>\n\n<rules>\n- For each row, judge whether Blog Post Title, Article Type, Content Brief, and CTA Rule are all written in TARGET_LANGUAGE\n- language_ok is true only when all four fields are written in TARGET_LANGUAGE\n- language_ok is false when any field is written in a different language or unnaturally mixes languages\n- Brand names, product names, acronyms, URLs, and SEO keywords inside the text may legitimately stay in their original language and must NOT count as a violation\n- Loanwords that are normal in TARGET_LANGUAGE are acceptable\n- Judge the prose, not individual borrowed terms\n- Do not evaluate quality, style, or content. Language match is the only criterion\n- Return a verdict for every row_id you received, in the same order\n</rules>\n\n<output>\nProvide the output in JSON format as explained in the output parser.\n</output>"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -596,7 +596,7 @@
         -336,
         -3728
       ],
-      "id": "156b002a-bb6c-43a8-84a4-75ee314e6ac6",
+      "id": "1a82ee09-af10-43be-85ae-ee92d7c63124",
       "name": "Language Auditor",
       "retryOnFail": true,
       "maxTries": 5,
@@ -621,7 +621,7 @@
         -400,
         -3552
       ],
-      "id": "0d6e05f3-a696-4c66-bfb6-0fc8c13b8ec6",
+      "id": "ed368bd2-e3ae-4e26-9b59-269a0ccc9bf2",
       "name": "Language Model",
       "credentials": {
         "openAiApi": {
@@ -640,7 +640,7 @@
         -240,
         -3552
       ],
-      "id": "f79592e5-c2bb-4a11-bdc9-99c9e13367b1",
+      "id": "ec1a5451-1855-4d65-a04c-2e27ec993299",
       "name": "Language Audit Structure",
       "retryOnFail": true,
       "maxTries": 5
@@ -655,7 +655,7 @@
         -96,
         -3728
       ],
-      "id": "19f345fa-403a-41ca-b482-b706cd503d3a",
+      "id": "1a8f6465-7059-4ea0-b588-47c7efd77d0b",
       "name": "Check Translation Needed"
     },
     {
@@ -669,7 +669,7 @@
           },
           "conditions": [
             {
-              "id": "768910e8-5929-4d55-b37c-17e27caa780c",
+              "id": "6bd2542e-dbbd-4a51-8dcf-9802194c4eed",
               "leftValue": "={{ $json.needs_translation }}",
               "rightValue": "",
               "operator": {
@@ -689,12 +689,12 @@
         64,
         -3728
       ],
-      "id": "3450f4ec-88dd-4253-80d0-683002b4070d",
+      "id": "a1590ba6-7c5b-4bf8-b91e-7e0e90e73dce",
       "name": "Needs Translation"
     },
     {
       "parameters": {
-        "jsCode": "const wrongRowIds = $input.first().json.wrong_row_ids || [];\nconst allRows = $('Collect Final Rows').all().map(i => i.json || {});\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nconst FIELDS = ['Blog Post Title', 'Content Brief', 'CTA Rule'];\n\nconst DEEPL_TARGETS = {\n  en: 'EN-GB',\n  pt: 'PT-PT',\n  no: 'NB',\n};\n\nconst first = allRows[0] || {};\nconst code = clean(first.content_plan_language_code).toLowerCase() || 'en';\nconst targetSource = DEEPL_TARGETS[code] || code.toUpperCase();\n\nconst wrongRows = allRows.filter(r => wrongRowIds.includes(String(r.row_id)));\n\nif (!wrongRows.length) {\n  throw new Error('Translation Prep: no rows matched wrong_row_ids.');\n}\n\nconst fieldNames = [];\nconst fieldTexts = [];\n\nfor (const row of wrongRows) {\n  for (const field of FIELDS) {\n    fieldNames.push(`${row.row_id}::${field}`);\n    fieldTexts.push(clean(row[field]) || ' ');\n  }\n}\n\nreturn [{\n  json: {\n    fieldNames,\n    fieldTexts,\n    targetSource,\n  },\n}];"
+        "jsCode": "const wrongRowIds = $input.first().json.wrong_row_ids || [];\nconst allRows = $('Collect Final Rows').all().map(i => i.json || {});\n\nfunction clean(value) {\n  return String(value ?? '').replace(/\\s+/g, ' ').trim();\n}\n\nconst FIELDS = ['Blog Post Title', 'Article Type', 'Content Brief', 'CTA Rule'];\n\nconst DEEPL_TARGETS = {\n  en: 'EN-GB',\n  pt: 'PT-PT',\n  no: 'NB',\n};\n\nconst first = allRows[0] || {};\nconst code = clean(first.content_plan_language_code).toLowerCase() || 'en';\nconst targetSource = DEEPL_TARGETS[code] || code.toUpperCase();\n\nconst wrongRows = allRows.filter(r => wrongRowIds.includes(String(r.row_id)));\n\nif (!wrongRows.length) {\n  throw new Error('Translation Prep: no rows matched wrong_row_ids.');\n}\n\nconst fieldNames = [];\nconst fieldTexts = [];\n\nfor (const row of wrongRows) {\n  for (const field of FIELDS) {\n    fieldNames.push(`${row.row_id}::${field}`);\n    fieldTexts.push(clean(row[field]) || ' ');\n  }\n}\n\nreturn [{\n  json: {\n    fieldNames,\n    fieldTexts,\n    targetSource,\n  },\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -702,7 +702,7 @@
         240,
         -3792
       ],
-      "id": "c0d520b1-6d93-47bb-aa70-f335ab686039",
+      "id": "9a65bb75-f9cc-4cea-8a82-5e7993c4e309",
       "name": "Translation Prep"
     },
     {
@@ -731,7 +731,7 @@
         416,
         -3792
       ],
-      "id": "9c4b7b87-4c29-4f0f-88f0-d9e44c9f92df",
+      "id": "155b649a-2349-48e2-b9a6-6257a6357281",
       "name": "DeepL Translation",
       "retryOnFail": true,
       "maxTries": 5,
@@ -754,12 +754,12 @@
         592,
         -3792
       ],
-      "id": "52a81459-a2e4-48d9-800b-bad3a49a4fac",
+      "id": "04d75844-ea72-4a46-a6c8-d41ec0a1c3b7",
       "name": "Unwrapper"
     },
     {
       "parameters": {
-        "jsCode": "const translations = $input.first().json.translations || {};\nconst allRows = $('Collect Final Rows').all().map(i => i.json || {});\n\nreturn allRows.map(row => {\n  const patch = translations[String(row.row_id)];\n  if (!patch) return { json: row };\n  return {\n    json: {\n      ...row,\n      'Blog Post Title': patch['Blog Post Title'] || row['Blog Post Title'],\n      'Content Brief': patch['Content Brief'] || row['Content Brief'],\n      'CTA Rule': patch['CTA Rule'] || row['CTA Rule'],\n      unique_angle: patch['Content Brief'] || row.unique_angle,\n      cta_rule: patch['CTA Rule'] || row.cta_rule,\n      _translated: true,\n    },\n  };\n});"
+        "jsCode": "const translations = $input.first().json.translations || {};\nconst allRows = $('Collect Final Rows').all().map(i => i.json || {});\n\nreturn allRows.map(row => {\n  const patch = translations[String(row.row_id)];\n  if (!patch) return { json: row };\n  return {\n    json: {\n      ...row,\n      'Blog Post Title': patch['Blog Post Title'] || row['Blog Post Title'],\n      'Article Type': patch['Article Type'] || row['Article Type'],\n      'Content Brief': patch['Content Brief'] || row['Content Brief'],\n      'CTA Rule': patch['CTA Rule'] || row['CTA Rule'],\n      unique_angle: patch['Content Brief'] || row.unique_angle,\n      cta_rule: patch['CTA Rule'] || row.cta_rule,\n      article_type: patch['Article Type'] || row.article_type,\n      _translated: true,\n    },\n  };\n});"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -767,7 +767,7 @@
         768,
         -3792
       ],
-      "id": "48dea6c7-d9f4-40a6-97d6-ce7a81254452",
+      "id": "13e41e73-90c3-4787-a87a-11db67f26408",
       "name": "Apply Translations"
     },
     {
@@ -780,7 +780,7 @@
         240,
         -3600
       ],
-      "id": "daf1871f-dc28-471d-8873-de7e36e75e42",
+      "id": "a140ca17-2967-40bd-afbe-ed2e5f263c1f",
       "name": "Pass Rows"
     }
   ],
