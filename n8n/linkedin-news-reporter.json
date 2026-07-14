@@ -22,14 +22,14 @@
         -1440,
         380
       ],
-      "id": "ce0143c2-774d-4243-a30f-20e017486a5b",
+      "id": "a6505aee-a113-4e3a-8163-5f4ae911bc15",
       "name": "Schedule Trigger"
     },
     {
       "parameters": {
         "mode": "runOnceForAllItems",
         "language": "javaScript",
-        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst now = Date.now();\nconst SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;\n\n// Prune covered topics older than 7 days, keep max 50 (migrates old string format too)\nsd.usedTopics = (sd.usedTopics || [])\n  .map(t => typeof t === 'string' ? { title: t, ts: now } : t)\n  .filter(t => t && t.title && (now - (t.ts || 0)) < SEVEN_DAYS)\n  .slice(-50);\n\n// Keep the last 100 rejected article links\nsd.rejectedLinks = (sd.rejectedLinks || []).slice(-100);\n\n// Reset per-run state\nsd.attemptCount = 0;\nsd.candidates = [];\nsd.currentSelection = null;\ndelete sd.runCount;\n\nreturn $input.all();"
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst now = Date.now();\nconst SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;\n\nsd.usedTopics = (sd.usedTopics || [])\n  .map(t => typeof t === 'string' ? { title: t, ts: now } : t)\n  .filter(t => t && t.title && (now - (t.ts || 0)) < SEVEN_DAYS)\n  .slice(-50);\n\nsd.rejectedLinks = (sd.rejectedLinks || []).slice(-100);\n\nsd.attemptCount = 0;\nsd.candidates = [];\nsd.currentSelection = null;\ndelete sd.runCount;\n\nreturn $input.all();"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -37,7 +37,7 @@
         -1220,
         380
       ],
-      "id": "416bdb03-0e72-49f2-a8a1-9bffd27e523f",
+      "id": "ae51d548-0000-4547-9de3-04f6c63f2866",
       "name": "Clean Memory"
     },
     {
@@ -51,7 +51,7 @@
         -980,
         80
       ],
-      "id": "130be18d-0940-460a-96ad-194e71a2fc38",
+      "id": "7128ab5c-9ee0-45c4-a9b3-cbbf1916fbcf",
       "name": "Marketing Feed",
       "alwaysOutputData": true,
       "onError": "continueRegularOutput"
@@ -67,7 +67,7 @@
         -980,
         280
       ],
-      "id": "f0d2443e-b64e-410a-ad3d-5bfd6a2ded47",
+      "id": "ebfae0ed-2447-45be-bdce-9d7d5f526db7",
       "name": "Startups Feed",
       "alwaysOutputData": true,
       "onError": "continueRegularOutput"
@@ -83,7 +83,7 @@
         -980,
         480
       ],
-      "id": "9cda4dec-af3a-44c8-93c6-a4f9664df597",
+      "id": "bb3e3ff7-25ca-4abf-9e4a-04d9945b2283",
       "name": "SaaS News Feed",
       "alwaysOutputData": true,
       "onError": "continueRegularOutput"
@@ -99,7 +99,7 @@
         -980,
         680
       ],
-      "id": "759d766e-ea4b-4c89-9f04-e504fad31afb",
+      "id": "a72ba7f9-de02-40d1-92e5-67fbcc659581",
       "name": "AI Visibility Feed",
       "alwaysOutputData": true,
       "onError": "continueRegularOutput"
@@ -115,14 +115,14 @@
         -740,
         380
       ],
-      "id": "547936a6-145d-4606-98a1-9855ab2d3285",
+      "id": "257ced83-957e-4e4b-9a6c-e856685e3c74",
       "name": "Merge Feeds"
     },
     {
       "parameters": {
         "mode": "runOnceForAllItems",
         "language": "javaScript",
-        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst now = Date.now();\n\nconst rejected = new Set(sd.rejectedLinks || []);\nconst usedTitles = new Set((sd.usedTopics || []).map(t => String(t.title).toLowerCase().trim()));\n\nconst all = $input.all()\n  .map(i => i.json)\n  .filter(a => a && a.title && a.link && a.isoDate);\n\nfunction collect(hours) {\n  const cutoff = now - hours * 60 * 60 * 1000;\n  const seenTitles = new Set();\n  const seenLinks = new Set();\n  const out = [];\n  for (const a of all) {\n    const ts = new Date(a.isoDate).getTime();\n    if (isNaN(ts) || ts < cutoff) continue;\n    const titleKey = String(a.title).toLowerCase().trim();\n    if (seenTitles.has(titleKey) || seenLinks.has(a.link)) continue;\n    seenTitles.add(titleKey);\n    seenLinks.add(a.link);\n    if (rejected.has(a.link)) continue;\n    if (usedTitles.has(titleKey)) continue;\n    out.push({\n      title: String(a.title).trim(),\n      link: a.link,\n      snippet: String(a.contentSnippet || '').slice(0, 300),\n      isoDate: a.isoDate,\n    });\n  }\n  return out;\n}\n\n// Try the last 4 hours first; if nothing is left, extend to 6 hours\nlet windowHours = 4;\nlet candidates = collect(4);\nif (candidates.length === 0) {\n  windowHours = 6;\n  candidates = collect(6);\n}\n\nif (candidates.length === 0) {\n  return [{ json: {\n    found: false,\n    reason: 'No publishable articles were found. I checked the last 4 hours, then extended the window to 6 hours, but the feeds came back empty (or only contained articles that were already covered or previously rejected).',\n  } }];\n}\n\nsd.candidates = candidates;\nreturn [{ json: {\n  found: true,\n  windowHours: windowHours,\n  candidateCount: candidates.length,\n  candidates: candidates,\n  usedTopics: (sd.usedTopics || []).map(t => t.title),\n} }];"
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst now = Date.now();\n\nconst rejected = new Set(sd.rejectedLinks || []);\nconst usedTitles = new Set((sd.usedTopics || []).map(t => String(t.title).toLowerCase().trim()));\n\nconst all = $input.all()\n  .map(i => i.json)\n  .filter(a => a && a.title && a.link && a.isoDate);\n\nfunction collect(hours) {\n  const cutoff = now - hours * 60 * 60 * 1000;\n  const seenTitles = new Set();\n  const seenLinks = new Set();\n  const out = [];\n  for (const a of all) {\n    const ts = new Date(a.isoDate).getTime();\n    if (isNaN(ts) || ts < cutoff) continue;\n    const titleKey = String(a.title).toLowerCase().trim();\n    if (seenTitles.has(titleKey) || seenLinks.has(a.link)) continue;\n    seenTitles.add(titleKey);\n    seenLinks.add(a.link);\n    if (rejected.has(a.link)) continue;\n    if (usedTitles.has(titleKey)) continue;\n    out.push({\n      title: String(a.title).trim(),\n      link: a.link,\n      snippet: String(a.contentSnippet || '').slice(0, 300),\n      isoDate: a.isoDate,\n    });\n  }\n  return out;\n}\n\nlet windowHours = 4;\nlet candidates = collect(4);\nif (candidates.length === 0) {\n  windowHours = 6;\n  candidates = collect(6);\n}\n\nif (candidates.length === 0) {\n  return [{ json: {\n    found: false,\n    reason: 'No publishable articles were found. I checked the last 4 hours, then extended the window to 6 hours, but the feeds came back empty (or only contained articles that were already covered or previously rejected).',\n  } }];\n}\n\nsd.candidates = candidates;\nreturn [{ json: {\n  found: true,\n  windowHours: windowHours,\n  candidateCount: candidates.length,\n  candidates: candidates,\n  usedTopics: (sd.usedTopics || []).map(t => t.title),\n} }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -130,7 +130,7 @@
         -520,
         380
       ],
-      "id": "f9ae3eb7-a711-4f52-a8cf-a84f8cc9b418",
+      "id": "f28b35bd-ac9e-4c87-a854-b76f62d17f75",
       "name": "Collect Candidates"
     },
     {
@@ -144,7 +144,7 @@
           },
           "conditions": [
             {
-              "id": "c3c3415c-9087-44d3-8e2b-1f421d8546af",
+              "id": "adee2d51-55cf-4781-9645-fb935d60185c",
               "leftValue": "={{ $json.found }}",
               "rightValue": "",
               "operator": {
@@ -164,7 +164,7 @@
         -300,
         380
       ],
-      "id": "63f7c132-fc1e-4189-b183-86e41a577ccc",
+      "id": "dbf4bece-720f-49a5-a146-d4c0d26e9381",
       "name": "Articles Found?"
     },
     {
@@ -183,9 +183,9 @@
         -80,
         680
       ],
-      "id": "e6cfc67c-5c8c-49bb-87f2-bc1afb9fe709",
+      "id": "98b0329d-7a19-4ca5-a3e6-1e323d2f211d",
       "name": "No Articles Alert",
-      "webhookId": "b8f5a576-d22e-4b18-b0dd-0c1f57828218",
+      "webhookId": "101b02a8-84b2-444d-8829-9566e2bacecc",
       "credentials": {
         "telegramApi": {
           "id": "",
@@ -209,7 +209,7 @@
         -80,
         300
       ],
-      "id": "460c1c40-f864-4a90-b6dc-4dee1b0852df",
+      "id": "ed2b9bf1-6613-4ff4-8c69-2a9e836232d1",
       "name": "News Picker",
       "retryOnFail": true,
       "maxTries": 3,
@@ -231,7 +231,7 @@
         -160,
         480
       ],
-      "id": "2d92f80f-ed55-428e-acab-c0e9bce860b9",
+      "id": "12e79b4d-b933-4dfe-ae22-439a49ba2f51",
       "name": "Picker Model",
       "credentials": {
         "openAiApi": {
@@ -251,14 +251,14 @@
         20,
         480
       ],
-      "id": "9c0ae5e9-6b91-4652-a3c9-1639aa92c465",
+      "id": "1e9c9bd3-ee5e-4e4c-9854-550047d98196",
       "name": "Picker Output"
     },
     {
       "parameters": {
         "mode": "runOnceForAllItems",
         "language": "javaScript",
-        "jsCode": "const sd = $getWorkflowStaticData('global');\n\n// Candidate list: prefer workflow memory, then fall back to the upstream nodes.\n// The fallbacks cover pinned or partial executions where Collect Candidates'\n// code did not actually run and therefore never wrote to static data.\nlet candidates = sd.candidates || [];\nif (candidates.length === 0) {\n  try { candidates = $('Handle Rejection').first().json.candidates || []; } catch (e) {}\n}\nif (candidates.length === 0) {\n  try { candidates = $('Collect Candidates').first().json.candidates || []; } catch (e) {}\n}\n\nconst out = ($input.first().json.output) || {};\nlet picked = out.article;\nif (Array.isArray(picked)) picked = picked[0];\npicked = picked || {};\n\n// The model must pick from the real list; never trust an invented link\nlet match = candidates.find(c => c.link === picked.link);\nif (!match && picked.title) {\n  const t = String(picked.title).toLowerCase().trim();\n  match = candidates.find(c => c.title.toLowerCase().trim() === t);\n}\nif (!match && candidates.length > 0) {\n  match = candidates.slice().sort((a, b) => new Date(b.isoDate) - new Date(a.isoDate))[0];\n}\n// Last resort: trust the picker's own output so the flow never dies here\nif (!match && picked.link) {\n  match = { title: picked.title || picked.link, link: picked.link, isoDate: picked.isoDate || new Date().toISOString() };\n}\nif (!match) {\n  throw new Error('Select Article received no candidate list and no usable pick from News Picker. Run the full flow so Collect Candidates executes (unpin it if pinned).');\n}\n\nsd.candidates = candidates;\nsd.attemptCount = (sd.attemptCount || 0) + 1;\nsd.currentSelection = { title: match.title, link: match.link };\n\nreturn [{ json: { title: match.title, link: match.link, isoDate: match.isoDate, attempt: sd.attemptCount } }];"
+        "jsCode": "const sd = $getWorkflowStaticData('global');\n\nlet candidates = sd.candidates || [];\nif (candidates.length === 0) {\n  try { candidates = $('Handle Rejection').first().json.candidates || []; } catch (e) {}\n}\nif (candidates.length === 0) {\n  try { candidates = $('Collect Candidates').first().json.candidates || []; } catch (e) {}\n}\n\nconst out = ($input.first().json.output) || {};\nlet picked = out.article;\nif (Array.isArray(picked)) picked = picked[0];\npicked = picked || {};\n\nlet match = candidates.find(c => c.link === picked.link);\nif (!match && picked.title) {\n  const t = String(picked.title).toLowerCase().trim();\n  match = candidates.find(c => c.title.toLowerCase().trim() === t);\n}\nif (!match && candidates.length > 0) {\n  match = candidates.slice().sort((a, b) => new Date(b.isoDate) - new Date(a.isoDate))[0];\n}\nif (!match && picked.link) {\n  match = { title: picked.title || picked.link, link: picked.link, isoDate: picked.isoDate || new Date().toISOString() };\n}\nif (!match) {\n  throw new Error('Select Article received no candidate list and no usable pick from News Picker. Run the full flow so Collect Candidates executes (unpin it if pinned).');\n}\n\nsd.candidates = candidates;\nsd.attemptCount = (sd.attemptCount || 0) + 1;\nsd.currentSelection = { title: match.title, link: match.link };\n\nreturn [{ json: { title: match.title, link: match.link, isoDate: match.isoDate, attempt: sd.attemptCount } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -266,7 +266,7 @@
         160,
         300
       ],
-      "id": "d3a34cf7-d35d-4c75-9c29-d45e06546fa3",
+      "id": "dd75dadd-43f8-4c4e-aa20-8cda7d5a6606",
       "name": "Select Article"
     },
     {
@@ -283,7 +283,7 @@
         380,
         300
       ],
-      "id": "ec7da86f-51fb-4c7b-8841-7b23da2bd386",
+      "id": "ce8dac2f-7432-44d3-899c-8fc6219de9ab",
       "name": "Extract News",
       "retryOnFail": true,
       "maxTries": 2,
@@ -308,7 +308,7 @@
         600,
         300
       ],
-      "id": "a730db72-5d5c-4bc4-ac12-39de24a7cbcc",
+      "id": "01737001-c9e6-4475-b81d-c69cab01f2e9",
       "name": "Prepare Content"
     },
     {
@@ -322,7 +322,7 @@
           },
           "conditions": [
             {
-              "id": "1ebaf7ad-8de5-487f-99d8-06efcbbd7704",
+              "id": "c78c54b1-5e7b-48aa-b14f-0bb1d331613f",
               "leftValue": "={{ $json.contentLength }}",
               "rightValue": 200,
               "operator": {
@@ -341,7 +341,7 @@
         820,
         300
       ],
-      "id": "9517bc0b-0104-4ca6-85b7-7a272070986e",
+      "id": "b430f067-a336-4c7a-971e-dfb6f3e26ed6",
       "name": "Content OK?"
     },
     {
@@ -360,7 +360,7 @@
         1040,
         240
       ],
-      "id": "dbb24c56-804c-48f1-968a-61524e21980e",
+      "id": "715b5949-6d0a-4811-870c-12c20059ca70",
       "name": "News Reporter",
       "retryOnFail": true,
       "maxTries": 2,
@@ -382,7 +382,7 @@
         980,
         420
       ],
-      "id": "3fd930a3-ee6e-487c-9bba-5a871121f30f",
+      "id": "5c253f5f-4ef1-4edc-bdd8-540ada00c02c",
       "name": "Reporter Model",
       "credentials": {
         "anthropicApi": {
@@ -402,7 +402,7 @@
         1160,
         420
       ],
-      "id": "13d47f62-f45b-44ee-a397-9e8354786079",
+      "id": "d4d78209-d130-4a9f-8a58-70dd209b75b3",
       "name": "Reporter Output"
     },
     {
@@ -417,7 +417,7 @@
         1260,
         240
       ],
-      "id": "0c1f9c02-075b-4958-b23c-e439e5ed99f1",
+      "id": "9688d459-1ceb-41ba-ac42-dcf8dbd8f29b",
       "name": "Format Post"
     },
     {
@@ -451,9 +451,9 @@
         1480,
         240
       ],
-      "id": "c7e7d454-c821-41fd-871c-c90649c8107f",
+      "id": "40f27ee6-e2db-42cd-a30a-2be6eb89e6c0",
       "name": "Request Approval",
-      "webhookId": "2ec7f29f-9f41-46ad-ac19-53b9d2f78baf",
+      "webhookId": "cb78f19e-e7ce-4f37-b000-cc1c808a0a5c",
       "credentials": {
         "telegramApi": {
           "id": "",
@@ -472,7 +472,7 @@
           },
           "conditions": [
             {
-              "id": "aba57aaf-c390-4df6-adb9-675e067b7561",
+              "id": "eb32ee72-9ce4-48a5-a954-68fecaf89f73",
               "leftValue": "={{ $json.data?.approved ?? false }}",
               "rightValue": "",
               "operator": {
@@ -492,7 +492,7 @@
         1700,
         240
       ],
-      "id": "5eff80a0-c168-4a84-92ed-c935f3114f03",
+      "id": "8f6dcf68-892f-4548-b9a6-23fe40e986d6",
       "name": "Approved?"
     },
     {
@@ -511,7 +511,7 @@
         1920,
         120
       ],
-      "id": "c8a221b6-d7a4-4865-a380-ba6c37eb820c",
+      "id": "80b7efe7-20cf-450c-b110-3f821da9c8ee",
       "name": "Publish to LinkedIn",
       "retryOnFail": true,
       "maxTries": 2,
@@ -528,7 +528,7 @@
       "parameters": {
         "mode": "runOnceForAllItems",
         "language": "javaScript",
-        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst sel = sd.currentSelection || {};\n\n// Record the published topic so future runs skip it (pruned after 7 days)\nif (sel.title) {\n  sd.usedTopics = [...(sd.usedTopics || []), { title: sel.title, ts: Date.now() }].slice(-50);\n}\nsd.candidates = [];\nsd.currentSelection = null;\nsd.attemptCount = 0;\n\nreturn [{ json: { published: true, title: sel.title || '', link: sel.link || '' } }];"
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst sel = sd.currentSelection || {};\n\nif (sel.title) {\n  sd.usedTopics = [...(sd.usedTopics || []), { title: sel.title, ts: Date.now() }].slice(-50);\n}\nsd.candidates = [];\nsd.currentSelection = null;\nsd.attemptCount = 0;\n\nreturn [{ json: { published: true, title: sel.title || '', link: sel.link || '' } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -536,7 +536,7 @@
         2140,
         120
       ],
-      "id": "6a513542-ea37-40e9-8436-8a812e8af048",
+      "id": "e6397e92-5324-45a1-8a74-dd6b19ec49c3",
       "name": "Update Memory"
     },
     {
@@ -555,9 +555,9 @@
         2360,
         120
       ],
-      "id": "ab8ca80e-4791-478f-adce-49b2833566de",
+      "id": "6c8cfb0f-c1c9-46ee-895b-bda4adb385b0",
       "name": "Notify Published",
-      "webhookId": "e1a67646-eaca-42cf-85e9-da3e821c93c3",
+      "webhookId": "3c62c721-72db-45a4-8441-af170bf5b1d0",
       "credentials": {
         "telegramApi": {
           "id": "",
@@ -581,9 +581,9 @@
         2140,
         320
       ],
-      "id": "db308158-4c1a-474a-9d98-3f180f9f836f",
+      "id": "780da03a-0109-43d8-9040-528fbce0e61c",
       "name": "Publish Failed Alert",
-      "webhookId": "c147eae8-2f53-4101-b215-c62459e3cd64",
+      "webhookId": "fa219b10-2c4b-482b-a040-7ba4d36516be",
       "credentials": {
         "telegramApi": {
           "id": "",
@@ -595,7 +595,7 @@
       "parameters": {
         "mode": "runOnceForAllItems",
         "language": "javaScript",
-        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst sel = sd.currentSelection || {};\nconst MAX_ATTEMPTS = 3;\n\n// Remember the rejected/failed article so it is never picked again\nif (sel.link) {\n  sd.rejectedLinks = [...(sd.rejectedLinks || []), sel.link].slice(-100);\n  sd.candidates = (sd.candidates || []).filter(c => c.link !== sel.link);\n}\nsd.currentSelection = null;\n\nconst attempts = sd.attemptCount || 0;\nconst remaining = (sd.candidates || []).length;\n\nif (attempts >= MAX_ATTEMPTS) {\n  return [{ json: { retry: false, reason: 'I tried ' + attempts + ' articles this run and none was approved or usable, so I am stopping this run.' } }];\n}\nif (remaining === 0) {\n  return [{ json: { retry: false, reason: 'No candidate articles are left to try after the last rejection.' } }];\n}\n\nreturn [{ json: {\n  retry: true,\n  found: true,\n  candidateCount: remaining,\n  candidates: sd.candidates,\n  usedTopics: (sd.usedTopics || []).map(t => t.title),\n} }];"
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst sel = sd.currentSelection || {};\nconst MAX_ATTEMPTS = 3;\n\nif (sel.link) {\n  sd.rejectedLinks = [...(sd.rejectedLinks || []), sel.link].slice(-100);\n  sd.candidates = (sd.candidates || []).filter(c => c.link !== sel.link);\n}\nsd.currentSelection = null;\n\nconst attempts = sd.attemptCount || 0;\nconst remaining = (sd.candidates || []).length;\n\nif (attempts >= MAX_ATTEMPTS) {\n  return [{ json: { retry: false, reason: 'I tried ' + attempts + ' articles this run and none was approved or usable, so I am stopping this run.' } }];\n}\nif (remaining === 0) {\n  return [{ json: { retry: false, reason: 'No candidate articles are left to try after the last rejection.' } }];\n}\n\nreturn [{ json: {\n  retry: true,\n  found: true,\n  candidateCount: remaining,\n  candidates: sd.candidates,\n  usedTopics: (sd.usedTopics || []).map(t => t.title),\n} }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -603,7 +603,7 @@
         1920,
         560
       ],
-      "id": "a503aacf-4736-4ce9-95f5-f1688b931c37",
+      "id": "7627d891-de3d-4ec4-a413-1d7b7d979348",
       "name": "Handle Rejection"
     },
     {
@@ -617,7 +617,7 @@
           },
           "conditions": [
             {
-              "id": "c665b4f2-e94f-4479-becd-cd1a4e81a0cd",
+              "id": "dab953f0-67ec-4dfd-ba6e-6c2fcec6f8ee",
               "leftValue": "={{ $json.retry }}",
               "rightValue": "",
               "operator": {
@@ -637,7 +637,7 @@
         2140,
         560
       ],
-      "id": "94e8851f-e76c-4af3-992a-a0ce5d7b8627",
+      "id": "64f52242-5438-4cba-91a4-65c2cadea2af",
       "name": "Retry Pick?"
     },
     {
@@ -656,9 +656,9 @@
         2360,
         640
       ],
-      "id": "33e0ef97-6f42-42f7-ac19-0af554e075b6",
+      "id": "983f9144-ecbb-4fe3-82d2-f7f969ab1b0d",
       "name": "Run Ended Alert",
-      "webhookId": "242296e2-71ec-4636-9ace-ff6babe314ba",
+      "webhookId": "bd3e2b67-99f0-41cf-ae80-39109673e401",
       "credentials": {
         "telegramApi": {
           "id": "",
@@ -679,7 +679,7 @@
         -2000,
         80
       ],
-      "id": "fc56dbcf-c791-4724-9054-e641f904d058",
+      "id": "00ae0332-23d6-4279-b2a1-e0ac3236a611",
       "name": "Sticky Note"
     }
   ],
