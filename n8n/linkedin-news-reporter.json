@@ -1,0 +1,1035 @@
+{
+  "name": "LinkedIn News Reporter (Telegram Approval)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "triggerAtHour": 9
+            },
+            {
+              "field": "days",
+              "triggerAtHour": 17
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1440,
+        380
+      ],
+      "id": "d547c374-92ab-4ea4-ac87-82f475b2fd1e",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst now = Date.now();\nconst SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;\n\n// Prune covered topics older than 7 days, keep max 50 (migrates old string format too)\nsd.usedTopics = (sd.usedTopics || [])\n  .map(t => typeof t === 'string' ? { title: t, ts: now } : t)\n  .filter(t => t && t.title && (now - (t.ts || 0)) < SEVEN_DAYS)\n  .slice(-50);\n\n// Keep the last 100 rejected article links\nsd.rejectedLinks = (sd.rejectedLinks || []).slice(-100);\n\n// Reset per-run state\nsd.attemptCount = 0;\nsd.candidates = [];\nsd.currentSelection = null;\ndelete sd.runCount;\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1220,
+        380
+      ],
+      "id": "b479f355-9817-4c1f-8be4-97d33ac50d57",
+      "name": "Clean Memory"
+    },
+    {
+      "parameters": {
+        "url": "https://rss.app/feeds/tnB85iGttJbWQsmo.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -980,
+        80
+      ],
+      "id": "ad45c072-3690-469a-9919-b00423e4b08f",
+      "name": "Marketing Feed",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://rss.app/feeds/tSjA7vC0jcARKypX.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -980,
+        280
+      ],
+      "id": "f2c8f37f-8563-446c-b1ca-ce5204e96e3f",
+      "name": "Startups Feed",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://rss.app/feeds/tJqecbuBNEMI9WYW.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -980,
+        480
+      ],
+      "id": "da42cb81-6b74-427a-8936-29a3df428a94",
+      "name": "SaaS News Feed",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://rss.app/feeds/t0IREYmhBr3HJ3oF.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -980,
+        680
+      ],
+      "id": "d226db12-0d27-4c65-93ff-d61a2c50a7c3",
+      "name": "AI Visibility Feed",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "append",
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -740,
+        380
+      ],
+      "id": "929d812d-ecca-4427-9568-f759971263e0",
+      "name": "Merge Feeds"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst now = Date.now();\n\nconst rejected = new Set(sd.rejectedLinks || []);\nconst usedTitles = new Set((sd.usedTopics || []).map(t => String(t.title).toLowerCase().trim()));\n\nconst all = $input.all()\n  .map(i => i.json)\n  .filter(a => a && a.title && a.link && a.isoDate);\n\nfunction collect(hours) {\n  const cutoff = now - hours * 60 * 60 * 1000;\n  const seenTitles = new Set();\n  const seenLinks = new Set();\n  const out = [];\n  for (const a of all) {\n    const ts = new Date(a.isoDate).getTime();\n    if (isNaN(ts) || ts < cutoff) continue;\n    const titleKey = String(a.title).toLowerCase().trim();\n    if (seenTitles.has(titleKey) || seenLinks.has(a.link)) continue;\n    seenTitles.add(titleKey);\n    seenLinks.add(a.link);\n    if (rejected.has(a.link)) continue;\n    if (usedTitles.has(titleKey)) continue;\n    out.push({\n      title: String(a.title).trim(),\n      link: a.link,\n      snippet: String(a.contentSnippet || '').slice(0, 300),\n      isoDate: a.isoDate,\n    });\n  }\n  return out;\n}\n\n// Try the last 4 hours first; if nothing is left, extend to 6 hours\nlet windowHours = 4;\nlet candidates = collect(4);\nif (candidates.length === 0) {\n  windowHours = 6;\n  candidates = collect(6);\n}\n\nif (candidates.length === 0) {\n  return [{ json: {\n    found: false,\n    reason: 'No publishable articles were found. I checked the last 4 hours, then extended the window to 6 hours, but the feeds came back empty (or only contained articles that were already covered or previously rejected).',\n  } }];\n}\n\nsd.candidates = candidates;\nreturn [{ json: {\n  found: true,\n  windowHours: windowHours,\n  candidateCount: candidates.length,\n  candidates: candidates,\n  usedTopics: (sd.usedTopics || []).map(t => t.title),\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -520,
+        380
+      ],
+      "id": "f514aab6-c891-4738-b73f-70a912440a01",
+      "name": "Collect Candidates"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "eebd8aaa-1f66-492d-afd6-6074e4b8f816",
+              "leftValue": "={{ $json.found }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -300,
+        380
+      ],
+      "id": "e5c00f81-5173-4b4f-98d3-fae716d89fa7",
+      "name": "Articles Found?"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "=🔎 {{ $json.reason }}\n\nI will try again at the next scheduled run.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -80,
+        680
+      ],
+      "id": "2d122083-638b-4964-bf88-8ace8dc2924a",
+      "name": "No Articles Alert",
+      "webhookId": "0dfc2a40-eb82-4e57-9f8f-9ccef5fafe70",
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram Bot (create with @BotFather)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Select exactly ONE article for our LinkedIn company news page.\n\nCandidate articles (JSON):\n{{ JSON.stringify($json.candidates) }}\n\nRecently covered topics (avoid anything substantially similar):\n{{ JSON.stringify($json.usedTopics) }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are the content editor of a LinkedIn company news page covering marketing, startups, SaaS, and AI. Your task: from the candidate list you are given, select exactly ONE article that will perform best as a LinkedIn post for an audience of founders, marketers, and SaaS/AI professionals.\n\n<rules>\n1. You MUST pick exactly one article that appears in the provided candidate list. Never invent an article.\n2. Copy the \"title\" and \"link\" values EXACTLY as they appear in the list, character for character. Do not modify, shorten, or fix the link.\n3. Respond with ONLY the JSON object in the required format. No commentary, no markdown fences.\n</rules>\n\n<selection_criteria>\nPrefer, in this order:\n1. Concrete, newsworthy developments in marketing, startups, SaaS, or AI: funding rounds, acquisitions, product launches, platform changes, research reports with data.\n2. Articles with specific numbers, percentages, or study findings.\n3. Stories with a clear implication for business professionals (what changes for them).\n4. More recent articles over older ones when quality is comparable.\n</selection_criteria>\n\n<exclusions>\nNever pick:\n- Anything substantially similar to a recently covered topic from the provided list.\n- Press releases, sponsored or promotional content, award announcements, company self-promotion.\n- Entertainment, TV shows, celebrity, sports, or lifestyle content, even if the headline contains keywords like SaaS (for example TV serials).\n- Opinion pieces with no factual news, roundups, digests, or listicles (for example daily funding report digests, top-N lists, job move roundups).\n- Video-only content or paywalled teasers where the snippet has no substance.\n- Local small-town stories with no relevance to an international professional audience.\n</exclusions>\n\nIn the \"reason\" field explain your choice in one sentence.",
+          "enableStreaming": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -80,
+        300
+      ],
+      "id": "c670e93a-5539-42b1-9b52-1dc4d28531bb",
+      "name": "News Picker",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5.6-luna",
+          "cachedResultName": "gpt-5.6-luna"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -160,
+        480
+      ],
+      "id": "12cf9ba2-0c4f-45f7-8b83-241bc46c1fcf",
+      "name": "Picker Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "GGGW5utzZVwRtNOs",
+          "name": "OpenAI Content Maker 4.0 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "fromJson",
+        "jsonSchemaExample": "{\n  \"article\": {\n    \"title\": \"Exact title copied from the candidate list\",\n    \"link\": \"https://example.com/exact-link-copied-from-the-list\",\n    \"reason\": \"One sentence explaining why this article was selected\"\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        20,
+        480
+      ],
+      "id": "521679cf-75e5-4a14-8439-0c406b374486",
+      "name": "Picker Output"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst candidates = sd.candidates || [];\n\nif (candidates.length === 0) {\n  throw new Error('No candidates stored in workflow memory. Collect Candidates must run before News Picker.');\n}\n\nconst out = ($input.first().json.output) || {};\nlet picked = out.article;\nif (Array.isArray(picked)) picked = picked[0];\npicked = picked || {};\n\n// The model must pick from the real list; never trust an invented link\nlet match = candidates.find(c => c.link === picked.link);\nif (!match && picked.title) {\n  const t = String(picked.title).toLowerCase().trim();\n  match = candidates.find(c => c.title.toLowerCase().trim() === t);\n}\nif (!match) {\n  match = candidates.slice().sort((a, b) => new Date(b.isoDate) - new Date(a.isoDate))[0];\n}\n\nsd.attemptCount = (sd.attemptCount || 0) + 1;\nsd.currentSelection = { title: match.title, link: match.link };\n\nreturn [{ json: { title: match.title, link: match.link, isoDate: match.isoDate, attempt: sd.attemptCount } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        300
+      ],
+      "id": "cb0d4dbd-bd54-4ceb-bb7f-dd2225a80c23",
+      "name": "Select Article"
+    },
+    {
+      "parameters": {
+        "resource": "reader",
+        "operation": "read",
+        "url": "={{ $json.link }}",
+        "simplify": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.jinaAi",
+      "typeVersion": 1,
+      "position": [
+        380,
+        300
+      ],
+      "id": "5bf219e9-81ec-4106-8492-fd6c5f31139f",
+      "name": "Extract News",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 3000,
+      "onError": "continueErrorOutput",
+      "credentials": {
+        "jinaAiApi": {
+          "id": "NNDbWo36mt2JCHwE",
+          "name": "JinaAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst sel = sd.currentSelection || {};\nconst j = $input.first().json;\n\nlet content = '';\nif (typeof j.content === 'string') content = j.content;\nelse if (j.data && typeof j.data.content === 'string') content = j.data.content;\nelse if (typeof j.data === 'string') content = j.data;\nelse if (typeof j.text === 'string') content = j.text;\ncontent = content.trim();\n\nlet publication = '';\nconst m = String(sel.link || '').match(/^https?:\\/\\/(?:www\\.)?([^\\/]+)/i);\nif (m) publication = m[1];\n\nreturn [{ json: {\n  title: sel.title || j.title || '',\n  link: sel.link || '',\n  publication: publication,\n  content: content.slice(0, 20000),\n  contentLength: content.length,\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        300
+      ],
+      "id": "0c2ade18-ef8f-4bc8-9e7f-b25aa82d22ea",
+      "name": "Prepare Content"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "01fd9cee-fb68-4d04-9abe-07223a49c665",
+              "leftValue": "={{ $json.contentLength }}",
+              "rightValue": 200,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        820,
+        300
+      ],
+      "id": "4283fd96-f99c-4aa4-abdc-4681f330faa9",
+      "name": "Content OK?"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write one LinkedIn post based on this article.\n\nOriginal title: {{ $json.title }}\nPublication: {{ $json.publication }}\n\nArticle content:\n{{ $json.content }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a social media editor who writes high-performing LinkedIn posts for a company news page covering marketing, startups, SaaS, and AI. The audience is founders, marketers, growth professionals, and SaaS/AI practitioners. Transform the provided article into ONE original LinkedIn post.\n\n<content_rules>\n- Rephrase everything in your own words. Never copy sentences from the source.\n- Use only facts, numbers, and quotes that appear in the source content. Never invent or extrapolate data, prices, or figures.\n- Focus on ONE story. If the content covers several topics, pick the most newsworthy one and ignore the rest.\n- Credit the source naturally in the text, for example \"reports Forbes\" or \"(via techcrunch.com)\". Do NOT put a URL in the post body: LinkedIn reduces the reach of posts with external links.\n- Add one concrete takeaway or implication for the reader (what this means for their work).\n</content_rules>\n\n<linkedin_format>\n- Total length: 800 to 1300 characters.\n- Line 1: a hook under 140 characters that states the most surprising fact or creates curiosity. No hashtags at the start. The first two lines decide whether people tap \"see more\", so make them carry the story.\n- Body: short paragraphs of 1 to 2 sentences separated by blank lines, easy to scan on mobile.\n- Near the end, ask one specific question that invites readers to comment with their opinion or experience (comments drive LinkedIn distribution).\n- Last line: 3 to 5 hashtags, mixing one broad tag (#marketing, #startups, #SaaS, #AI) with more specific ones. Never more than 5.\n</linkedin_format>\n\n<style>\n- Confident, conversational, human. Write like a sharp operator sharing news with peers, not a press office.\n- Plain language, short sentences, active voice.\n- No em-dashes. No participle clauses. No corporate buzzwords (game-changer, delve, landscape, in today's fast-paced world).\n- At most 2 emoji in the whole post, only where they help scanning.\n</style>\n\nAlso produce a \"headline\": a neutral one-line summary (max 90 characters) used internally for review, not part of the LinkedIn post.\n\nRespond with ONLY the JSON object in the required format.",
+          "enableStreaming": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1040,
+        240
+      ],
+      "id": "4343af8f-a254-4a8e-be49-315b90e022fa",
+      "name": "News Reporter",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-opus-4-8",
+          "cachedResultName": "Claude Opus 4.8"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        980,
+        420
+      ],
+      "id": "7325ed49-b381-4937-88d6-31b11294c88e",
+      "name": "Reporter Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "DrfiU3H1MN24MyeY",
+          "name": "Anthropic API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "fromJson",
+        "jsonSchemaExample": "{\n  \"headline\": \"Neutral one-line summary of the story (max 90 characters)\",\n  \"post\": \"Full LinkedIn post text with line breaks, ending with 3-5 hashtags\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1160,
+        420
+      ],
+      "id": "9b81c44e-f9ac-4d72-bda0-4550c28000ce",
+      "name": "Reporter Output"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst sel = sd.currentSelection || {};\nconst out = ($input.first().json.output) || {};\n\nconst post = String(out.post || '').trim();\nconst headline = String(out.headline || sel.title || '').trim();\n\nif (!post) {\n  throw new Error('News Reporter returned an empty post.');\n}\n\nreturn [{ json: {\n  headline: headline,\n  post: post,\n  title: sel.title || '',\n  link: sel.link || '',\n  attempt: sd.attemptCount || 1,\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1260,
+        240
+      ],
+      "id": "fb654a76-861e-46d1-8ab5-194c91d3d237",
+      "name": "Format Post"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendAndWait",
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "message": "=📝 LinkedIn post for review (attempt {{ $json.attempt }} of 3)\n\n{{ $json.headline }}\n\n----------------\n\n{{ $json.post }}\n\n----------------\n\nSource: {{ $json.link }}\n\nApprove to publish to the LinkedIn page. Reject to pick a different article.",
+        "responseType": "approval",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "✅ Publish",
+            "disapproveLabel": "❌ Reject"
+          }
+        },
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "limitType": "afterTimeInterval",
+              "resumeAmount": 4,
+              "resumeUnit": "hours"
+            }
+          },
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1480,
+        240
+      ],
+      "id": "957df92a-3d60-431c-baf5-db8d8c3d7bc5",
+      "name": "Request Approval",
+      "webhookId": "4eb8fba5-f469-4b08-a50f-7cf27ad6e9eb",
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram Bot (create with @BotFather)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "44ec2d87-cfa1-41a1-a564-2c85069cd149",
+              "leftValue": "={{ $json.data?.approved ?? false }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1700,
+        240
+      ],
+      "id": "d77940cf-1433-488c-b891-50a92fdb5373",
+      "name": "Approved?"
+    },
+    {
+      "parameters": {
+        "resource": "post",
+        "operation": "create",
+        "postAs": "organization",
+        "organization": "YOUR_LINKEDIN_ORG_ID",
+        "text": "={{ $('Format Post').item.json.post }}",
+        "shareMediaCategory": "NONE",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        1920,
+        120
+      ],
+      "id": "c9b2342d-56aa-43a0-aaef-a7177a741482",
+      "name": "Publish to LinkedIn",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput",
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "",
+          "name": "LinkedIn (page admin account)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst sel = sd.currentSelection || {};\n\n// Record the published topic so future runs skip it (pruned after 7 days)\nif (sel.title) {\n  sd.usedTopics = [...(sd.usedTopics || []), { title: sel.title, ts: Date.now() }].slice(-50);\n}\nsd.candidates = [];\nsd.currentSelection = null;\nsd.attemptCount = 0;\n\nreturn [{ json: { published: true, title: sel.title || '', link: sel.link || '' } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2140,
+        120
+      ],
+      "id": "f802594e-d1cc-4701-a920-9a3fc6258bf7",
+      "name": "Update Memory"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "=✅ Published to LinkedIn:\n{{ $json.title }}\n\nSource: {{ $json.link }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2360,
+        120
+      ],
+      "id": "bd219bb0-5aa0-4b49-9843-c300e88bec45",
+      "name": "Notify Published",
+      "webhookId": "bbc77949-2e8b-4722-8165-c696ba60b139",
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram Bot (create with @BotFather)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "=⚠️ The post was approved but publishing to LinkedIn failed. Check the execution log in n8n and post manually if needed.\n\n{{ $('Format Post').item.json.post }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2140,
+        320
+      ],
+      "id": "216880de-698d-40e5-b609-fa7e12ac8dee",
+      "name": "Publish Failed Alert",
+      "webhookId": "adfe7b22-77db-415a-87b5-32a6680bc2a8",
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram Bot (create with @BotFather)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst sel = sd.currentSelection || {};\nconst MAX_ATTEMPTS = 3;\n\n// Remember the rejected/failed article so it is never picked again\nif (sel.link) {\n  sd.rejectedLinks = [...(sd.rejectedLinks || []), sel.link].slice(-100);\n  sd.candidates = (sd.candidates || []).filter(c => c.link !== sel.link);\n}\nsd.currentSelection = null;\n\nconst attempts = sd.attemptCount || 0;\nconst remaining = (sd.candidates || []).length;\n\nif (attempts >= MAX_ATTEMPTS) {\n  return [{ json: { retry: false, reason: 'I tried ' + attempts + ' articles this run and none was approved or usable, so I am stopping this run.' } }];\n}\nif (remaining === 0) {\n  return [{ json: { retry: false, reason: 'No candidate articles are left to try after the last rejection.' } }];\n}\n\nreturn [{ json: {\n  retry: true,\n  found: true,\n  candidateCount: remaining,\n  candidates: sd.candidates,\n  usedTopics: (sd.usedTopics || []).map(t => t.title),\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        560
+      ],
+      "id": "90dc8087-41b2-404d-a7f9-0253537f3274",
+      "name": "Handle Rejection"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "67254cd9-2a79-421f-8254-f811fc6c6492",
+              "leftValue": "={{ $json.retry }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2140,
+        560
+      ],
+      "id": "4e083030-16ea-4d07-8fb7-18f0395667de",
+      "name": "Retry Pick?"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "=🛑 {{ $json.reason }}\n\nNo post was published this run. I will try again at the next scheduled run.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2360,
+        640
+      ],
+      "id": "4d433916-6714-4d52-8d4e-677baabd9826",
+      "name": "Run Ended Alert",
+      "webhookId": "9f32b4ce-bcfc-4462-9abe-3d72deb3a389",
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram Bot (create with @BotFather)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Setup required\n\n1. **Telegram**: create a bot with @BotFather, add the credential to all 5 Telegram nodes, and replace YOUR_TELEGRAM_CHAT_ID with your own chat ID in all of them (send /start to your bot first, get the ID from @get_id_bot). A direct chat with the bot is the simplest setup for a single reviewer.\n2. **LinkedIn**: connect the LinkedIn credential of an admin of the news page and replace YOUR_LINKEDIN_ORG_ID in 'Publish to LinkedIn' (the number from your page admin URL: linkedin.com/company/XXXXXXX/admin).\n3. **Jina AI / OpenAI / Anthropic**: existing credentials are referenced; re-select them if the import shows them as missing.\n\n## How it works\n\nFeeds are scanned twice a day. Articles from the last 4h (6h fallback) are deduplicated and filtered against covered topics (7-day memory) and previously rejected links. One article is picked, extracted, rewritten for LinkedIn, and sent to Telegram for approval. Approve = publish to the LinkedIn page. Reject (or extraction failure, or 4h without an answer) = the next best article is tried, max 3 per run. Every dead end sends a Telegram notification.",
+        "height": 620,
+        "width": 460,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2000,
+        80
+      ],
+      "id": "68a36d28-7d2f-4f78-a89c-2214dbfd6d2b",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Clean Memory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Memory": {
+      "main": [
+        [
+          {
+            "node": "Marketing Feed",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Startups Feed",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SaaS News Feed",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Visibility Feed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marketing Feed": {
+      "main": [
+        [
+          {
+            "node": "Merge Feeds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Startups Feed": {
+      "main": [
+        [
+          {
+            "node": "Merge Feeds",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "SaaS News Feed": {
+      "main": [
+        [
+          {
+            "node": "Merge Feeds",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "AI Visibility Feed": {
+      "main": [
+        [
+          {
+            "node": "Merge Feeds",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Merge Feeds": {
+      "main": [
+        [
+          {
+            "node": "Collect Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Candidates": {
+      "main": [
+        [
+          {
+            "node": "Articles Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Articles Found?": {
+      "main": [
+        [
+          {
+            "node": "News Picker",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Articles Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Picker Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "News Picker",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Picker Output": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "News Picker",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "News Picker": {
+      "main": [
+        [
+          {
+            "node": "Select Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Article": {
+      "main": [
+        [
+          {
+            "node": "Extract News",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract News": {
+      "main": [
+        [
+          {
+            "node": "Prepare Content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Handle Rejection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Content": {
+      "main": [
+        [
+          {
+            "node": "Content OK?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content OK?": {
+      "main": [
+        [
+          {
+            "node": "News Reporter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Handle Rejection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reporter Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "News Reporter",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reporter Output": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "News Reporter",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "News Reporter": {
+      "main": [
+        [
+          {
+            "node": "Format Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Post": {
+      "main": [
+        [
+          {
+            "node": "Request Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request Approval": {
+      "main": [
+        [
+          {
+            "node": "Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approved?": {
+      "main": [
+        [
+          {
+            "node": "Publish to LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Handle Rejection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish to LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Update Memory",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Publish Failed Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Memory": {
+      "main": [
+        [
+          {
+            "node": "Notify Published",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle Rejection": {
+      "main": [
+        [
+          {
+            "node": "Retry Pick?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retry Pick?": {
+      "main": [
+        [
+          {
+            "node": "News Picker",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Run Ended Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}
