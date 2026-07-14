@@ -22,7 +22,7 @@
         -1440,
         380
       ],
-      "id": "d547c374-92ab-4ea4-ac87-82f475b2fd1e",
+      "id": "ce0143c2-774d-4243-a30f-20e017486a5b",
       "name": "Schedule Trigger"
     },
     {
@@ -37,7 +37,7 @@
         -1220,
         380
       ],
-      "id": "b479f355-9817-4c1f-8be4-97d33ac50d57",
+      "id": "416bdb03-0e72-49f2-a8a1-9bffd27e523f",
       "name": "Clean Memory"
     },
     {
@@ -51,7 +51,7 @@
         -980,
         80
       ],
-      "id": "ad45c072-3690-469a-9919-b00423e4b08f",
+      "id": "130be18d-0940-460a-96ad-194e71a2fc38",
       "name": "Marketing Feed",
       "alwaysOutputData": true,
       "onError": "continueRegularOutput"
@@ -67,7 +67,7 @@
         -980,
         280
       ],
-      "id": "f2c8f37f-8563-446c-b1ca-ce5204e96e3f",
+      "id": "f0d2443e-b64e-410a-ad3d-5bfd6a2ded47",
       "name": "Startups Feed",
       "alwaysOutputData": true,
       "onError": "continueRegularOutput"
@@ -83,7 +83,7 @@
         -980,
         480
       ],
-      "id": "da42cb81-6b74-427a-8936-29a3df428a94",
+      "id": "9cda4dec-af3a-44c8-93c6-a4f9664df597",
       "name": "SaaS News Feed",
       "alwaysOutputData": true,
       "onError": "continueRegularOutput"
@@ -99,7 +99,7 @@
         -980,
         680
       ],
-      "id": "d226db12-0d27-4c65-93ff-d61a2c50a7c3",
+      "id": "759d766e-ea4b-4c89-9f04-e504fad31afb",
       "name": "AI Visibility Feed",
       "alwaysOutputData": true,
       "onError": "continueRegularOutput"
@@ -115,7 +115,7 @@
         -740,
         380
       ],
-      "id": "929d812d-ecca-4427-9568-f759971263e0",
+      "id": "547936a6-145d-4606-98a1-9855ab2d3285",
       "name": "Merge Feeds"
     },
     {
@@ -130,7 +130,7 @@
         -520,
         380
       ],
-      "id": "f514aab6-c891-4738-b73f-70a912440a01",
+      "id": "f9ae3eb7-a711-4f52-a8cf-a84f8cc9b418",
       "name": "Collect Candidates"
     },
     {
@@ -144,7 +144,7 @@
           },
           "conditions": [
             {
-              "id": "eebd8aaa-1f66-492d-afd6-6074e4b8f816",
+              "id": "c3c3415c-9087-44d3-8e2b-1f421d8546af",
               "leftValue": "={{ $json.found }}",
               "rightValue": "",
               "operator": {
@@ -164,7 +164,7 @@
         -300,
         380
       ],
-      "id": "e5c00f81-5173-4b4f-98d3-fae716d89fa7",
+      "id": "63f7c132-fc1e-4189-b183-86e41a577ccc",
       "name": "Articles Found?"
     },
     {
@@ -183,9 +183,9 @@
         -80,
         680
       ],
-      "id": "2d122083-638b-4964-bf88-8ace8dc2924a",
+      "id": "e6cfc67c-5c8c-49bb-87f2-bc1afb9fe709",
       "name": "No Articles Alert",
-      "webhookId": "0dfc2a40-eb82-4e57-9f8f-9ccef5fafe70",
+      "webhookId": "b8f5a576-d22e-4b18-b0dd-0c1f57828218",
       "credentials": {
         "telegramApi": {
           "id": "",
@@ -209,7 +209,7 @@
         -80,
         300
       ],
-      "id": "c670e93a-5539-42b1-9b52-1dc4d28531bb",
+      "id": "460c1c40-f864-4a90-b6dc-4dee1b0852df",
       "name": "News Picker",
       "retryOnFail": true,
       "maxTries": 3,
@@ -231,7 +231,7 @@
         -160,
         480
       ],
-      "id": "12cf9ba2-0c4f-45f7-8b83-241bc46c1fcf",
+      "id": "2d92f80f-ed55-428e-acab-c0e9bce860b9",
       "name": "Picker Model",
       "credentials": {
         "openAiApi": {
@@ -251,14 +251,14 @@
         20,
         480
       ],
-      "id": "521679cf-75e5-4a14-8439-0c406b374486",
+      "id": "9c0ae5e9-6b91-4652-a3c9-1639aa92c465",
       "name": "Picker Output"
     },
     {
       "parameters": {
         "mode": "runOnceForAllItems",
         "language": "javaScript",
-        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst candidates = sd.candidates || [];\n\nif (candidates.length === 0) {\n  throw new Error('No candidates stored in workflow memory. Collect Candidates must run before News Picker.');\n}\n\nconst out = ($input.first().json.output) || {};\nlet picked = out.article;\nif (Array.isArray(picked)) picked = picked[0];\npicked = picked || {};\n\n// The model must pick from the real list; never trust an invented link\nlet match = candidates.find(c => c.link === picked.link);\nif (!match && picked.title) {\n  const t = String(picked.title).toLowerCase().trim();\n  match = candidates.find(c => c.title.toLowerCase().trim() === t);\n}\nif (!match) {\n  match = candidates.slice().sort((a, b) => new Date(b.isoDate) - new Date(a.isoDate))[0];\n}\n\nsd.attemptCount = (sd.attemptCount || 0) + 1;\nsd.currentSelection = { title: match.title, link: match.link };\n\nreturn [{ json: { title: match.title, link: match.link, isoDate: match.isoDate, attempt: sd.attemptCount } }];"
+        "jsCode": "const sd = $getWorkflowStaticData('global');\n\n// Candidate list: prefer workflow memory, then fall back to the upstream nodes.\n// The fallbacks cover pinned or partial executions where Collect Candidates'\n// code did not actually run and therefore never wrote to static data.\nlet candidates = sd.candidates || [];\nif (candidates.length === 0) {\n  try { candidates = $('Handle Rejection').first().json.candidates || []; } catch (e) {}\n}\nif (candidates.length === 0) {\n  try { candidates = $('Collect Candidates').first().json.candidates || []; } catch (e) {}\n}\n\nconst out = ($input.first().json.output) || {};\nlet picked = out.article;\nif (Array.isArray(picked)) picked = picked[0];\npicked = picked || {};\n\n// The model must pick from the real list; never trust an invented link\nlet match = candidates.find(c => c.link === picked.link);\nif (!match && picked.title) {\n  const t = String(picked.title).toLowerCase().trim();\n  match = candidates.find(c => c.title.toLowerCase().trim() === t);\n}\nif (!match && candidates.length > 0) {\n  match = candidates.slice().sort((a, b) => new Date(b.isoDate) - new Date(a.isoDate))[0];\n}\n// Last resort: trust the picker's own output so the flow never dies here\nif (!match && picked.link) {\n  match = { title: picked.title || picked.link, link: picked.link, isoDate: picked.isoDate || new Date().toISOString() };\n}\nif (!match) {\n  throw new Error('Select Article received no candidate list and no usable pick from News Picker. Run the full flow so Collect Candidates executes (unpin it if pinned).');\n}\n\nsd.candidates = candidates;\nsd.attemptCount = (sd.attemptCount || 0) + 1;\nsd.currentSelection = { title: match.title, link: match.link };\n\nreturn [{ json: { title: match.title, link: match.link, isoDate: match.isoDate, attempt: sd.attemptCount } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -266,7 +266,7 @@
         160,
         300
       ],
-      "id": "cb0d4dbd-bd54-4ceb-bb7f-dd2225a80c23",
+      "id": "d3a34cf7-d35d-4c75-9c29-d45e06546fa3",
       "name": "Select Article"
     },
     {
@@ -283,7 +283,7 @@
         380,
         300
       ],
-      "id": "5bf219e9-81ec-4106-8492-fd6c5f31139f",
+      "id": "ec7da86f-51fb-4c7b-8841-7b23da2bd386",
       "name": "Extract News",
       "retryOnFail": true,
       "maxTries": 2,
@@ -308,7 +308,7 @@
         600,
         300
       ],
-      "id": "0c2ade18-ef8f-4bc8-9e7f-b25aa82d22ea",
+      "id": "a730db72-5d5c-4bc4-ac12-39de24a7cbcc",
       "name": "Prepare Content"
     },
     {
@@ -322,7 +322,7 @@
           },
           "conditions": [
             {
-              "id": "01fd9cee-fb68-4d04-9abe-07223a49c665",
+              "id": "1ebaf7ad-8de5-487f-99d8-06efcbbd7704",
               "leftValue": "={{ $json.contentLength }}",
               "rightValue": 200,
               "operator": {
@@ -341,7 +341,7 @@
         820,
         300
       ],
-      "id": "4283fd96-f99c-4aa4-abdc-4681f330faa9",
+      "id": "9517bc0b-0104-4ca6-85b7-7a272070986e",
       "name": "Content OK?"
     },
     {
@@ -360,7 +360,7 @@
         1040,
         240
       ],
-      "id": "4343af8f-a254-4a8e-be49-315b90e022fa",
+      "id": "dbb24c56-804c-48f1-968a-61524e21980e",
       "name": "News Reporter",
       "retryOnFail": true,
       "maxTries": 2,
@@ -382,7 +382,7 @@
         980,
         420
       ],
-      "id": "7325ed49-b381-4937-88d6-31b11294c88e",
+      "id": "3fd930a3-ee6e-487c-9bba-5a871121f30f",
       "name": "Reporter Model",
       "credentials": {
         "anthropicApi": {
@@ -402,7 +402,7 @@
         1160,
         420
       ],
-      "id": "9b81c44e-f9ac-4d72-bda0-4550c28000ce",
+      "id": "13d47f62-f45b-44ee-a397-9e8354786079",
       "name": "Reporter Output"
     },
     {
@@ -417,7 +417,7 @@
         1260,
         240
       ],
-      "id": "fb654a76-861e-46d1-8ab5-194c91d3d237",
+      "id": "0c1f9c02-075b-4958-b23c-e439e5ed99f1",
       "name": "Format Post"
     },
     {
@@ -451,9 +451,9 @@
         1480,
         240
       ],
-      "id": "957df92a-3d60-431c-baf5-db8d8c3d7bc5",
+      "id": "c7e7d454-c821-41fd-871c-c90649c8107f",
       "name": "Request Approval",
-      "webhookId": "4eb8fba5-f469-4b08-a50f-7cf27ad6e9eb",
+      "webhookId": "2ec7f29f-9f41-46ad-ac19-53b9d2f78baf",
       "credentials": {
         "telegramApi": {
           "id": "",
@@ -472,7 +472,7 @@
           },
           "conditions": [
             {
-              "id": "44ec2d87-cfa1-41a1-a564-2c85069cd149",
+              "id": "aba57aaf-c390-4df6-adb9-675e067b7561",
               "leftValue": "={{ $json.data?.approved ?? false }}",
               "rightValue": "",
               "operator": {
@@ -492,7 +492,7 @@
         1700,
         240
       ],
-      "id": "d77940cf-1433-488c-b891-50a92fdb5373",
+      "id": "5eff80a0-c168-4a84-92ed-c935f3114f03",
       "name": "Approved?"
     },
     {
@@ -511,7 +511,7 @@
         1920,
         120
       ],
-      "id": "c9b2342d-56aa-43a0-aaef-a7177a741482",
+      "id": "c8a221b6-d7a4-4865-a380-ba6c37eb820c",
       "name": "Publish to LinkedIn",
       "retryOnFail": true,
       "maxTries": 2,
@@ -536,7 +536,7 @@
         2140,
         120
       ],
-      "id": "f802594e-d1cc-4701-a920-9a3fc6258bf7",
+      "id": "6a513542-ea37-40e9-8436-8a812e8af048",
       "name": "Update Memory"
     },
     {
@@ -555,9 +555,9 @@
         2360,
         120
       ],
-      "id": "bd219bb0-5aa0-4b49-9843-c300e88bec45",
+      "id": "ab8ca80e-4791-478f-adce-49b2833566de",
       "name": "Notify Published",
-      "webhookId": "bbc77949-2e8b-4722-8165-c696ba60b139",
+      "webhookId": "e1a67646-eaca-42cf-85e9-da3e821c93c3",
       "credentials": {
         "telegramApi": {
           "id": "",
@@ -581,9 +581,9 @@
         2140,
         320
       ],
-      "id": "216880de-698d-40e5-b609-fa7e12ac8dee",
+      "id": "db308158-4c1a-474a-9d98-3f180f9f836f",
       "name": "Publish Failed Alert",
-      "webhookId": "adfe7b22-77db-415a-87b5-32a6680bc2a8",
+      "webhookId": "c147eae8-2f53-4101-b215-c62459e3cd64",
       "credentials": {
         "telegramApi": {
           "id": "",
@@ -603,7 +603,7 @@
         1920,
         560
       ],
-      "id": "90dc8087-41b2-404d-a7f9-0253537f3274",
+      "id": "a503aacf-4736-4ce9-95f5-f1688b931c37",
       "name": "Handle Rejection"
     },
     {
@@ -617,7 +617,7 @@
           },
           "conditions": [
             {
-              "id": "67254cd9-2a79-421f-8254-f811fc6c6492",
+              "id": "c665b4f2-e94f-4479-becd-cd1a4e81a0cd",
               "leftValue": "={{ $json.retry }}",
               "rightValue": "",
               "operator": {
@@ -637,7 +637,7 @@
         2140,
         560
       ],
-      "id": "4e083030-16ea-4d07-8fb7-18f0395667de",
+      "id": "94e8851f-e76c-4af3-992a-a0ce5d7b8627",
       "name": "Retry Pick?"
     },
     {
@@ -656,9 +656,9 @@
         2360,
         640
       ],
-      "id": "4d433916-6714-4d52-8d4e-677baabd9826",
+      "id": "33e0ef97-6f42-42f7-ac19-0af554e075b6",
       "name": "Run Ended Alert",
-      "webhookId": "9f32b4ce-bcfc-4462-9abe-3d72deb3a389",
+      "webhookId": "242296e2-71ec-4636-9ace-ff6babe314ba",
       "credentials": {
         "telegramApi": {
           "id": "",
@@ -679,7 +679,7 @@
         -2000,
         80
       ],
-      "id": "68a36d28-7d2f-4f78-a89c-2214dbfd6d2b",
+      "id": "fc56dbcf-c791-4724-9054-e641f904d058",
       "name": "Sticky Note"
     }
   ],

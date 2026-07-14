@@ -64,6 +64,7 @@ for (const n of wf.nodes) {
 
 /* ---------------- code node executor ---------------- */
 const staticData = {}; // shared across the whole "workflow instance"
+let nodeData = {}; // per-scenario mock for $('Node') references
 function runCode(nodeName, items) {
   const js = byName[nodeName].parameters.jsCode;
   const ctx = {
@@ -72,6 +73,10 @@ function runCode(nodeName, items) {
       all: () => items,
       first: () => items[0],
     },
+    $: (name) => ({ first: () => {
+      if (!(name in nodeData)) throw new Error('Referenced node "' + name + '" has no data');
+      return { json: nodeData[name] };
+    } }),
     Date, Set, Error, String, Array, JSON, isNaN, Object,
   };
   const fn = new vm.Script('(function(){\n' + js + '\n})()');
@@ -265,6 +270,34 @@ staticData.usedTopics = Array.from({ length: 80 }, (_, i) => ({ title: 'T' + i, 
 runCode('Clean Memory', [item({})]);
 check('rejectedLinks capped at 100', staticData.rejectedLinks.length === 100);
 check('usedTopics capped at 50', staticData.usedTopics.length === 50);
+
+/* ---------------- Scenario 11: Select Article fallbacks (pinned/partial executions) ---------------- */
+console.log('--- Scenario 11: Select Article survives empty static data');
+// simulate: Collect Candidates was pinned, so static data was never written
+for (const k of Object.keys(staticData)) delete staticData[k];
+nodeData = { 'Collect Candidates': { found: true, candidates: [
+  { title: 'Pinned story', link: 'https://ex.com/pinned', isoDate: h(1) },
+] } };
+out = runCode('Select Article', [item({ output: { article: { title: 'Pinned story', link: 'https://ex.com/pinned' } } })]);
+check('fallback to Collect Candidates output', out[0].json.link === 'https://ex.com/pinned', out[0].json);
+check('static data repopulated from fallback', staticData.candidates.length === 1);
+// simulate: retry loop context, static data lost, Handle Rejection has the list
+for (const k of Object.keys(staticData)) delete staticData[k];
+nodeData = { 'Handle Rejection': { retry: true, candidates: [
+  { title: 'Second try story', link: 'https://ex.com/second', isoDate: h(2) },
+] } };
+out = runCode('Select Article', [item({ output: { article: { title: 'Second try story', link: 'https://ex.com/second' } } })]);
+check('fallback to Handle Rejection output', out[0].json.link === 'https://ex.com/second', out[0].json);
+// simulate: no candidate source anywhere, but picker returned a valid-looking article
+for (const k of Object.keys(staticData)) delete staticData[k];
+nodeData = {};
+out = runCode('Select Article', [item({ output: { article: { title: 'Lone pick', link: 'https://ex.com/lone' } } })]);
+check('last resort trusts picker output instead of throwing', out[0].json.link === 'https://ex.com/lone', out[0].json);
+// simulate: nothing at all -> must still throw with a helpful message
+let threw = false;
+try { runCode('Select Article', [item({ output: {} })]); } catch (e) { threw = /no candidate list/.test(e.message); }
+check('throws helpful error only when truly nothing usable', threw);
+nodeData = {};
 
 console.log(failures === 0 ? '\nALL TESTS PASSED' : `\n${failures} TEST(S) FAILED`);
 process.exit(failures === 0 ? 0 : 1);
