@@ -1,0 +1,1358 @@
+{
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        12064,
+        3008
+      ],
+      "id": "09c80212-27dd-4972-aa84-c223da491619",
+      "name": "0"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        12192,
+        2928
+      ],
+      "id": "d76514b7-cab0-40e3-84d0-e4d8d61b7b76",
+      "name": "1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            },
+            {
+              "triggerAtHour": 17
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        7744,
+        2704
+      ],
+      "id": "8ae625bf-19ed-4c1c-819d-0d902d728002",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst now = Date.now();\nconst SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;\n\n// Prune covered topics older than 7 days, keep max 50 (migrates old string format too)\nsd.usedTopics = (sd.usedTopics || [])\n  .map(t => typeof t === 'string' ? { title: t, ts: now } : t)\n  .filter(t => t && t.title && (now - (t.ts || 0)) < SEVEN_DAYS)\n  .slice(-50);\n\n// Keep the last 100 rejected article links\nsd.rejectedLinks = (sd.rejectedLinks || []).slice(-100);\n\n// Reset per-run state\nsd.attemptCount = 0;\nsd.candidates = [];\nsd.currentSelection = null;\ndelete sd.runCount;\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8032,
+        2704
+      ],
+      "id": "d6298488-0e4f-491f-9172-aac64206d70f",
+      "name": "Clean Memory"
+    },
+    {
+      "parameters": {
+        "url": "https://rss.app/feeds/tnB85iGttJbWQsmo.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        8560,
+        2352
+      ],
+      "id": "8f223045-a931-4bb9-878a-911a59b0731e",
+      "name": "Marketing Feed",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://rss.app/feeds/tSjA7vC0jcARKypX.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        8608,
+        2592
+      ],
+      "id": "240f039c-1075-43ca-b990-d2176513cd03",
+      "name": "Startups Feed",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://rss.app/feeds/tJqecbuBNEMI9WYW.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        8544,
+        2816
+      ],
+      "id": "1210ff7c-e589-422a-8e99-c3af683e7c51",
+      "name": "SaaS News Feed",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://rss.app/feeds/t0IREYmhBr3HJ3oF.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        8624,
+        3072
+      ],
+      "id": "04c4a566-1608-4292-8912-9b24110cb465",
+      "name": "AI Visibility Feed",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        9152,
+        2672
+      ],
+      "id": "104825d9-a50c-4248-ba28-e7dbf0f4bc7e",
+      "name": "Merge Feeds"
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst now = Date.now();\n\nconst rejected = new Set(sd.rejectedLinks || []);\nconst usedTitles = new Set((sd.usedTopics || []).map(t => String(t.title).toLowerCase().trim()));\n\nconst all = $input.all()\n  .map(i => i.json)\n  .filter(a => a && a.title && a.link && a.isoDate);\n\nfunction collect(hours) {\n  const cutoff = now - hours * 60 * 60 * 1000;\n  const seenTitles = new Set();\n  const seenLinks = new Set();\n  const out = [];\n  for (const a of all) {\n    const ts = new Date(a.isoDate).getTime();\n    if (isNaN(ts) || ts < cutoff) continue;\n    const titleKey = String(a.title).toLowerCase().trim();\n    if (seenTitles.has(titleKey) || seenLinks.has(a.link)) continue;\n    seenTitles.add(titleKey);\n    seenLinks.add(a.link);\n    if (rejected.has(a.link)) continue;\n    if (usedTitles.has(titleKey)) continue;\n    out.push({\n      title: String(a.title).trim(),\n      link: a.link,\n      snippet: String(a.contentSnippet || '').slice(0, 300),\n      isoDate: a.isoDate,\n    });\n  }\n  return out;\n}\n\n// Try the last 4 hours first; if nothing is left, extend to 6 hours\nlet windowHours = 4;\nlet candidates = collect(4);\nif (candidates.length === 0) {\n  windowHours = 6;\n  candidates = collect(6);\n}\n\nif (candidates.length === 0) {\n  return [{ json: {\n    found: false,\n    reason: 'No publishable articles were found. I checked the last 4 hours, then extended the window to 6 hours, but the feeds came back empty (or only contained articles that were already covered or previously rejected).',\n  } }];\n}\n\nsd.candidates = candidates;\nreturn [{ json: {\n  found: true,\n  windowHours: windowHours,\n  candidateCount: candidates.length,\n  candidates: candidates,\n  usedTopics: (sd.usedTopics || []).map(t => t.title),\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9456,
+        2768
+      ],
+      "id": "ec660eba-d773-472a-9bdb-b50022b9ed1e",
+      "name": "Collect Candidates"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "eebd8aaa-1f66-492d-afd6-6074e4b8f816",
+              "leftValue": "={{ $json.found }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        9760,
+        2736
+      ],
+      "id": "99ad9814-8402-42af-9f7b-8ea5bd3d99aa",
+      "name": "Articles Found?"
+    },
+    {
+      "parameters": {
+        "chatId": "5233249036",
+        "text": "=🔎 {{ $json.reason }}\n\nI will try again at the next scheduled run.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        10080,
+        2880
+      ],
+      "id": "c3d92e71-4274-4e80-b8d0-4524da19ca1d",
+      "name": "No Articles Alert",
+      "webhookId": "0dfc2a40-eb82-4e57-9f8f-9ccef5fafe70",
+      "credentials": {
+        "telegramApi": {
+          "id": "o19W8ug2Nu2cqvU3",
+          "name": "LinkedIn News Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Select exactly ONE article for our LinkedIn company news page.\n\nCandidate articles (JSON):\n{{ JSON.stringify($json.candidates) }}\n\nRecently covered topics (avoid anything substantially similar):\n{{ JSON.stringify($json.usedTopics) }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are the content editor of a LinkedIn company news page covering marketing, startups, SaaS, and AI. Your task: from the candidate list you are given, select exactly ONE article that will perform best as a LinkedIn post for an audience of founders, marketers, and SaaS/AI professionals.\n\n<rules>\n1. You MUST pick exactly one article that appears in the provided candidate list. Never invent an article.\n2. Copy the \"title\" and \"link\" values EXACTLY as they appear in the list, character for character. Do not modify, shorten, or fix the link.\n3. Respond with ONLY the JSON object in the required format. No commentary, no markdown fences.\n</rules>\n\n<selection_criteria>\nPrefer, in this order:\n1. Concrete, newsworthy developments in marketing, startups, SaaS, or AI: funding rounds, acquisitions, product launches, platform changes, research reports with data.\n2. Articles with specific numbers, percentages, or study findings.\n3. Stories with a clear implication for business professionals (what changes for them).\n4. More recent articles over older ones when quality is comparable.\n</selection_criteria>\n\n<exclusions>\nNever pick:\n- Anything substantially similar to a recently covered topic from the provided list.\n- Press releases, sponsored or promotional content, award announcements, company self-promotion.\n- Entertainment, TV shows, celebrity, sports, or lifestyle content, even if the headline contains keywords like SaaS (for example TV serials).\n- Opinion pieces with no factual news, roundups, digests, or listicles (for example daily funding report digests, top-N lists, job move roundups).\n- Video-only content or paywalled teasers where the snippet has no substance.\n- Local small-town stories with no relevance to an international professional audience.\n</exclusions>\n\nIn the \"reason\" field explain your choice in one sentence.",
+          "enableStreaming": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        10432,
+        2656
+      ],
+      "id": "544079f6-9f0b-45e2-a794-f7a85822e7c4",
+      "name": "News Picker",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5.6-luna",
+          "cachedResultName": "gpt-5.6-luna"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        10416,
+        2864
+      ],
+      "id": "d95af794-c631-4437-a9d1-ebebd2d56b4f",
+      "name": "Picker Model",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"article\": {\n    \"title\": \"Exact title copied from the candidate list\",\n    \"link\": \"https://example.com/exact-link-copied-from-the-list\",\n    \"reason\": \"One sentence explaining why this article was selected\"\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        10592,
+        2864
+      ],
+      "id": "0f2a1a40-f6c1-43fd-88f2-05e92cadd2d8",
+      "name": "Picker Output",
+      "retryOnFail": true,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\n\nlet candidates = sd.candidates || [];\nif (candidates.length === 0) {\n  try { candidates = $('Handle Rejection1').first().json.candidates || []; } catch (e) {}\n}\nif (candidates.length === 0) {\n  try { candidates = $('Collect Candidates1').first().json.candidates || []; } catch (e) {}\n}\n\nconst out = ($input.first().json.output) || {};\nlet picked = out.article;\nif (Array.isArray(picked)) picked = picked[0];\npicked = picked || {};\n\nlet match = candidates.find(c => c.link === picked.link);\nif (!match && picked.title) {\n  const t = String(picked.title).toLowerCase().trim();\n  match = candidates.find(c => c.title.toLowerCase().trim() === t);\n}\nif (!match && candidates.length > 0) {\n  match = candidates.slice().sort((a, b) => new Date(b.isoDate) - new Date(a.isoDate))[0];\n}\nif (!match && picked.link) {\n  match = { title: picked.title || picked.link, link: picked.link, isoDate: picked.isoDate || new Date().toISOString() };\n}\nif (!match) {\n  throw new Error('Select Article received no candidate list and no usable pick from News Picker. Run the full flow so Collect Candidates executes (unpin it if pinned).');\n}\n\nsd.candidates = candidates;\nsd.attemptCount = (sd.attemptCount || 0) + 1;\nsd.currentSelection = { title: match.title, link: match.link };\n\nreturn [{ json: { title: match.title, link: match.link, isoDate: match.isoDate, attempt: sd.attemptCount } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        10896,
+        2688
+      ],
+      "id": "1cdd7a29-6c64-4548-9c06-d2eb1fb04634",
+      "name": "Select Article"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.link }}",
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.jinaAi",
+      "typeVersion": 1,
+      "position": [
+        11200,
+        2704
+      ],
+      "id": "4a618620-f4eb-4c6e-969b-7cc9fedc458d",
+      "name": "Extract News",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "jinaAiApi": {
+          "id": "NNDbWo36mt2JCHwE",
+          "name": "JinaAI API"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst sel = sd.currentSelection || {};\nconst j = $input.first().json;\n\nlet content = '';\nif (typeof j.content === 'string') content = j.content;\nelse if (j.data && typeof j.data.content === 'string') content = j.data.content;\nelse if (typeof j.data === 'string') content = j.data;\nelse if (typeof j.text === 'string') content = j.text;\ncontent = content.trim();\n\nlet publication = '';\nconst m = String(sel.link || '').match(/^https?:\\/\\/(?:www\\.)?([^\\/]+)/i);\nif (m) publication = m[1];\n\nreturn [{ json: {\n  title: sel.title || j.title || '',\n  link: sel.link || '',\n  publication: publication,\n  content: content.slice(0, 20000),\n  contentLength: content.length,\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        11600,
+        2576
+      ],
+      "id": "3edcb3f0-5a7d-49be-aec5-0da5f03e6e97",
+      "name": "Prepare Content"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "01fd9cee-fb68-4d04-9abe-07223a49c665",
+              "leftValue": "={{ $json.contentLength }}",
+              "rightValue": 200,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        11856,
+        2576
+      ],
+      "id": "bad4aac3-2592-4c3e-91cf-58b7ec389738",
+      "name": "Content OK?"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write one news article for LinkedIn page based on this news piece:\n\nOriginal title: {{ $json.title }}\nPublication: {{ $json.publication }}\n\nArticle content:\n{{ $json.content }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=<persona>\nYou are a social media editor with 14 years of writing behind you, the last 5 spent writing specifically for the way people read now: scrolling a LinkedIn feed where only the first line of your post is visible and a reader decides in about a second whether the story deserves a tap on \"see more\". You came up writing long explanatory features, then watched attention move into the feed and rebuilt how you write around it. You learned that the opening sentence has to carry the whole story on its own, because that is the unit the feed shows and the reader judges.\n\nSo you lead with the story. Every time. You don't warm up, you don't set the scene, you don't make the reader wait for the payoff three paragraphs down. You state the thing, then you earn it: the mechanism, the one solid number from the source you actually checked, and then the part most writers skip, your own read on what that number means. That last move is what separates you from a news wire. Anyone can repeat an announcement. You tell the reader what it implies for their situation, the inference the source itself never spelled out.\n\nYou're ruthless about facts. A number you can't trace to the source content doesn't go in, full stop, because you know a single invented statistic ends a reader's trust the moment they catch it. You translate dense, technical, jargon-heavy material into plain words without flattening what made it true. And you write to one specific person and their actual problem, never to a category, never telling them what they are. You hold one voice and one line of argument from the opening sentence to the final question, so the post reads like it was written by a person who knew exactly what they were saying.\n</persona>\n\nYou write for a company news page covering marketing, startups, SaaS, and AI. The audience is founders, marketers, growth professionals, and SaaS/AI practitioners. Transform the provided article into ONE original LinkedIn post.\n\n<content_rules>\n- Rephrase everything in your own words. Never copy sentences from the source.\n- Use only facts, numbers, and quotes that appear in the source content. Never invent or extrapolate data, prices, or figures.\n- Focus on ONE story. If the content covers several topics, pick the most newsworthy one and ignore the rest.\n- Credit the source naturally in the text, for example \"reports Forbes\" or \"(via techcrunch.com)\". Do NOT put a URL in the post body: LinkedIn reduces the reach of posts with external links.\n- Add one concrete takeaway or implication for the reader (what this means for their work) without mentioning your target audience directly.\n</content_rules>\n\n<linkedin_format>\n- Total length: 1500 to 2500 characters.\n- Line 1: a hook under 140 characters that states the most surprising fact or creates curiosity. No hashtags at the start. The first two lines decide whether people tap \"see more\", so make them carry the story.\n- Body: short paragraphs of 1 to 2 sentences separated by blank lines, easy to scan on mobile.\n- Near the end, ask one specific question that invites readers to comment with their opinion or experience (comments drive LinkedIn distribution).\n- Last line: 3 to 5 hashtags, mixing one broad tag (#marketing, #startups, #SaaS, #AI) with more specific ones. Never more than 5.\n</linkedin_format>\n\n<style>\n- Confident and natural. Write like a sharp operator sharing news with peers, not a press office.\n- Plain language, short sentences, active voice.\n- No em-dashes. No participle clauses. No corporate buzzwords (game-changer, delve, landscape, in today's fast-paced world).\n- No emojis in the whole post.\n</style>\n\n<forbidden_patterns>\nAvoid negative parallelisms. Never use constructions like \"Not only... but...\" or \"It's not just about X, it's Y.\"\nWrong: \"It's not just about the beat riding under the vocals; it's part of the aggression and atmosphere. It's not merely a song, it's a statement.\"\nCorrect: \"The heavy beat adds to the aggressive tone.\"\n\nAvoid tailing negations. Never tack clipped negation fragments such as \"no guessing\" or \"not a motion\" onto the end of a sentence. Write a real clause instead.\nWrong: \"The options come from the selected item, not from guessing.\"\nCorrect: \"The options come from the selected item without forcing the user to guess.\"\n\nBreak the rule of three. Never list exactly three parallel items of any grammatical type in a series connected by commas: three nouns, three adjectives, three verb phrases, three clauses, or any other triad. This mechanical rhythm signals AI authorship. When you need to list, use one or two items maximum. If you have three or more pieces of information to convey, deliver the third as a separate sentence or absorb it into the surrounding prose.\nWrong: \"The rally that carried the S&P 500, Nasdaq, and Dow into 2026 has been long, narrow, and concentrated.\"\nCorrect: \"The rally that carried the S&P 500 into 2026 has been long and concentrated.\"\nWrong: \"So the central tension is set. Prices are high, breadth is narrow, and shocks keep arriving.\"\nCorrect: \"So the central tension is set as the prices keep climbing and shocks keep arriving.\"\n</forbidden_patterns>\n\n<output>\nReturn ONLY a raw JSON object. No markdown fences, no ```json wrapper, no commentary before or after. The response must start with { and end with }.\n\nThe object must contain exactly these three string fields and nothing else:\n\n{\n  \"headline\": \"Neutral one-line summary of the story, 40 to 60 characters, used internally for review, not part of the LinkedIn post\",\n  \"post\": \"The full LinkedIn post text, 1500 to 2500 characters, ending with 3 to 5 hashtags\",\n  \"imageQuery\": \"2 to 4 plain English words naming a concrete, visual stock photo subject that fits the story, used to search a stock photo library\"\n}\n\nRules for imageQuery:\n- Use generic, concrete, photographable concepts. Good examples: \"data center servers\", \"city skyline office\", \"handshake business meeting\", \"robot arm factory\", \"stock market screens\".\n- Never use company names, product names, brand names, logos, or people's names. Stock libraries do not have them and will return nothing.\n- No hashtags and no punctuation. Just 2 to 4 space-separated lowercase words.\n\nJSON formatting rules:\n- Escape every line break inside \"post\" as \\n. A blank line between paragraphs is \\n\\n. Never put a raw line break inside a JSON string.\n- Escape any double quote inside the text as \\\".\n- Use straight quotes only, never typographic quotes, inside the JSON syntax.\n- Do not add any other fields, keys, or explanations.\n</output>",
+          "enableStreaming": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        12272,
+        2512
+      ],
+      "id": "acc18261-1247-4e59-bd62-05938b48919e",
+      "name": "News Reporter",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-opus-4-8",
+          "cachedResultName": "Claude Opus 4.8"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        12240,
+        2688
+      ],
+      "id": "4c513142-4403-40fb-a95a-7ae44eb135c8",
+      "name": "Reporter Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "DrfiU3H1MN24MyeY",
+          "name": "Anthropic API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"headline\": \"Neutral one-line summary\",\n  \"post\": \"Full LinkedIn post\",\n  \"imageQuery\": \"data center servers\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        12432,
+        2688
+      ],
+      "id": "cf45bdaf-db2b-4c81-bef0-c8d1df49eb92",
+      "name": "Reporter Output",
+      "retryOnFail": true,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\n\nlet sel = sd.currentSelection || {};\nif (!sel.link) {\n  try { sel = $('Select Article').first().json || {}; } catch (e) {}\n}\n\nconst out = ($input.first().json.output) || {};\nconst post = String(out.post || '').trim();\nconst headline = String(out.headline || sel.title || '').trim();\nconst imageQuery = String(out.imageQuery || '').trim();\n\nif (!post) {\n  throw new Error('News Reporter returned an empty post.');\n}\n\nlet attempt = sd.attemptCount || 0;\nif (attempt === 0) {\n  try { attempt = $('Select Article').first().json.attempt || 1; } catch (e) { attempt = 1; }\n}\n\nreturn [{ json: {\n  headline: headline,\n  post: post,\n  title: sel.title || '',\n  link: sel.link || '',\n  attempt: attempt,\n  imageQuery: imageQuery,\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        12672,
+        2528
+      ],
+      "id": "307be19e-82f7-4d96-bb69-f4ab01774b60",
+      "name": "Format Post"
+    },
+    {
+      "parameters": {
+        "url": "https://api.unsplash.com/search/photos",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $json.imageQuery }}"
+            },
+            {
+              "name": "orientation",
+              "value": "landscape"
+            },
+            {
+              "name": "per_page",
+              "value": "1"
+            },
+            {
+              "name": "content_filter",
+              "value": "high"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        12608,
+        2736
+      ],
+      "id": "b1f2a3c4-0001-4a00-8000-000000000001",
+      "name": "Find Image",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "UNSPLASH_HEADER_AUTH",
+          "name": "Unsplash API"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const src = $input.first().json || {};\nconst fp = $('Format Post').first().json || {};\n\nlet results = [];\nif (Array.isArray(src.results)) results = src.results;\n\nlet hasImage = false;\nlet imageUrl = '';\nlet photographer = '';\nlet photographerUrl = '';\nlet downloadLocation = '';\nlet creditLine = '';\n\nif (results.length > 0) {\n  const p = results[0] || {};\n  const urls = p.urls || {};\n  imageUrl = urls.regular || urls.full || urls.small || '';\n  const user = p.user || {};\n  photographer = user.name || 'Unsplash';\n  photographerUrl = (user.links && user.links.html) || 'https://unsplash.com';\n  downloadLocation = (p.links && p.links.download_location) || '';\n  if (imageUrl) {\n    hasImage = true;\n    creditLine = 'Photo by ' + photographer + ' on Unsplash';\n  }\n}\n\nlet post = String(fp.post || '');\nif (hasImage && creditLine) {\n  post = post + '\\n\\n' + creditLine;\n}\n\nreturn [{ json: {\n  headline: fp.headline || '',\n  post: post,\n  title: fp.title || '',\n  link: fp.link || '',\n  attempt: fp.attempt || 1,\n  imageQuery: fp.imageQuery || '',\n  hasImage: hasImage,\n  imageUrl: imageUrl,\n  photographer: photographer,\n  photographerUrl: photographerUrl,\n  downloadLocation: downloadLocation,\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        12800,
+        2736
+      ],
+      "id": "b1f2a3c4-0002-4a00-8000-000000000002",
+      "name": "Pick Image"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c0000000-0000-4000-8000-000000000101",
+              "leftValue": "={{ $json.hasImage }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        12992,
+        2736
+      ],
+      "id": "b1f2a3c4-0003-4a00-8000-000000000003",
+      "name": "Has Image?"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendPhoto",
+        "chatId": "5233249036",
+        "binaryData": false,
+        "file": "={{ $json.imageUrl }}",
+        "additionalFields": {
+          "caption": "=🖼 Suggested image (via Unsplash)\nPhoto by {{ $json.photographer }} on Unsplash\n\nThe post text and approval buttons follow below."
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        13184,
+        2864
+      ],
+      "id": "b1f2a3c4-0004-4a00-8000-000000000004",
+      "name": "Send Preview Photo",
+      "webhookId": "b1f2a3c4-0004-4a00-8000-0000000000f4",
+      "credentials": {
+        "telegramApi": {
+          "id": "o19W8ug2Nu2cqvU3",
+          "name": "LinkedIn News Bot"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "5233249036",
+        "message": "=📝 LinkedIn post for review (attempt {{ $('Pick Image').first().json.attempt }} of 3)\n\n{{ $('Pick Image').first().json.headline }}\n\n{{ $('Pick Image').first().json.hasImage ? '🖼 Image attached (shown above, via Unsplash)' : '⚠️ No matching image found — this will publish as text only' }}\n\n----------------\n\n{{ $('Pick Image').first().json.post }}\n\n----------------\n\nSource: {{ $('Pick Image').first().json.link }}\n\nApprove to publish to the LinkedIn page. Reject to pick a different article.",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "✅ Publish",
+            "disapproveLabel": "❌ Reject"
+          }
+        },
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "resumeAmount": 4
+            }
+          },
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        13456,
+        2512
+      ],
+      "id": "73056ed2-327a-4952-b93e-f7657426b97d",
+      "name": "Request Approval",
+      "webhookId": "4eb8fba5-f469-4b08-a50f-7cf27ad6e9eb",
+      "credentials": {
+        "telegramApi": {
+          "id": "o19W8ug2Nu2cqvU3",
+          "name": "LinkedIn News Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "44ec2d87-cfa1-41a1-a564-2c85069cd149",
+              "leftValue": "={{ $json.data?.approved ?? false }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        13728,
+        2512
+      ],
+      "id": "8ac9938b-fa59-4fb9-b842-caae211cf244",
+      "name": "Approved?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c0000000-0000-4000-8000-000000000102",
+              "leftValue": "={{ $('Pick Image').first().json.hasImage }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        14000,
+        2560
+      ],
+      "id": "b1f2a3c4-0005-4a00-8000-000000000005",
+      "name": "Publish Route"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Pick Image').first().json.imageUrl }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "data"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        14256,
+        2432
+      ],
+      "id": "b1f2a3c4-0006-4a00-8000-000000000006",
+      "name": "Download Image",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 2000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Pick Image').first().json.downloadLocation }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        14256,
+        2704
+      ],
+      "id": "b1f2a3c4-0007-4a00-8000-000000000007",
+      "name": "Unsplash Download Ping",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "UNSPLASH_HEADER_AUTH",
+          "name": "Unsplash API"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "postAs": "organization",
+        "organization": "YOUR_LINKEDIN_ORG_ID",
+        "text": "={{ $('Pick Image').first().json.post }}",
+        "shareMediaCategory": "IMAGE",
+        "binaryPropertyName": "data",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        14544,
+        2432
+      ],
+      "id": "37c61691-ebc0-4129-ab69-fe5c3db40d3d",
+      "name": "Publish to LinkedIn",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "postAs": "organization",
+        "organization": "YOUR_LINKEDIN_ORG_ID",
+        "text": "={{ $('Pick Image').first().json.post }}",
+        "shareMediaCategory": "NONE",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        14544,
+        2704
+      ],
+      "id": "b1f2a3c4-0008-4a00-8000-000000000008",
+      "name": "Publish to LinkedIn (Text)",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst sel = sd.currentSelection || {};\n\n// Record the published topic so future runs skip it (pruned after 7 days)\nif (sel.title) {\n  sd.usedTopics = [...(sd.usedTopics || []), { title: sel.title, ts: Date.now() }].slice(-50);\n}\nsd.candidates = [];\nsd.currentSelection = null;\nsd.attemptCount = 0;\n\nreturn [{ json: { published: true, title: sel.title || '', link: sel.link || '' } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        14848,
+        2528
+      ],
+      "id": "4af5e098-9a5e-4806-b0e5-f848c6e03e80",
+      "name": "Update Memory"
+    },
+    {
+      "parameters": {
+        "chatId": "5233249036",
+        "text": "=✅ Published to LinkedIn:\n{{ $json.title }}\n\nSource: {{ $json.link }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        15136,
+        2512
+      ],
+      "id": "f7a1e213-98e9-4868-8e42-eb2e5b44ad6f",
+      "name": "Notify Published",
+      "webhookId": "bbc77949-2e8b-4722-8165-c696ba60b139",
+      "credentials": {
+        "telegramApi": {
+          "id": "o19W8ug2Nu2cqvU3",
+          "name": "LinkedIn News Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "5233249036",
+        "text": "=⚠️ The post was approved but publishing to LinkedIn failed. Check the execution log in n8n and post manually if needed.\n\n{{ $('Pick Image').first().json.post }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        14848,
+        2752
+      ],
+      "id": "42e2b6cd-e404-4b61-bbfe-25d59f7964b3",
+      "name": "Publish Failed Alert",
+      "webhookId": "adfe7b22-77db-415a-87b5-32a6680bc2a8",
+      "credentials": {
+        "telegramApi": {
+          "id": "o19W8ug2Nu2cqvU3",
+          "name": "LinkedIn News Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst MAX_ATTEMPTS = 3;\n\nlet sel = sd.currentSelection || {};\nif (!sel.link) {\n  try { sel = $('Select Article').first().json || {}; } catch (e) {}\n}\n\nlet candidates = sd.candidates || [];\nif (candidates.length === 0) {\n  try { candidates = $('Collect Candidates').first().json.candidates || []; } catch (e) {}\n}\n\nlet attempts = sd.attemptCount || 0;\nif (attempts === 0) {\n  try { attempts = $('Select Article').first().json.attempt || 1; } catch (e) { attempts = 1; }\n}\n\nif (sel.link) {\n  sd.rejectedLinks = [...(sd.rejectedLinks || []), sel.link].slice(-100);\n  candidates = candidates.filter(c => c.link !== sel.link);\n}\nsd.candidates = candidates;\nsd.currentSelection = null;\nsd.attemptCount = attempts;\n\nconst remaining = candidates.length;\n\nif (attempts >= MAX_ATTEMPTS) {\n  return [{ json: { retry: false, reason: 'I tried ' + attempts + ' articles this run and none was approved or usable, so I am stopping this run.' } }];\n}\nif (remaining === 0) {\n  return [{ json: { retry: false, reason: 'No candidate articles are left to try after the last rejection.' } }];\n}\n\nreturn [{ json: {\n  retry: true,\n  found: true,\n  candidateCount: remaining,\n  candidates: candidates,\n  usedTopics: (sd.usedTopics || []).map(t => t.title),\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        13568,
+        3008
+      ],
+      "id": "87b1f2ba-993d-4239-983f-a753b4c39f71",
+      "name": "Handle Rejection"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "67254cd9-2a79-421f-8254-f811fc6c6492",
+              "leftValue": "={{ $json.retry }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        13808,
+        3024
+      ],
+      "id": "a7d85f44-c758-40c2-8990-bf43c86cd60f",
+      "name": "Retry Pick?"
+    },
+    {
+      "parameters": {
+        "chatId": "5233249036",
+        "text": "=🛑 {{ $json.reason }}\n\nNo post was published this run. I will try again at the next scheduled run.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        14144,
+        2992
+      ],
+      "id": "e40aa0a7-8453-4f26-b40d-bcf6832ecdaa",
+      "name": "Run Ended Alert",
+      "webhookId": "9f32b4ce-bcfc-4462-9abe-3d72deb3a389",
+      "credentials": {
+        "telegramApi": {
+          "id": "o19W8ug2Nu2cqvU3",
+          "name": "LinkedIn News Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "0": {
+      "main": [
+        [
+          {
+            "node": "Handle Rejection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1": {
+      "main": [
+        [
+          {
+            "node": "Handle Rejection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Clean Memory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Memory": {
+      "main": [
+        [
+          {
+            "node": "Marketing Feed",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Startups Feed",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SaaS News Feed",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Visibility Feed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marketing Feed": {
+      "main": [
+        [
+          {
+            "node": "Merge Feeds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Startups Feed": {
+      "main": [
+        [
+          {
+            "node": "Merge Feeds",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "SaaS News Feed": {
+      "main": [
+        [
+          {
+            "node": "Merge Feeds",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "AI Visibility Feed": {
+      "main": [
+        [
+          {
+            "node": "Merge Feeds",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Merge Feeds": {
+      "main": [
+        [
+          {
+            "node": "Collect Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Candidates": {
+      "main": [
+        [
+          {
+            "node": "Articles Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Articles Found?": {
+      "main": [
+        [
+          {
+            "node": "News Picker",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Articles Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "News Picker": {
+      "main": [
+        [
+          {
+            "node": "Select Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Picker Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "News Picker",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Picker Output": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "News Picker",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Article": {
+      "main": [
+        [
+          {
+            "node": "Extract News",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract News": {
+      "main": [
+        [
+          {
+            "node": "Prepare Content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "0",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Content": {
+      "main": [
+        [
+          {
+            "node": "Content OK?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content OK?": {
+      "main": [
+        [
+          {
+            "node": "News Reporter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "News Reporter": {
+      "main": [
+        [
+          {
+            "node": "Format Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reporter Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "News Reporter",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reporter Output": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "News Reporter",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Post": {
+      "main": [
+        [
+          {
+            "node": "Find Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Image": {
+      "main": [
+        [
+          {
+            "node": "Pick Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pick Image": {
+      "main": [
+        [
+          {
+            "node": "Has Image?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Image?": {
+      "main": [
+        [
+          {
+            "node": "Send Preview Photo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Request Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Preview Photo": {
+      "main": [
+        [
+          {
+            "node": "Request Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request Approval": {
+      "main": [
+        [
+          {
+            "node": "Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approved?": {
+      "main": [
+        [
+          {
+            "node": "Publish Route",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Handle Rejection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish Route": {
+      "main": [
+        [
+          {
+            "node": "Download Image",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Unsplash Download Ping",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Publish to LinkedIn (Text)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Image": {
+      "main": [
+        [
+          {
+            "node": "Publish to LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Publish to LinkedIn (Text)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish to LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Update Memory",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Publish Failed Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish to LinkedIn (Text)": {
+      "main": [
+        [
+          {
+            "node": "Update Memory",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Publish Failed Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Memory": {
+      "main": [
+        [
+          {
+            "node": "Notify Published",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle Rejection": {
+      "main": [
+        [
+          {
+            "node": "Retry Pick?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retry Pick?": {
+      "main": [
+        [
+          {
+            "node": "Run Ended Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "News Picker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a6740e20b8df4b0f2232ee7d723b289903c7e14e81e1ddef83935bd01161123c"
+  }
+}
