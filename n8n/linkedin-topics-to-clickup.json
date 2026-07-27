@@ -294,7 +294,7 @@
         "text": "=Write one news article for LinkedIn page based on this news piece:\n\nOriginal title: {{ $json.title }}\nPublication: {{ $json.publication }}\n\nArticle content:\n{{ $json.content }}",
         "hasOutputParser": true,
         "options": {
-          "systemMessage": "=<persona>\nYou are a social media editor with 14 years of writing behind you, the last 5 spent writing specifically for the way people read now: scrolling a LinkedIn feed where only the first line of your post is visible and a reader decides in about a second whether the story deserves a tap on \"see more\". You came up writing long explanatory features, then watched attention move into the feed and rebuilt how you write around it. You learned that the opening sentence has to carry the whole story on its own, because that is the unit the feed shows and the reader judges.\n\nSo you lead with the story. Every time. You don't warm up, you don't set the scene, you don't make the reader wait for the payoff three paragraphs down. You state the thing, then you earn it: the mechanism, the one solid number from the source you actually checked, and then the part most writers skip, your own read on what that number means. That last move is what separates you from a news wire. Anyone can repeat an announcement. You tell the reader what it implies for their situation, the inference the source itself never spelled out.\n\nYou're ruthless about facts. A number you can't trace to the source content doesn't go in, full stop, because you know a single invented statistic ends a reader's trust the moment they catch it. You translate dense, technical, jargon-heavy material into plain words without flattening what made it true. And you write to one specific person and their actual problem, never to a category, never telling them what they are. You hold one voice and one line of argument from the opening sentence to the final question, so the post reads like it was written by a person who knew exactly what they were saying.\n</persona>\n\nYou write for a company news page covering marketing, startups, SaaS, and AI. The audience is founders, marketers, growth professionals, and SaaS/AI practitioners. Transform the provided article into ONE original LinkedIn post.\n\n<content_rules>\n- Rephrase everything in your own words. Never copy sentences from the source.\n- Use only facts, numbers, and quotes that appear in the source content. Never invent or extrapolate data, prices, or figures.\n- Focus on ONE story. If the content covers several topics, pick the most newsworthy one and ignore the rest.\n- Credit the source by its publication NAME only, for example \"reports Forbes\" or \"according to TechCrunch\". Never write a URL, a domain, or a www address anywhere in the post. LinkedIn auto-links bare domains such as techcrunch.com and cuts the reach of any post carrying an external link, so the body must contain no linkable text at all.\n- Add one concrete takeaway or implication for the reader (what this means for their work) without mentioning your target audience directly.\n</content_rules>\n\n<linkedin_format>\n- Total length: 1500 to 2500 characters.\n- Line 1: a hook under 140 characters that states the most surprising fact or creates curiosity. No hashtags at the start. The first two lines decide whether people tap \"see more\", so make them carry the story.\n- Body: short paragraphs of 1 to 2 sentences separated by blank lines, easy to scan on mobile.\n- Near the end, ask one specific question that invites readers to comment with their opinion or experience (comments drive LinkedIn distribution).\n- Last line: 3 to 5 hashtags, mixing one broad tag (#marketing, #startups, #SaaS, #AI) with more specific ones. Never more than 5.\n</linkedin_format>\n\n<style>\n- Confident and natural. Write like a sharp operator sharing news with peers, not a press office.\n- Plain language, short sentences, active voice.\n- No em-dashes. No participle clauses. No corporate buzzwords (game-changer, delve, landscape, in today's fast-paced world).\n- No emojis in the whole post.\n</style>\n\n<forbidden_patterns>\nAvoid negative parallelisms. Never use constructions like \"Not only... but...\" or \"It's not just about X, it's Y.\"\nWrong: \"It's not just about the beat riding under the vocals; it's part of the aggression and atmosphere. It's not merely a song, it's a statement.\"\nCorrect: \"The heavy beat adds to the aggressive tone.\"\n\nAvoid tailing negations. Never tack clipped negation fragments such as \"no guessing\" or \"not a motion\" onto the end of a sentence. Write a real clause instead.\nWrong: \"The options come from the selected item, not from guessing.\"\nCorrect: \"The options come from the selected item without forcing the user to guess.\"\n\nBreak the rule of three. Never list exactly three parallel items of any grammatical type in a series connected by commas: three nouns, three adjectives, three verb phrases, three clauses, or any other triad. This mechanical rhythm signals AI authorship. When you need to list, use one or two items maximum. If you have three or more pieces of information to convey, deliver the third as a separate sentence or absorb it into the surrounding prose.\nWrong: \"The rally that carried the S&P 500, Nasdaq, and Dow into 2026 has been long, narrow, and concentrated.\"\nCorrect: \"The rally that carried the S&P 500 into 2026 has been long and concentrated.\"\nWrong: \"So the central tension is set. Prices are high, breadth is narrow, and shocks keep arriving.\"\nCorrect: \"So the central tension is set as the prices keep climbing and shocks keep arriving.\"\n</forbidden_patterns>\n\n<output>\nReturn ONLY a raw JSON object. No markdown fences, no ```json wrapper, no commentary before or after. The response must start with { and end with }.\n\nThe object must contain exactly these three string fields and nothing else:\n\n{\n  \"headline\": \"Neutral one-line summary of the story, 40 to 60 characters, used internally for review, not part of the LinkedIn post\",\n  \"post\": \"The full LinkedIn post text, 1500 to 2500 characters, ending with 3 to 5 hashtags\",\n  \"image_query\": \"a 2-3 word query used to search Unsplash for the post visual. It must work as a wide 1.91:1 hero image on LinkedIn, so favour clean, uncluttered subjects with room around them. No location names, no brand names, keep it general enough that the query is guaranteed to return results.\"\n}\n\nJSON formatting rules:\n- Escape every line break inside \"post\" as \\n. A blank line between paragraphs is \\n\\n. Never put a raw line break inside a JSON string.\n- Escape any double quote inside the text as \\\".\n- Use straight quotes only, never typographic quotes, inside the JSON syntax.\n- Do not add any other fields, keys, or explanations.\n</output>",
+          "systemMessage": "=<persona>\nYou are a social media editor with 14 years of writing behind you, the last 5 spent writing specifically for the way people read now: scrolling a LinkedIn feed where only the first line of your post is visible and a reader decides in about a second whether the story deserves a tap on \"see more\". You came up writing long explanatory features, then watched attention move into the feed and rebuilt how you write around it. You learned that the opening sentence has to carry the whole story on its own, because that is the unit the feed shows and the reader judges.\n\nSo you lead with the story. Every time. You don't warm up, you don't set the scene, you don't make the reader wait for the payoff three paragraphs down. You state the thing, then you earn it: the mechanism, the one solid number from the source you actually checked, and then the part most writers skip, your own read on what that number means. That last move is what separates you from a news wire. Anyone can repeat an announcement. You tell the reader what it implies for their situation, the inference the source itself never spelled out.\n\nYou're ruthless about facts. A number you can't trace to the source content doesn't go in, full stop, because you know a single invented statistic ends a reader's trust the moment they catch it. You translate dense, technical, jargon-heavy material into plain words without flattening what made it true. And you write to one specific person and their actual problem, never to a category, never telling them what they are. You hold one voice and one line of argument from the opening sentence to the final question, so the post reads like it was written by a person who knew exactly what they were saying.\n</persona>\n\nYou write for a company news page covering marketing, startups, SaaS, and AI. The audience is founders, marketers, growth professionals, and SaaS/AI practitioners. Transform the provided article into ONE original LinkedIn post.\n\n<content_rules>\n- Rephrase everything in your own words. Never copy sentences from the source.\n- Use only facts, numbers, and quotes that appear in the source content. Never invent or extrapolate data, prices, or figures.\n- Focus on ONE story. If the content covers several topics, pick the most newsworthy one and ignore the rest.\n- Credit the source by its publication NAME only, for example \"reports Forbes\" or \"according to TechCrunch\". Never write a URL, a domain, or a www address anywhere in the post. LinkedIn auto-links bare domains such as techcrunch.com and cuts the reach of any post carrying an external link, so the body must contain no linkable text at all.\n- Add one concrete takeaway or implication for the reader (what this means for their work) without mentioning your target audience directly.\n</content_rules>\n\n<linkedin_format>\n- Total length: 1500 to 2500 characters.\n- Line 1: a hook under 140 characters that states the most surprising fact or creates curiosity. No hashtags at the start. The first two lines decide whether people tap \"see more\", so make them carry the story.\n- Body: short paragraphs of 1 to 2 sentences separated by blank lines, easy to scan on mobile.\n- Near the end, ask one specific question that invites readers to comment with their opinion or experience (comments drive LinkedIn distribution).\n- Last line: 3 to 5 hashtags, mixing one broad tag (#marketing, #startups, #SaaS, #AI) with more specific ones. Never more than 5.\n</linkedin_format>\n\n<style>\n- Confident and natural. Write like a sharp operator sharing news with peers, not a press office.\n- Plain language, short sentences, active voice.\n- No em-dashes. No participle clauses. No corporate buzzwords (game-changer, delve, landscape, in today's fast-paced world).\n- No emojis in the whole post.\n</style>\n\n<forbidden_patterns>\nAvoid negative parallelisms. Never use constructions like \"Not only... but...\" or \"It's not just about X, it's Y.\"\nWrong: \"It's not just about the beat riding under the vocals; it's part of the aggression and atmosphere. It's not merely a song, it's a statement.\"\nCorrect: \"The heavy beat adds to the aggressive tone.\"\n\nAvoid tailing negations. Never tack clipped negation fragments such as \"no guessing\" or \"not a motion\" onto the end of a sentence. Write a real clause instead.\nWrong: \"The options come from the selected item, not from guessing.\"\nCorrect: \"The options come from the selected item without forcing the user to guess.\"\n\nBreak the rule of three. Never list exactly three parallel items of any grammatical type in a series connected by commas: three nouns, three adjectives, three verb phrases, three clauses, or any other triad. This mechanical rhythm signals AI authorship. When you need to list, use one or two items maximum. If you have three or more pieces of information to convey, deliver the third as a separate sentence or absorb it into the surrounding prose.\nWrong: \"The rally that carried the S&P 500, Nasdaq, and Dow into 2026 has been long, narrow, and concentrated.\"\nCorrect: \"The rally that carried the S&P 500 into 2026 has been long and concentrated.\"\nWrong: \"So the central tension is set. Prices are high, breadth is narrow, and shocks keep arriving.\"\nCorrect: \"So the central tension is set as the prices keep climbing and shocks keep arriving.\"\n</forbidden_patterns>\n\n<output>\nReturn ONLY a raw JSON object. No markdown fences, no ```json wrapper, no commentary before or after. The response must start with { and end with }.\n\nThe object must contain exactly these five string fields and nothing else:\n\n{\n  \"headline\": \"Neutral one-line summary of the story, 40 to 60 characters, used internally for review, not part of the LinkedIn post\",\n  \"post\": \"The full LinkedIn post text, 1500 to 2500 characters, ending with 3 to 5 hashtags\",\n  \"scene_subject\": \"Who is in the photo. One or two people at most, described by age range, clothing and posture, never by name and never with a brand. Example: a woman in her late twenties in a plain grey knit sweater\",\n  \"scene_action\": \"What they are physically doing, in a candid unposed way that suits the story. Example: pausing to look out of the window while holding a coffee cup\",\n  \"scene_setting\": \"Where they are. Either an office interior or an outdoor location, described concretely with depth in the background. Example: in a quiet corner of an open plan office with glass partitions and out of focus plants behind\"\n}\n\nRules for the three scene fields:\n- Write them as plain lower-case fragments with no trailing full stop, because they are dropped into a longer sentence.\n- They must suit the story's mood without illustrating it literally. Never try to depict a logo, a chart, a headline or a screen showing content.\n- Never request text, writing, signage or interface copy of any kind. The image must be completely free of written characters.\n- Keep the subject human and ordinary. One person is usually stronger than a group.\n\nJSON formatting rules:\n- Escape every line break inside \"post\" as \\n. A blank line between paragraphs is \\n\\n. Never put a raw line break inside a JSON string.\n- Escape any double quote inside the text as \\\".\n- Use straight quotes only, never typographic quotes, inside the JSON syntax.\n- Do not add any other fields, keys, or explanations.\n</output>",
           "enableStreaming": false
         }
       },
@@ -338,7 +338,7 @@
     },
     {
       "parameters": {
-        "jsonSchemaExample": "{\n  \"headline\": \"Neutral one-line summary\",\n  \"post\": \"Full LinkedIn post\",\n  \"image_query\": \"query\"\n}"
+        "jsonSchemaExample": "{\n  \"headline\": \"Neutral one-line summary\",\n  \"post\": \"Full LinkedIn post\",\n  \"scene_subject\": \"a man in his forties in a dark open collar shirt\",\n  \"scene_action\": \"leaning against a desk while thinking through a problem\",\n  \"scene_setting\": \"in a bright office with large windows and blurred city rooftops behind\"\n}"
       },
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
@@ -353,7 +353,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const sources = $('Source Text Normalizer').all().map(i => i.json);\nconst drafts = $input.all().map(i => i.json || {});\n\nconst TLD = '(?:com|net|org|io|ai|co|dev|app|news|tech|info|biz|me|xyz|us|uk|eu|de|fr|nl|es|it|ca|au|in|jp)';\n\n// Safety net: the prompt forbids links, this guarantees none survive into the post.\n// LinkedIn auto-links bare domains, so those go too, not just full URLs.\nfunction stripLinks(text) {\n  let s = String(text || '');\n\n  s = s.replace(/\\bhttps?:\\/\\/\\S+/gi, '');\n  s = s.replace(/\\bwww\\.[^\\s)\\]]+/gi, '');\n  s = s.replace(new RegExp('\\\\b[a-z0-9][a-z0-9-]*(?:\\\\.[a-z0-9-]+)*\\\\.' + TLD + '\\\\b(?:\\\\/[^\\\\s)\\\\]]*)?', 'gi'), '');\n\n  // Tidy up whatever the removals left behind\n  s = s.replace(/\\((?:\\s*via\\s*)?\\s*\\)/gi, '');\n  s = s.replace(/[ \\t]{2,}/g, ' ');\n  s = s.replace(/[ \\t]+([.,;:!?])/g, '$1');\n  s = s.replace(/\\n{3,}/g, '\\n\\n');\n\n  return s.trim();\n}\n\nconst out = [];\nconst dropped = [];\n\n// One failed or empty draft must not take the rest of the batch down with it\ndrafts.forEach((d, i) => {\n  const src = sources[i] || {};\n  const res = d.output || {};\n  const post = stripLinks(res.post);\n\n  if (d.error || !post) {\n    dropped.push(src.title || ('slot ' + (i + 1)));\n    return;\n  }\n\n  out.push({ json: {\n    slot: src.slot || (i + 1),\n    headline: String(res.headline || src.title || '').trim(),\n    post: post,\n    postLength: post.length,\n    imageQuery: String(res.image_query || '').trim() || 'business technology',\n    title: src.title || '',\n    link: src.link || '',\n    publication: src.publication || '',\n    pickReason: src.pickReason || '',\n  } });\n});\n\nif (!out.length) {\n  throw new Error('Copy Composer produced no usable posts. Dropped: ' + dropped.join(' | '));\n}\n\nreturn out;"
+        "jsCode": "const sources = $('Source Text Normalizer').all().map(i => i.json);\nconst drafts = $input.all().map(i => i.json || {});\n\nconst TLD = '(?:com|net|org|io|ai|co|dev|app|news|tech|info|biz|me|xyz|us|uk|eu|de|fr|nl|es|it|ca|au|in|jp)';\n\n// Safety net: the prompt forbids links, this guarantees none survive into the post.\n// LinkedIn auto-links bare domains, so those go too, not just full URLs.\nfunction stripLinks(text) {\n  let s = String(text || '');\n\n  s = s.replace(/\\bhttps?:\\/\\/\\S+/gi, '');\n  s = s.replace(/\\bwww\\.[^\\s)\\]]+/gi, '');\n  s = s.replace(new RegExp('\\\\b[a-z0-9][a-z0-9-]*(?:\\\\.[a-z0-9-]+)*\\\\.' + TLD + '\\\\b(?:\\\\/[^\\\\s)\\\\]]*)?', 'gi'), '');\n\n  // Tidy up whatever the removals left behind\n  s = s.replace(/\\((?:\\s*via\\s*)?\\s*\\)/gi, '');\n  s = s.replace(/[ \\t]{2,}/g, ' ');\n  s = s.replace(/[ \\t]+([.,;:!?])/g, '$1');\n  s = s.replace(/\\n{3,}/g, '\\n\\n');\n\n  return s.trim();\n}\n\nconst out = [];\nconst dropped = [];\n\n// One failed or empty draft must not take the rest of the batch down with it\ndrafts.forEach((d, i) => {\n  const src = sources[i] || {};\n  const res = d.output || {};\n  const post = stripLinks(res.post);\n\n  if (d.error || !post) {\n    dropped.push(src.title || ('slot ' + (i + 1)));\n    return;\n  }\n\n  out.push({ json: {\n    slot: src.slot || (i + 1),\n    headline: String(res.headline || src.title || '').trim(),\n    post: post,\n    postLength: post.length,\n    sceneSubject: String(res.scene_subject || '').trim(),\n    sceneSetting: String(res.scene_setting || '').trim(),\n    sceneAction: String(res.scene_action || '').trim(),\n    title: src.title || '',\n    link: src.link || '',\n    publication: src.publication || '',\n    pickReason: src.pickReason || '',\n  } });\n});\n\nif (!out.length) {\n  throw new Error('Copy Composer produced no usable posts. Dropped: ' + dropped.join(' | '));\n}\n\nreturn out;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -363,107 +363,6 @@
       ],
       "id": "c0a9d1b3-6081-4494-bdc5-293a4b5c6d7e",
       "name": "Draft Packager"
-    },
-    {
-      "parameters": {
-        "url": "https://api.unsplash.com/search/photos",
-        "sendQuery": true,
-        "queryParameters": {
-          "parameters": [
-            {
-              "name": "query",
-              "value": "={{ $json.imageQuery || 'business technology' }}"
-            },
-            {
-              "name": "orientation",
-              "value": "landscape"
-            },
-            {
-              "name": "content_filter",
-              "value": "high"
-            },
-            {
-              "name": "per_page",
-              "value": "24"
-            }
-          ]
-        },
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Authorization",
-              "value": "Client-ID ooasoDgRd8F2oPNktYCxcqOG6UhpMIF8kkqg0jp-GRU"
-            },
-            {
-              "name": "Accept",
-              "value": "application/json"
-            },
-            {
-              "name": "Accept-Version",
-              "value": "v1"
-            }
-          ]
-        },
-        "options": {
-          "timeout": 15000
-        }
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        1740,
-        340
-      ],
-      "id": "d1b0e2c4-7192-45a5-ced6-3a4b5c6d7e8f",
-      "name": "Stock Visual Lookup",
-      "retryOnFail": true,
-      "maxTries": 3,
-      "waitBetweenTries": 2000,
-      "alwaysOutputData": true,
-      "onError": "continueRegularOutput"
-    },
-    {
-      "parameters": {
-        "jsCode": "// LinkedIn single-image post: 1200 x 627 px, 1.91:1. Same ratio LinkedIn uses for the feed card.\nconst LI_WIDTH = 1200;\nconst LI_HEIGHT = 627;\nconst QUALITY = 80;\n\nconst drafts = $('Draft Packager').all().map(i => i.json);\nconst responses = $input.all().map(i => i.json || {});\n\nfunction linkedInCrop(rawUrl, w, h, q) {\n  const sep = rawUrl.includes('?') ? '&' : '?';\n  return rawUrl + sep\n    + 'fm=jpg&cs=srgb&auto=compress&fit=crop&crop=faces,entropy'\n    + '&w=' + w + '&h=' + h + '&q=' + q;\n}\n\nconst usedIds = new Set();\n\nreturn drafts.map((d, i) => {\n  const res = responses[i] || {};\n  const results = Array.isArray(res.results) ? res.results : [];\n\n  // Wide enough to crop to 1200x627 without upscaling, landscape, and not already used by another topic in this run\n  const clean = results.filter(p =>\n    p && p.id && p.urls && p.urls.raw && !usedIds.has(p.id)\n  );\n  const ideal = clean.filter(p =>\n    (p.width || 0) >= LI_WIDTH &&\n    (p.height || 0) >= LI_HEIGHT &&\n    (p.width || 0) >= (p.height || 0)\n  );\n\n  const photo = ideal[0] || clean[0] || null;\n\n  if (!photo) {\n    return { json: {\n      ...d,\n      hasVisual: false,\n      visualId: '',\n      visualUrl: '',\n      visualPreviewUrl: '',\n      visualAlt: '',\n      visualSpec: LI_WIDTH + 'x' + LI_HEIGHT,\n      visualCredit: '',\n      visualCreditUrl: '',\n      downloadLocation: '',\n    } };\n  }\n\n  usedIds.add(photo.id);\n\n  const author = (photo.user && photo.user.name) || 'Unsplash';\n  const authorUrl = (photo.user && photo.user.links && photo.user.links.html) || 'https://unsplash.com';\n  const utm = '?utm_source=n8n_clickup_bot&utm_medium=referral';\n\n  return { json: {\n    ...d,\n    hasVisual: true,\n    visualId: photo.id,\n    visualUrl: linkedInCrop(photo.urls.raw, LI_WIDTH, LI_HEIGHT, QUALITY),\n    visualPreviewUrl: linkedInCrop(photo.urls.raw, 600, Math.round(600 * LI_HEIGHT / LI_WIDTH), 70),\n    visualAlt: photo.alt_description || '',\n    visualSpec: LI_WIDTH + 'x' + LI_HEIGHT + ' px, 1.91:1, LinkedIn single-image post',\n    visualCredit: 'Photo by ' + author + ' on Unsplash',\n    visualCreditUrl: authorUrl + utm,\n    downloadLocation: (photo.links && photo.links.download_location) || '',\n  } };\n});"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1960,
-        340
-      ],
-      "id": "e2c1f3d5-82a3-46b6-df07-4b5c6d7e8f90",
-      "name": "Hero Visual Selector"
-    },
-    {
-      "parameters": {
-        "url": "={{ $json.downloadLocation || 'https://api.unsplash.com/photos' }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Authorization",
-              "value": "Client-ID ooasoDgRd8F2oPNktYCxcqOG6UhpMIF8kkqg0jp-GRU"
-            }
-          ]
-        },
-        "options": {
-          "timeout": 10000
-        }
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        2180,
-        340
-      ],
-      "id": "f3d2a4e6-93b4-47c7-e018-5c6d7e8f90a1",
-      "name": "Unsplash Attribution Ping",
-      "alwaysOutputData": true,
-      "notesInFlow": true,
-      "onError": "continueRegularOutput",
-      "notes": "Required by Unsplash API terms"
     },
     {
       "parameters": {
@@ -486,7 +385,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        2290,
+        3060,
         340
       ],
       "id": "d7e6b8c0-a1b2-42c3-9d4e-5f6071829a3b",
@@ -502,12 +401,12 @@
     },
     {
       "parameters": {
-        "jsCode": "const topics = $('Hero Visual Selector').all().map(i => i.json);\n\n// ClickUp's chat API has no @mention support, so the reviewer is notified by\n// assigning the closing message to them. Set REVIEWER_EMAIL if two people\n// share a display name, it wins over the name match.\nconst REVIEWER_NAME = 'Petro Bilinskyi';\nconst REVIEWER_EMAIL = '';\n\nconst BANNER = '━━━━━━━━━━━━━━━━━━━━━━━━━━━━';\n\nfunction resolveReviewerId() {\n  let roster = null;\n  try { roster = $('Workspace Roster Lookup').first().json; } catch (e) { return ''; }\n  if (!roster || !Array.isArray(roster.teams)) return '';\n\n  const wantedName = REVIEWER_NAME.toLowerCase().trim();\n  const wantedEmail = REVIEWER_EMAIL.toLowerCase().trim();\n\n  const people = [];\n  for (const team of roster.teams) {\n    for (const m of (team.members || [])) {\n      if (m && m.user && m.user.id) people.push(m.user);\n    }\n  }\n\n  if (wantedEmail) {\n    const byEmail = people.find(u => String(u.email || '').toLowerCase().trim() === wantedEmail);\n    if (byEmail) return String(byEmail.id);\n  }\n\n  const exact = people.find(u => String(u.username || '').toLowerCase().trim() === wantedName);\n  if (exact) return String(exact.id);\n\n  // Loose match so a middle name or odd spacing still resolves\n  const parts = wantedName.split(/\\s+/).filter(Boolean);\n  const loose = people.find(u => {\n    const uname = String(u.username || '').toLowerCase();\n    return parts.length && parts.every(p => uname.includes(p));\n  });\n  return loose ? String(loose.id) : '';\n}\n\nconst reviewerId = resolveReviewerId();\n\nconst TLD = '(?:com|net|org|io|ai|co|dev|app|news|tech|info|biz|me|xyz|us|uk|eu|de|fr|nl|es|it|ca|au|in|jp)';\n\n// LinkedIn auto-links bare domains and cuts reach on posts carrying external\n// links, so nothing linkable may survive in the body. Full URLs and bare\n// domains both go. The Source line below is built separately and untouched.\nfunction stripLinks(text) {\n  let s = String(text || '');\n\n  s = s.replace(/\\bhttps?:\\/\\/\\S+/gi, '');\n  s = s.replace(/\\bwww\\.[^\\s)\\]]+/gi, '');\n  s = s.replace(new RegExp('\\\\b[a-z0-9][a-z0-9-]*(?:\\\\.[a-z0-9-]+)*\\\\.' + TLD + '\\\\b(?:\\\\/[^\\\\s)\\\\]]*)?', 'gi'), '');\n\n  // Tidy up whatever the removals left behind\n  s = s.replace(/\\((?:\\s*via\\s*)?\\s*\\)/gi, '');\n  s = s.replace(/[ \\t]{2,}/g, ' ');\n  s = s.replace(/[ \\t]+([.,;:!?])/g, '$1');\n  s = s.replace(/\\n{3,}/g, '\\n\\n');\n\n  return s.trim();\n}\n\nconst messages = topics.map((t, i) => {\n  const lines = [];\n\n  lines.push(BANNER);\n  lines.push('## 📝 POST ' + (i + 1) + ' SUGGESTION');\n  lines.push(BANNER);\n  lines.push('');\n  lines.push('**' + String(t.headline || '').trim() + '**');\n  lines.push('');\n  lines.push(stripLinks(t.post));\n  lines.push('');\n  lines.push('----');\n  lines.push('');\n  // Direct 1200x627 JPG, right-click and save straight from the browser\n  lines.push('Link to image: ' + (t.hasVisual ? t.visualUrl : 'no match for \"' + t.imageQuery + '\"'));\n  lines.push('Source: ' + t.link);\n\n  return { json: {\n    slot: t.slot,\n    headline: t.headline,\n    title: t.title,\n    link: t.link,\n    visualUrl: t.visualUrl || '',\n    assignee: '',\n    messageMarkdown: lines.join('\\n'),\n  } };\n});\n\n// Closing message that hands the batch over for a human decision. The assignee\n// is what actually notifies them, the @name is only there so the text reads right.\nmessages.push({ json: {\n  slot: 0,\n  isReviewPrompt: true,\n  headline: '',\n  title: '',\n  link: '',\n  visualUrl: '',\n  assignee: reviewerId,\n  reviewerResolved: Boolean(reviewerId),\n  messageMarkdown: '@' + REVIEWER_NAME + ' what do you think we should post?',\n} });\n\nreturn messages;"
+        "jsCode": "const topics = $('Visual Record Builder').all().map(i => i.json);\n\n// ClickUp's chat API has no @mention support, so the reviewer is notified by\n// assigning the closing message to them. Set REVIEWER_EMAIL if two people\n// share a display name, it wins over the name match.\nconst REVIEWER_NAME = 'Petro Bilinskyi';\nconst REVIEWER_EMAIL = '';\n\nconst BANNER = '━━━━━━━━━━━━━━━━━━━━━━━━━━━━';\n\nfunction resolveReviewerId() {\n  let roster = null;\n  try { roster = $('Workspace Roster Lookup').first().json; } catch (e) { return ''; }\n  if (!roster || !Array.isArray(roster.teams)) return '';\n\n  const wantedName = REVIEWER_NAME.toLowerCase().trim();\n  const wantedEmail = REVIEWER_EMAIL.toLowerCase().trim();\n\n  const people = [];\n  for (const team of roster.teams) {\n    for (const m of (team.members || [])) {\n      if (m && m.user && m.user.id) people.push(m.user);\n    }\n  }\n\n  if (wantedEmail) {\n    const byEmail = people.find(u => String(u.email || '').toLowerCase().trim() === wantedEmail);\n    if (byEmail) return String(byEmail.id);\n  }\n\n  const exact = people.find(u => String(u.username || '').toLowerCase().trim() === wantedName);\n  if (exact) return String(exact.id);\n\n  // Loose match so a middle name or odd spacing still resolves\n  const parts = wantedName.split(/\\s+/).filter(Boolean);\n  const loose = people.find(u => {\n    const uname = String(u.username || '').toLowerCase();\n    return parts.length && parts.every(p => uname.includes(p));\n  });\n  return loose ? String(loose.id) : '';\n}\n\nconst reviewerId = resolveReviewerId();\n\nconst TLD = '(?:com|net|org|io|ai|co|dev|app|news|tech|info|biz|me|xyz|us|uk|eu|de|fr|nl|es|it|ca|au|in|jp)';\n\n// LinkedIn auto-links bare domains and cuts reach on posts carrying external\n// links, so nothing linkable may survive in the body. Full URLs and bare\n// domains both go. The Source line below is built separately and untouched.\nfunction stripLinks(text) {\n  let s = String(text || '');\n\n  s = s.replace(/\\bhttps?:\\/\\/\\S+/gi, '');\n  s = s.replace(/\\bwww\\.[^\\s)\\]]+/gi, '');\n  s = s.replace(new RegExp('\\\\b[a-z0-9][a-z0-9-]*(?:\\\\.[a-z0-9-]+)*\\\\.' + TLD + '\\\\b(?:\\\\/[^\\\\s)\\\\]]*)?', 'gi'), '');\n\n  // Tidy up whatever the removals left behind\n  s = s.replace(/\\((?:\\s*via\\s*)?\\s*\\)/gi, '');\n  s = s.replace(/[ \\t]{2,}/g, ' ');\n  s = s.replace(/[ \\t]+([.,;:!?])/g, '$1');\n  s = s.replace(/\\n{3,}/g, '\\n\\n');\n\n  return s.trim();\n}\n\nconst messages = topics.map((t, i) => {\n  const lines = [];\n\n  lines.push(BANNER);\n  lines.push('## 📝 POST ' + (i + 1) + ' SUGGESTION');\n  lines.push(BANNER);\n  lines.push('');\n  lines.push('**' + String(t.headline || '').trim() + '**');\n  lines.push('');\n  lines.push(stripLinks(t.post));\n  lines.push('');\n  lines.push('----');\n  lines.push('');\n  // Direct 1200x627 JPG, right-click and save straight from the browser\n  lines.push('Link to image: ' + (t.hasVisual ? t.visualUrl : 'generation failed for this topic, pick a visual manually'));\n  lines.push('Source: ' + t.link);\n\n  return { json: {\n    slot: t.slot,\n    headline: t.headline,\n    title: t.title,\n    link: t.link,\n    visualUrl: t.visualUrl || '',\n    assignee: '',\n    messageMarkdown: lines.join('\\n'),\n  } };\n});\n\n// Closing message that hands the batch over for a human decision. The assignee\n// is what actually notifies them, the @name is only there so the text reads right.\nmessages.push({ json: {\n  slot: 0,\n  isReviewPrompt: true,\n  headline: '',\n  title: '',\n  link: '',\n  visualUrl: '',\n  assignee: reviewerId,\n  reviewerResolved: Boolean(reviewerId),\n  messageMarkdown: '@' + REVIEWER_NAME + ' what do you think we should post?',\n} });\n\nreturn messages;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2400,
+        3280,
         340
       ],
       "id": "a4e3b5f7-a4c5-48d8-f129-6d7e8f90a1b2",
@@ -538,7 +437,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        2620,
+        3500,
         340
       ],
       "id": "b5f4c6a8-b5d6-49e9-021a-7e8f90a1b2c3",
@@ -553,7 +452,137 @@
     },
     {
       "parameters": {
-        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst now = Date.now();\nconst SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;\n\nconst batch = $('Hero Visual Selector').all().map(i => i.json);\nconst dispatch = $input.all().map(i => i.json || {});\n\nlet usedTopics = (sd.usedTopics || [])\n  .map(t => typeof t === 'string' ? { title: t, ts: now } : t)\n  .filter(t => t && t.title && (now - (t.ts || 0)) < SEVEN_DAYS);\n\nconst sent = [];\nconst failed = [];\n\n// Only mark a topic as covered once ClickUp actually accepted it, so a failed\n// send comes back around on the next run instead of being silently burned\nbatch.forEach((b, i) => {\n  if (!b || !b.title) return;\n  const res = dispatch[i];\n  if (res && !res.error) {\n    usedTopics.push({ title: b.title, ts: now });\n    sent.push(b);\n  } else {\n    failed.push(b.title);\n  }\n});\n\nsd.usedTopics = usedTopics.slice(-60);\nsd.candidatePool = [];\nsd.currentBatch = null;\n\nreturn [{ json: {\n  deliveredTopics: sent.length,\n  failedTopics: failed,\n  withVisual: sent.filter(b => b.hasVisual).length,\n  topics: sent.map(b => ({\n    headline: b.headline,\n    title: b.title,\n    link: b.link,\n    visualUrl: b.visualUrl || null,\n  })),\n} }];"
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst now = Date.now();\nconst SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;\n\nconst batch = $('Visual Record Builder').all().map(i => i.json);\nconst dispatch = $input.all().map(i => i.json || {});\n\nlet usedTopics = (sd.usedTopics || [])\n  .map(t => typeof t === 'string' ? { title: t, ts: now } : t)\n  .filter(t => t && t.title && (now - (t.ts || 0)) < SEVEN_DAYS);\n\nconst sent = [];\nconst failed = [];\n\n// Only mark a topic as covered once ClickUp actually accepted it, so a failed\n// send comes back around on the next run instead of being silently burned\nbatch.forEach((b, i) => {\n  if (!b || !b.title) return;\n  const res = dispatch[i];\n  if (res && !res.error) {\n    usedTopics.push({ title: b.title, ts: now });\n    sent.push(b);\n  } else {\n    failed.push(b.title);\n  }\n});\n\nsd.usedTopics = usedTopics.slice(-60);\nsd.candidatePool = [];\nsd.currentBatch = null;\n\nreturn [{ json: {\n  deliveredTopics: sent.length,\n  failedTopics: failed,\n  withVisual: sent.filter(b => b.hasVisual).length,\n  topics: sent.map(b => ({\n    headline: b.headline,\n    title: b.title,\n    link: b.link,\n    visualUrl: b.visualUrl || null,\n  })),\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3720,
+        340
+      ],
+      "id": "c6a5d7b9-c6e7-40fa-132b-8f90a1b2c3d4",
+      "name": "Topic Ledger Writer"
+    },
+    {
+      "parameters": {
+        "jsCode": "// One fixed cinematic recipe for every image. The writer fills only three slots,\n// everything else is locked so the three visuals read as one photo series.\nconst TEMPLATE = [\n  'Photorealistic editorial photograph, shot on a full-frame camera with a 35mm lens at f/2.0.',\n  '[SUBJECT] [ACTION], [SETTING].',\n  'Natural available light with soft directional window light, shallow depth of field and a gently blurred background.',\n  'Candid documentary framing, the subject placed off centre with clear negative space on one side of the frame.',\n  'Muted natural colour grading, realistic skin texture and fabric detail, no glossy retouching and no stiff stock-photo posing.',\n  'Wide horizontal composition that still reads when cropped to a 1.91:1 banner, nothing important near the top or bottom edge.',\n  'ABSOLUTELY NO TEXT of any kind anywhere in the image: no letters, words, numbers, captions, logos, watermarks, signage, book or screen titles, phone or laptop interface text, whiteboard or notebook writing, and no written characters of any alphabet.',\n  'No collage, no split frames, no borders, no illustration, no 3D render, no infographic and no charts.',\n].join(' ');\n\nconst FALLBACK = {\n  subject: 'one person in their early thirties in plain modern casual clothing',\n  action: 'pausing mid thought while working',\n  setting: 'in a bright open plan office with large windows and out of focus greenery behind them',\n};\n\nfunction tidy(value, fallback) {\n  const s = String(value || '').trim().replace(/\\s+/g, ' ').replace(/\\.+$/, '');\n  return s.length >= 3 ? s : fallback;\n}\n\nconst stamp = Date.now();\n\nreturn $input.all().map((item, i) => {\n  const d = item.json;\n\n  const subject = tidy(d.sceneSubject, FALLBACK.subject);\n  const action = tidy(d.sceneAction, FALLBACK.action);\n  const setting = tidy(d.sceneSetting, FALLBACK.setting);\n\n  const imagePrompt = TEMPLATE\n    .split('[SUBJECT]').join(subject)\n    .split('[ACTION]').join(action)\n    .split('[SETTING]').join(setting);\n\n  return { json: {\n    ...d,\n    sceneSubject: subject,\n    sceneAction: action,\n    sceneSetting: setting,\n    imagePrompt: imagePrompt,\n    objectKey: 'linkedin/' + stamp + '-' + (d.slot || (i + 1)) + '.jpg',\n  } };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1740,
+        340
+      ],
+      "id": "a1b2c3d4-1111-4a11-8b11-0a1b2c3d4e51",
+      "name": "Scene Prompt Forge"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/images/generations",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'gpt-image-1', prompt: $json.imagePrompt, size: '1536x1024', n: 1, quality: 'high', output_format: 'jpeg' }) }}",
+        "options": {
+          "timeout": 180000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1960,
+        340
+      ],
+      "id": "b2c3d4e5-2222-4b22-9c22-1b2c3d4e5f62",
+      "name": "Scene Image Synthesis",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput",
+      "notesInFlow": true,
+      "notes": "gpt-image-1, 1536x1024, returns base64"
+    },
+    {
+      "parameters": {
+        "jsCode": "const scenes = $('Scene Prompt Forge').all().map(i => i.json);\nconst responses = $input.all().map(i => i.json || {});\n\nconst out = [];\nconst failed = [];\n\n// Turn the base64 the image API returns into a real binary so Edit Image and\n// the uploader can work with it, and re-attach the scene json the HTTP node dropped.\nscenes.forEach((s, i) => {\n  const res = responses[i] || {};\n  const first = Array.isArray(res.data) ? res.data[0] : null;\n  const b64 = first && first.b64_json;\n\n  if (!b64) {\n    failed.push(s.headline || ('slot ' + (i + 1)));\n    return;\n  }\n\n  out.push({\n    json: { ...s, imageGenerated: true },\n    binary: {\n      data: {\n        data: b64,\n        mimeType: 'image/jpeg',\n        fileName: String(s.objectKey || 'image.jpg').split('/').pop(),\n      },\n    },\n  });\n});\n\nif (!out.length) {\n  throw new Error('The image API returned nothing usable. Failed: ' + failed.join(' | '));\n}\n\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2180,
+        340
+      ],
+      "id": "c3d4e5f6-3333-4c33-ad33-2c3d4e5f6073",
+      "name": "Image Bytes Materializer"
+    },
+    {
+      "parameters": {
+        "operation": "multiStep",
+        "operations": {
+          "operations": [
+            {
+              "operation": "crop",
+              "width": 1536,
+              "height": 804,
+              "positionX": 0,
+              "positionY": 110
+            },
+            {
+              "operation": "resize",
+              "width": 1200,
+              "height": 627,
+              "resizeOption": "ignoreAspectRatio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        2400,
+        340
+      ],
+      "id": "d4e5f607-4444-4d44-be44-3d4e5f607184",
+      "name": "LinkedIn Frame Crop",
+      "notesInFlow": true,
+      "notes": "3:2 -> centre crop -> 1200x627"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "upload",
+        "bucketName": "YOUR_BUCKET_NAME",
+        "fileName": "={{ $json.objectKey }}",
+        "binaryData": true,
+        "binaryPropertyName": "data",
+        "additionalFields": {
+          "acl": "publicRead"
+        },
+        "tagsUi": {}
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        2620,
+        340
+      ],
+      "id": "e5f60718-5555-4e55-8f55-4e5f60718295",
+      "name": "Object Store Upload",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput",
+      "notesInFlow": true,
+      "notes": "Set bucket + public read"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Public base URL of the bucket, no trailing slash. Examples:\n//   AWS S3          https://YOUR-BUCKET.s3.eu-central-1.amazonaws.com\n//   Cloudflare R2   https://pub-xxxxxxxxxxxx.r2.dev\n//   DO Spaces       https://YOUR-BUCKET.fra1.digitaloceanspaces.com\nconst PUBLIC_BASE_URL = 'https://YOUR-BUCKET.s3.eu-central-1.amazonaws.com';\n\nconst scenes = $('Image Bytes Materializer').all().map(i => i.json);\nconst uploads = $input.all().map(i => i.json || {});\n\nreturn scenes.map((s, i) => {\n  const up = uploads[i] || {};\n  const url = up.error ? '' : PUBLIC_BASE_URL.replace(/\\/+$/, '') + '/' + s.objectKey;\n\n  return { json: {\n    ...s,\n    hasVisual: Boolean(url),\n    visualUrl: url,\n    visualSpec: '1200x627 px, 1.91:1, LinkedIn single-image post',\n  } };\n});"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -561,8 +590,8 @@
         2840,
         340
       ],
-      "id": "c6a5d7b9-c6e7-40fa-132b-8f90a1b2c3d4",
-      "name": "Topic Ledger Writer"
+      "id": "f6071829-6666-4f66-9066-5f60718293a6",
+      "name": "Visual Record Builder"
     }
   ],
   "connections": {
@@ -786,50 +815,6 @@
         ]
       ]
     },
-    "Draft Packager": {
-      "main": [
-        [
-          {
-            "node": "Stock Visual Lookup",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Stock Visual Lookup": {
-      "main": [
-        [
-          {
-            "node": "Hero Visual Selector",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Hero Visual Selector": {
-      "main": [
-        [
-          {
-            "node": "Unsplash Attribution Ping",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Unsplash Attribution Ping": {
-      "main": [
-        [
-          {
-            "node": "Workspace Roster Lookup",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Workspace Roster Lookup": {
       "main": [
         [
@@ -857,6 +842,83 @@
         [
           {
             "node": "Topic Ledger Writer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft Packager": {
+      "main": [
+        [
+          {
+            "node": "Scene Prompt Forge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scene Prompt Forge": {
+      "main": [
+        [
+          {
+            "node": "Scene Image Synthesis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scene Image Synthesis": {
+      "main": [
+        [
+          {
+            "node": "Image Bytes Materializer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Bytes Materializer": {
+      "main": [
+        [
+          {
+            "node": "LinkedIn Frame Crop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LinkedIn Frame Crop": {
+      "main": [
+        [
+          {
+            "node": "Object Store Upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Object Store Upload": {
+      "main": [
+        [
+          {
+            "node": "Visual Record Builder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Visual Record Builder": {
+      "main": [
+        [
+          {
+            "node": "Workspace Roster Lookup",
             "type": "main",
             "index": 0
           }
