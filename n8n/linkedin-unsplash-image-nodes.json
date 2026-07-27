@@ -1,0 +1,391 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\n\nlet sel = sd.currentSelection || {};\nif (!sel.link) {\n  try { sel = $('Select Article').first().json || {}; } catch (e) {}\n}\n\nconst out = ($input.first().json.output) || {};\nconst post = String(out.post || '').trim();\nconst headline = String(out.headline || sel.title || '').trim();\n\n// Carry the image query forward so nothing downstream has to reach back\n// across the approval wait node to read it off News Reporter.\nconst imageQuery = String(out.image_query || '').trim() || 'business technology';\n\nif (!post) {\n  throw new Error('News Reporter returned an empty post.');\n}\n\nlet attempt = sd.attemptCount || 0;\nif (attempt === 0) {\n  try { attempt = $('Select Article').first().json.attempt || 1; } catch (e) { attempt = 1; }\n}\n\nreturn [{ json: {\n  headline: headline,\n  post: post,\n  imageQuery: imageQuery,\n  title: sel.title || '',\n  link: sel.link || '',\n  attempt: attempt,\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        12688,
+        2544
+      ],
+      "id": "307be19e-82f7-4d96-bb69-f4ab01774b60",
+      "name": "Format Post"
+    },
+    {
+      "parameters": {
+        "url": "https://api.unsplash.com/search/photos",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $json.imageQuery || 'business technology' }}"
+            },
+            {
+              "name": "orientation",
+              "value": "landscape"
+            },
+            {
+              "name": "content_filter",
+              "value": "high"
+            },
+            {
+              "name": "per_page",
+              "value": "12"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Client-ID ooasoDgRd8F2oPNktYCxcqOG6UhpMIF8kkqg0jp-GRU"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept-Version",
+              "value": "v1"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        12928,
+        2544
+      ],
+      "id": "2a3e7d9b-295d-4dc2-ace0-49b82a37730f",
+      "name": "Unsplash Search",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Picks one Unsplash photo and builds a LinkedIn-sized crop URL.\n// The crop is done by Unsplash's imgix CDN, so it costs nothing and needs no image library.\n//\n// LinkedIn single-image feed post: 1200 x 627 (1.91:1) is LinkedIn's recommended size.\n// Prefer more feed real estate? Use 1200 x 1200 (square) or 1200 x 1500 (4:5).\nconst TARGET_W = 1200;\nconst TARGET_H = 627;\nconst QUALITY = 80;\n\nconst post = $('Format Post').first().json;\nconst res = $input.first().json || {};\nconst results = Array.isArray(res.results) ? res.results : [];\n\nfunction sized(rawUrl, w, h, q) {\n  const sep = rawUrl.includes('?') ? '&' : '?';\n  return rawUrl + sep + 'fm=jpg&cs=srgb&auto=compress&fit=crop&crop=faces,entropy'\n    + '&w=' + w + '&h=' + h + '&q=' + q;\n}\n\n// Keep photos wide enough for a clean 1200px crop, in Unsplash relevance order\nconst usable = results.filter(p =>\n  p && p.urls && p.urls.raw && (p.width || 0) >= TARGET_W && (p.width || 0) >= (p.height || 0)\n);\nconst photo = usable[0] || results.find(p => p && p.urls && p.urls.raw) || null;\n\nif (!photo) {\n  return [{ json: {\n    ...post,\n    hasImage: false,\n    imageUrl: '',\n    imagePreviewUrl: '',\n    imageCredit: '',\n    imageCreditUrl: '',\n    downloadLocation: '',\n  } }];\n}\n\nconst author = (photo.user && photo.user.name) || 'Unsplash';\nconst authorUrl = (photo.user && photo.user.links && photo.user.links.html) || 'https://unsplash.com';\nconst utm = '?utm_source=n8n_linkedin_bot&utm_medium=referral';\n\nreturn [{ json: {\n  ...post,\n  hasImage: true,\n  imageId: photo.id,\n  imageUrl: sized(photo.urls.raw, TARGET_W, TARGET_H, QUALITY),\n  imagePreviewUrl: sized(photo.urls.raw, 800, Math.round(800 * TARGET_H / TARGET_W), 70),\n  imageAlt: photo.alt_description || '',\n  imageCredit: 'Photo by ' + author + ' on Unsplash',\n  imageCreditUrl: authorUrl + utm,\n  downloadLocation: (photo.links && photo.links.download_location) || '',\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        13120,
+        2544
+      ],
+      "id": "b1f4c7a2-3d6e-4a91-8c05-2f7e9d41ab30",
+      "name": "Pick Image"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "5233249036",
+        "message": "=📝 LinkedIn post for review (attempt {{ $json.attempt }} of 3)\n\n{{ $json.headline }}\n\n----------------\n\n{{ $json.post }}\n\n----------------\n\n{{ $json.hasImage ? '🖼 ' + $json.imageCredit + '\\n' + $json.imagePreviewUrl : '⚠️ No usable image found for \"' + $json.imageQuery + '\". Approving will publish the post as text only.' }}\n\nApprove to publish to the LinkedIn page. Reject to pick a different article.",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "✅ Publish",
+            "disapproveLabel": "❌ Reject"
+          }
+        },
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "resumeAmount": 4
+            }
+          },
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        13280,
+        2544
+      ],
+      "id": "73056ed2-327a-4952-b93e-f7657426b97d",
+      "name": "Request Approval",
+      "webhookId": "4eb8fba5-f469-4b08-a50f-7cf27ad6e9eb",
+      "credentials": {
+        "telegramApi": {
+          "id": "o19W8ug2Nu2cqvU3",
+          "name": "LinkedIn News Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7c1a5e60-9b23-4d18-9f44-6a0c8e2b7d11",
+              "leftValue": "={{ $('Pick Image').first().json.hasImage }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        13792,
+        2480
+      ],
+      "id": "5d8b3f14-6c07-42ae-b1d9-90e3f5c2a774",
+      "name": "Has Image?"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Pick Image').first().json.downloadLocation }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Client-ID ooasoDgRd8F2oPNktYCxcqOG6UhpMIF8kkqg0jp-GRU"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        13792,
+        2304
+      ],
+      "id": "9e2c6a08-41bf-4d73-a5e6-c7318b0d5f92",
+      "name": "Unsplash Download Trigger",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput",
+      "notesInFlow": true,
+      "notes": "Required by Unsplash API terms"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Pick Image').first().json.imageUrl }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "data"
+            }
+          },
+          "timeout": 30000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        13968,
+        2400
+      ],
+      "id": "3a71d5c9-8e04-4b26-9d13-5f60ea27c8b1",
+      "name": "Download Image",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "continueErrorOutput",
+      "notesInFlow": true,
+      "notes": "Binary -> property \"data\""
+    },
+    {
+      "parameters": {
+        "postAs": "organization",
+        "organization": "106083196",
+        "text": "={{ $('Format Post').first().json.post }}",
+        "shareMediaCategory": "IMAGE",
+        "binaryPropertyName": "data",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        14144,
+        2400
+      ],
+      "id": "37c61691-ebc0-4129-ab69-fe5c3db40d3d",
+      "name": "Publish to LinkedIn",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "qqcc1cWIBhp7iAWL",
+          "name": "LinkedIn Anton"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "postAs": "organization",
+        "organization": "106083196",
+        "text": "={{ $('Format Post').first().json.post }}",
+        "shareMediaCategory": "NONE",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        13968,
+        2624
+      ],
+      "id": "c04f8b71-2d95-4e83-a6b7-1e5230c9f4d6",
+      "name": "Publish Text Only",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "qqcc1cWIBhp7iAWL",
+          "name": "LinkedIn Anton"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "5233249036",
+        "text": "=⚠️ The post was approved but publishing to LinkedIn failed. Check the execution log in n8n and post manually if needed.\n\n{{ $('Format Post').first().json.post }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        14368,
+        2576
+      ],
+      "id": "42e2b6cd-e404-4b61-bbfe-25d59f7964b3",
+      "name": "Publish Failed Alert",
+      "webhookId": "adfe7b22-77db-415a-87b5-32a6680bc2a8",
+      "credentials": {
+        "telegramApi": {
+          "id": "o19W8ug2Nu2cqvU3",
+          "name": "LinkedIn News Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Format Post": {
+      "main": [
+        [
+          {
+            "node": "Unsplash Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unsplash Search": {
+      "main": [
+        [
+          {
+            "node": "Pick Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pick Image": {
+      "main": [
+        [
+          {
+            "node": "Request Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Image?": {
+      "main": [
+        [
+          {
+            "node": "Download Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Publish Text Only",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Image": {
+      "main": [
+        [
+          {
+            "node": "Publish to LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Publish Text Only",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish to LinkedIn": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Publish Failed Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish Text Only": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Publish Failed Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
