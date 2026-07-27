@@ -467,7 +467,42 @@
     },
     {
       "parameters": {
-        "jsCode": "const topics = $('Hero Visual Selector').all().map(i => i.json);\n\nconst REVIEWER = '@Petro Bilinskyi';\nconst BANNER = '━━━━━━━━━━━━━━━━━━━━━━━━━━━━';\n\nconst TLD = '(?:com|net|org|io|ai|co|dev|app|news|tech|info|biz|me|xyz|us|uk|eu|de|fr|nl|es|it|ca|au|in|jp)';\n\n// LinkedIn auto-links bare domains and cuts reach on posts carrying external\n// links, so nothing linkable may survive in the body. Full URLs and bare\n// domains both go. The Source line below is built separately and untouched.\nfunction stripLinks(text) {\n  let s = String(text || '');\n\n  s = s.replace(/\\bhttps?:\\/\\/\\S+/gi, '');\n  s = s.replace(/\\bwww\\.[^\\s)\\]]+/gi, '');\n  s = s.replace(new RegExp('\\\\b[a-z0-9][a-z0-9-]*(?:\\\\.[a-z0-9-]+)*\\\\.' + TLD + '\\\\b(?:\\\\/[^\\\\s)\\\\]]*)?', 'gi'), '');\n\n  // Tidy up whatever the removals left behind\n  s = s.replace(/\\((?:\\s*via\\s*)?\\s*\\)/gi, '');\n  s = s.replace(/[ \\t]{2,}/g, ' ');\n  s = s.replace(/[ \\t]+([.,;:!?])/g, '$1');\n  s = s.replace(/\\n{3,}/g, '\\n\\n');\n\n  return s.trim();\n}\n\nconst messages = topics.map((t, i) => {\n  const lines = [];\n\n  lines.push(BANNER);\n  lines.push('## 📝 POST ' + (i + 1) + ' SUGGESTION');\n  lines.push(BANNER);\n  lines.push('');\n  lines.push('**' + String(t.headline || '').trim() + '**');\n  lines.push('');\n  lines.push(stripLinks(t.post));\n  lines.push('');\n  lines.push('----');\n  lines.push('');\n  // Direct 1200x627 JPG, right-click and save straight from the browser\n  lines.push('Link to image: ' + (t.hasVisual ? t.visualUrl : 'no match for \"' + t.imageQuery + '\"'));\n  lines.push('Source: ' + t.link);\n\n  return { json: {\n    slot: t.slot,\n    headline: t.headline,\n    title: t.title,\n    link: t.link,\n    visualUrl: t.visualUrl || '',\n    messageMarkdown: lines.join('\\n'),\n  } };\n});\n\n// Closing message that hands the batch over for a human decision\nmessages.push({ json: {\n  slot: 0,\n  isReviewPrompt: true,\n  headline: '',\n  title: '',\n  link: '',\n  visualUrl: '',\n  messageMarkdown: REVIEWER + ' what do you think we should post?',\n} });\n\nreturn messages;"
+        "url": "https://api.clickup.com/api/v2/team",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "clickUpApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2290,
+        340
+      ],
+      "id": "d7e6b8c0-a1b2-42c3-9d4e-5f6071829a3b",
+      "name": "Workspace Roster Lookup",
+      "executeOnce": true,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 2000,
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "onError": "continueRegularOutput",
+      "notes": "Resolves the reviewer's ClickUp user id"
+    },
+    {
+      "parameters": {
+        "jsCode": "const topics = $('Hero Visual Selector').all().map(i => i.json);\n\n// ClickUp's chat API has no @mention support, so the reviewer is notified by\n// assigning the closing message to them. Set REVIEWER_EMAIL if two people\n// share a display name, it wins over the name match.\nconst REVIEWER_NAME = 'Petro Bilinskyi';\nconst REVIEWER_EMAIL = '';\n\nconst BANNER = '━━━━━━━━━━━━━━━━━━━━━━━━━━━━';\n\nfunction resolveReviewerId() {\n  let roster = null;\n  try { roster = $('Workspace Roster Lookup').first().json; } catch (e) { return ''; }\n  if (!roster || !Array.isArray(roster.teams)) return '';\n\n  const wantedName = REVIEWER_NAME.toLowerCase().trim();\n  const wantedEmail = REVIEWER_EMAIL.toLowerCase().trim();\n\n  const people = [];\n  for (const team of roster.teams) {\n    for (const m of (team.members || [])) {\n      if (m && m.user && m.user.id) people.push(m.user);\n    }\n  }\n\n  if (wantedEmail) {\n    const byEmail = people.find(u => String(u.email || '').toLowerCase().trim() === wantedEmail);\n    if (byEmail) return String(byEmail.id);\n  }\n\n  const exact = people.find(u => String(u.username || '').toLowerCase().trim() === wantedName);\n  if (exact) return String(exact.id);\n\n  // Loose match so a middle name or odd spacing still resolves\n  const parts = wantedName.split(/\\s+/).filter(Boolean);\n  const loose = people.find(u => {\n    const uname = String(u.username || '').toLowerCase();\n    return parts.length && parts.every(p => uname.includes(p));\n  });\n  return loose ? String(loose.id) : '';\n}\n\nconst reviewerId = resolveReviewerId();\n\nconst TLD = '(?:com|net|org|io|ai|co|dev|app|news|tech|info|biz|me|xyz|us|uk|eu|de|fr|nl|es|it|ca|au|in|jp)';\n\n// LinkedIn auto-links bare domains and cuts reach on posts carrying external\n// links, so nothing linkable may survive in the body. Full URLs and bare\n// domains both go. The Source line below is built separately and untouched.\nfunction stripLinks(text) {\n  let s = String(text || '');\n\n  s = s.replace(/\\bhttps?:\\/\\/\\S+/gi, '');\n  s = s.replace(/\\bwww\\.[^\\s)\\]]+/gi, '');\n  s = s.replace(new RegExp('\\\\b[a-z0-9][a-z0-9-]*(?:\\\\.[a-z0-9-]+)*\\\\.' + TLD + '\\\\b(?:\\\\/[^\\\\s)\\\\]]*)?', 'gi'), '');\n\n  // Tidy up whatever the removals left behind\n  s = s.replace(/\\((?:\\s*via\\s*)?\\s*\\)/gi, '');\n  s = s.replace(/[ \\t]{2,}/g, ' ');\n  s = s.replace(/[ \\t]+([.,;:!?])/g, '$1');\n  s = s.replace(/\\n{3,}/g, '\\n\\n');\n\n  return s.trim();\n}\n\nconst messages = topics.map((t, i) => {\n  const lines = [];\n\n  lines.push(BANNER);\n  lines.push('## 📝 POST ' + (i + 1) + ' SUGGESTION');\n  lines.push(BANNER);\n  lines.push('');\n  lines.push('**' + String(t.headline || '').trim() + '**');\n  lines.push('');\n  lines.push(stripLinks(t.post));\n  lines.push('');\n  lines.push('----');\n  lines.push('');\n  // Direct 1200x627 JPG, right-click and save straight from the browser\n  lines.push('Link to image: ' + (t.hasVisual ? t.visualUrl : 'no match for \"' + t.imageQuery + '\"'));\n  lines.push('Source: ' + t.link);\n\n  return { json: {\n    slot: t.slot,\n    headline: t.headline,\n    title: t.title,\n    link: t.link,\n    visualUrl: t.visualUrl || '',\n    assignee: '',\n    messageMarkdown: lines.join('\\n'),\n  } };\n});\n\n// Closing message that hands the batch over for a human decision. The assignee\n// is what actually notifies them, the @name is only there so the text reads right.\nmessages.push({ json: {\n  slot: 0,\n  isReviewPrompt: true,\n  headline: '',\n  title: '',\n  link: '',\n  visualUrl: '',\n  assignee: reviewerId,\n  reviewerResolved: Boolean(reviewerId),\n  messageMarkdown: '@' + REVIEWER_NAME + ' what do you think we should post?',\n} });\n\nreturn messages;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -495,7 +530,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ type: 'message', content: $json.messageMarkdown, content_format: 'text/md' }) }}",
+        "jsonBody": "={{ JSON.stringify(Object.assign({ type: 'message', content: $json.messageMarkdown, content_format: 'text/md' }, $json.assignee ? { assignee: $json.assignee } : {})) }}",
         "options": {
           "timeout": 20000
         }
@@ -785,6 +820,17 @@
       ]
     },
     "Unsplash Attribution Ping": {
+      "main": [
+        [
+          {
+            "node": "Workspace Roster Lookup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workspace Roster Lookup": {
       "main": [
         [
           {
