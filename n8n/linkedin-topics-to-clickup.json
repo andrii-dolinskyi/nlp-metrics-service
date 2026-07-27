@@ -431,6 +431,12 @@
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify(Object.assign({ type: 'message', content: $json.messageMarkdown, content_format: 'text/md' }, $json.assignee ? { assignee: $json.assignee } : {})) }}",
         "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 2000
+            }
+          },
           "timeout": 20000
         }
       },
@@ -448,7 +454,7 @@
       "alwaysOutputData": true,
       "notesInFlow": true,
       "onError": "continueRegularOutput",
-      "notes": "Replace WORKSPACE_ID and CHANNEL_ID in the URL"
+      "notes": "Replace WORKSPACE_ID and CHANNEL_ID in the URL. Batching sends one message every 2s so they land in order"
     },
     {
       "parameters": {
@@ -520,35 +526,11 @@
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload",
-        "sendBody": true,
-        "contentType": "multipart-form-data",
-        "bodyParameters": {
-          "parameters": [
-            {
-              "parameterType": "formBinaryData",
-              "name": "file",
-              "inputDataFieldName": "data"
-            },
-            {
-              "parameterType": "formData",
-              "name": "upload_preset",
-              "value": "YOUR_UNSIGNED_PRESET"
-            },
-            {
-              "parameterType": "formData",
-              "name": "folder",
-              "value": "linkedin-suggestions"
-            }
-          ]
-        },
-        "options": {
-          "timeout": 60000
-        }
+        "operation": "uploadFile",
+        "additionalFieldsFile": {}
       },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
+      "type": "n8n-nodes-cloudinary.cloudinary",
+      "typeVersion": 2,
       "position": [
         2640,
         340
@@ -561,7 +543,7 @@
       "alwaysOutputData": true,
       "onError": "continueRegularOutput",
       "notesInFlow": true,
-      "notes": "Unsigned preset, no API secret needed"
+      "notes": "Community node, uploads the binary as-is. Cropping happens later in the delivery URL"
     },
     {
       "parameters": {
