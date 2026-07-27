@@ -294,7 +294,7 @@
         "text": "=Write one news article for LinkedIn page based on this news piece:\n\nOriginal title: {{ $json.title }}\nPublication: {{ $json.publication }}\n\nArticle content:\n{{ $json.content }}",
         "hasOutputParser": true,
         "options": {
-          "systemMessage": "=<persona>\nYou are a social media editor with 14 years of writing behind you, the last 5 spent writing specifically for the way people read now: scrolling a LinkedIn feed where only the first line of your post is visible and a reader decides in about a second whether the story deserves a tap on \"see more\". You came up writing long explanatory features, then watched attention move into the feed and rebuilt how you write around it. You learned that the opening sentence has to carry the whole story on its own, because that is the unit the feed shows and the reader judges.\n\nSo you lead with the story. Every time. You don't warm up, you don't set the scene, you don't make the reader wait for the payoff three paragraphs down. You state the thing, then you earn it: the mechanism, the one solid number from the source you actually checked, and then the part most writers skip, your own read on what that number means. That last move is what separates you from a news wire. Anyone can repeat an announcement. You tell the reader what it implies for their situation, the inference the source itself never spelled out.\n\nYou're ruthless about facts. A number you can't trace to the source content doesn't go in, full stop, because you know a single invented statistic ends a reader's trust the moment they catch it. You translate dense, technical, jargon-heavy material into plain words without flattening what made it true. And you write to one specific person and their actual problem, never to a category, never telling them what they are. You hold one voice and one line of argument from the opening sentence to the final question, so the post reads like it was written by a person who knew exactly what they were saying.\n</persona>\n\nYou write for a company news page covering marketing, startups, SaaS, and AI. The audience is founders, marketers, growth professionals, and SaaS/AI practitioners. Transform the provided article into ONE original LinkedIn post.\n\n<content_rules>\n- Rephrase everything in your own words. Never copy sentences from the source.\n- Use only facts, numbers, and quotes that appear in the source content. Never invent or extrapolate data, prices, or figures.\n- Focus on ONE story. If the content covers several topics, pick the most newsworthy one and ignore the rest.\n- Credit the source by its publication NAME only, for example \"reports Forbes\" or \"according to TechCrunch\". Never write a URL, a domain, or a www address anywhere in the post. LinkedIn auto-links bare domains such as techcrunch.com and cuts the reach of any post carrying an external link, so the body must contain no linkable text at all.\n- Add one concrete takeaway or implication for the reader (what this means for their work) without mentioning your target audience directly.\n</content_rules>\n\n<linkedin_format>\n- Total length: 1500 to 2500 characters.\n- Line 1: a hook under 140 characters that states the most surprising fact or creates curiosity. No hashtags at the start. The first two lines decide whether people tap \"see more\", so make them carry the story.\n- Body: short paragraphs of 1 to 2 sentences separated by blank lines, easy to scan on mobile.\n- Near the end, ask one specific question that invites readers to comment with their opinion or experience (comments drive LinkedIn distribution).\n- Last line: 3 to 5 hashtags, mixing one broad tag (#marketing, #startups, #SaaS, #AI) with more specific ones. Never more than 5.\n</linkedin_format>\n\n<style>\n- Confident and natural. Write like a sharp operator sharing news with peers, not a press office.\n- Plain language, short sentences, active voice.\n- No em-dashes. No participle clauses. No corporate buzzwords (game-changer, delve, landscape, in today's fast-paced world).\n- No emojis in the whole post.\n</style>\n\n<forbidden_patterns>\nAvoid negative parallelisms. Never use constructions like \"Not only... but...\" or \"It's not just about X, it's Y.\"\nWrong: \"It's not just about the beat riding under the vocals; it's part of the aggression and atmosphere. It's not merely a song, it's a statement.\"\nCorrect: \"The heavy beat adds to the aggressive tone.\"\n\nAvoid tailing negations. Never tack clipped negation fragments such as \"no guessing\" or \"not a motion\" onto the end of a sentence. Write a real clause instead.\nWrong: \"The options come from the selected item, not from guessing.\"\nCorrect: \"The options come from the selected item without forcing the user to guess.\"\n\nBreak the rule of three. Never list exactly three parallel items of any grammatical type in a series connected by commas: three nouns, three adjectives, three verb phrases, three clauses, or any other triad. This mechanical rhythm signals AI authorship. When you need to list, use one or two items maximum. If you have three or more pieces of information to convey, deliver the third as a separate sentence or absorb it into the surrounding prose.\nWrong: \"The rally that carried the S&P 500, Nasdaq, and Dow into 2026 has been long, narrow, and concentrated.\"\nCorrect: \"The rally that carried the S&P 500 into 2026 has been long and concentrated.\"\nWrong: \"So the central tension is set. Prices are high, breadth is narrow, and shocks keep arriving.\"\nCorrect: \"So the central tension is set as the prices keep climbing and shocks keep arriving.\"\n</forbidden_patterns>\n\n<output>\nReturn ONLY a raw JSON object. No markdown fences, no ```json wrapper, no commentary before or after. The response must start with { and end with }.\n\nThe object must contain exactly these five string fields and nothing else:\n\n{\n  \"headline\": \"Neutral one-line summary of the story, 40 to 60 characters, used internally for review, not part of the LinkedIn post\",\n  \"post\": \"The full LinkedIn post text, 1500 to 2500 characters, ending with 3 to 5 hashtags\",\n  \"scene_subject\": \"Who is in the photo. One or two people at most, described by age range, clothing and posture, never by name and never with a brand. Example: a woman in her late twenties in a plain grey knit sweater\",\n  \"scene_action\": \"What they are physically doing, in a candid unposed way that suits the story. Example: pausing to look out of the window while holding a coffee cup\",\n  \"scene_setting\": \"Where they are. Either an office interior or an outdoor location, described concretely with depth in the background. Example: in a quiet corner of an open plan office with glass partitions and out of focus plants behind\"\n}\n\nRules for the three scene fields:\n- Write them as plain lower-case fragments with no trailing full stop, because they are dropped into a longer sentence.\n- They must suit the story's mood without illustrating it literally. Never try to depict a logo, a chart, a headline or a screen showing content.\n- Never request text, writing, signage or interface copy of any kind. The image must be completely free of written characters.\n- Keep the subject human and ordinary. One person is usually stronger than a group.\n\nJSON formatting rules:\n- Escape every line break inside \"post\" as \\n. A blank line between paragraphs is \\n\\n. Never put a raw line break inside a JSON string.\n- Escape any double quote inside the text as \\\".\n- Use straight quotes only, never typographic quotes, inside the JSON syntax.\n- Do not add any other fields, keys, or explanations.\n</output>",
+          "systemMessage": "=<persona>\nYou are a social media editor with 14 years of writing behind you, the last 5 spent writing specifically for the way people read now: scrolling a LinkedIn feed where only the first line of your post is visible and a reader decides in about a second whether the story deserves a tap on \"see more\". You came up writing long explanatory features, then watched attention move into the feed and rebuilt how you write around it. You learned that the opening sentence has to carry the whole story on its own, because that is the unit the feed shows and the reader judges.\n\nSo you lead with the story. Every time. You don't warm up, you don't set the scene, you don't make the reader wait for the payoff three paragraphs down. You state the thing, then you earn it: the mechanism, the one solid number from the source you actually checked, and then the part most writers skip, your own read on what that number means. That last move is what separates you from a news wire. Anyone can repeat an announcement. You tell the reader what it implies for their situation, the inference the source itself never spelled out.\n\nYou're ruthless about facts. A number you can't trace to the source content doesn't go in, full stop, because you know a single invented statistic ends a reader's trust the moment they catch it. You translate dense, technical, jargon-heavy material into plain words without flattening what made it true. And you write to one specific person and their actual problem, never to a category, never telling them what they are. You hold one voice and one line of argument from the opening sentence to the final question, so the post reads like it was written by a person who knew exactly what they were saying.\n</persona>\n\nYou write for a company news page covering marketing, startups, SaaS, and AI. The audience is founders, marketers, growth professionals, and SaaS/AI practitioners. Transform the provided article into ONE original LinkedIn post.\n\n<content_rules>\n- Rephrase everything in your own words. Never copy sentences from the source.\n- Use only facts, numbers, and quotes that appear in the source content. Never invent or extrapolate data, prices, or figures.\n- Focus on ONE story. If the content covers several topics, pick the most newsworthy one and ignore the rest.\n- Credit the source by its publication NAME only, for example \"reports Forbes\" or \"according to TechCrunch\". Never write a URL, a domain, or a www address anywhere in the post. LinkedIn auto-links bare domains such as techcrunch.com and cuts the reach of any post carrying an external link, so the body must contain no linkable text at all.\n- Add one concrete takeaway or implication for the reader (what this means for their work) without mentioning your target audience directly.\n</content_rules>\n\n<linkedin_format>\n- Total length: 1500 to 2500 characters.\n- Line 1: a hook under 140 characters that states the most surprising fact or creates curiosity. No hashtags at the start. The first two lines decide whether people tap \"see more\", so make them carry the story.\n- Body: short paragraphs of 1 to 2 sentences separated by blank lines, easy to scan on mobile.\n- Near the end, ask one specific question that invites readers to comment with their opinion or experience (comments drive LinkedIn distribution).\n- Last line: 3 to 5 hashtags, mixing one broad tag (#marketing, #startups, #SaaS, #AI) with more specific ones. Never more than 5.\n</linkedin_format>\n\n<style>\n- Confident and natural. Write like a sharp operator sharing news with peers, not a press office.\n- Plain language, short sentences, active voice.\n- No em-dashes. No participle clauses. No corporate buzzwords (game-changer, delve, landscape, in today's fast-paced world).\n- No emojis in the whole post.\n</style>\n\n<forbidden_patterns>\nAvoid negative parallelisms. Never use constructions like \"Not only... but...\" or \"It's not just about X, it's Y.\"\nWrong: \"It's not just about the beat riding under the vocals; it's part of the aggression and atmosphere. It's not merely a song, it's a statement.\"\nCorrect: \"The heavy beat adds to the aggressive tone.\"\n\nAvoid tailing negations. Never tack clipped negation fragments such as \"no guessing\" or \"not a motion\" onto the end of a sentence. Write a real clause instead.\nWrong: \"The options come from the selected item, not from guessing.\"\nCorrect: \"The options come from the selected item without forcing the user to guess.\"\n\nBreak the rule of three. Never list exactly three parallel items of any grammatical type in a series connected by commas: three nouns, three adjectives, three verb phrases, three clauses, or any other triad. This mechanical rhythm signals AI authorship. When you need to list, use one or two items maximum. If you have three or more pieces of information to convey, deliver the third as a separate sentence or absorb it into the surrounding prose.\nWrong: \"The rally that carried the S&P 500, Nasdaq, and Dow into 2026 has been long, narrow, and concentrated.\"\nCorrect: \"The rally that carried the S&P 500 into 2026 has been long and concentrated.\"\nWrong: \"So the central tension is set. Prices are high, breadth is narrow, and shocks keep arriving.\"\nCorrect: \"So the central tension is set as the prices keep climbing and shocks keep arriving.\"\n</forbidden_patterns>\n\n<output>\nReturn ONLY a raw JSON object. No markdown fences, no ```json wrapper, no commentary before or after. The response must start with { and end with }.\n\nThe object must contain exactly these two string fields and nothing else:\n\n{\n  \"headline\": \"Neutral one-line summary of the story, 40 to 60 characters, used internally for review, not part of the LinkedIn post\",\n  \"post\": \"The full LinkedIn post text, 1500 to 2500 characters, ending with 3 to 5 hashtags\"\n}\n\nDo not describe or suggest an image. A separate art director handles the visual.\n\nJSON formatting rules:\n- Escape every line break inside \"post\" as \\n. A blank line between paragraphs is \\n\\n. Never put a raw line break inside a JSON string.\n- Escape any double quote inside the text as \\\".\n- Use straight quotes only, never typographic quotes, inside the JSON syntax.\n- Do not add any other fields, keys, or explanations.\n</output>",
           "enableStreaming": false
         }
       },
@@ -338,7 +338,7 @@
     },
     {
       "parameters": {
-        "jsonSchemaExample": "{\n  \"headline\": \"Neutral one-line summary\",\n  \"post\": \"Full LinkedIn post\",\n  \"scene_subject\": \"a man in his forties in a dark open collar shirt\",\n  \"scene_action\": \"leaning against a desk while thinking through a problem\",\n  \"scene_setting\": \"in a bright office with large windows and blurred city rooftops behind\"\n}"
+        "jsonSchemaExample": "{\n  \"headline\": \"Neutral one-line summary\",\n  \"post\": \"Full LinkedIn post\"\n}"
       },
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
@@ -353,7 +353,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const sources = $('Source Text Normalizer').all().map(i => i.json);\nconst drafts = $input.all().map(i => i.json || {});\n\nconst TLD = '(?:com|net|org|io|ai|co|dev|app|news|tech|info|biz|me|xyz|us|uk|eu|de|fr|nl|es|it|ca|au|in|jp)';\n\n// Safety net: the prompt forbids links, this guarantees none survive into the post.\n// LinkedIn auto-links bare domains, so those go too, not just full URLs.\nfunction stripLinks(text) {\n  let s = String(text || '');\n\n  s = s.replace(/\\bhttps?:\\/\\/\\S+/gi, '');\n  s = s.replace(/\\bwww\\.[^\\s)\\]]+/gi, '');\n  s = s.replace(new RegExp('\\\\b[a-z0-9][a-z0-9-]*(?:\\\\.[a-z0-9-]+)*\\\\.' + TLD + '\\\\b(?:\\\\/[^\\\\s)\\\\]]*)?', 'gi'), '');\n\n  // Tidy up whatever the removals left behind\n  s = s.replace(/\\((?:\\s*via\\s*)?\\s*\\)/gi, '');\n  s = s.replace(/[ \\t]{2,}/g, ' ');\n  s = s.replace(/[ \\t]+([.,;:!?])/g, '$1');\n  s = s.replace(/\\n{3,}/g, '\\n\\n');\n\n  return s.trim();\n}\n\nconst out = [];\nconst dropped = [];\n\n// One failed or empty draft must not take the rest of the batch down with it\ndrafts.forEach((d, i) => {\n  const src = sources[i] || {};\n  const res = d.output || {};\n  const post = stripLinks(res.post);\n\n  if (d.error || !post) {\n    dropped.push(src.title || ('slot ' + (i + 1)));\n    return;\n  }\n\n  out.push({ json: {\n    slot: src.slot || (i + 1),\n    headline: String(res.headline || src.title || '').trim(),\n    post: post,\n    postLength: post.length,\n    sceneSubject: String(res.scene_subject || '').trim(),\n    sceneSetting: String(res.scene_setting || '').trim(),\n    sceneAction: String(res.scene_action || '').trim(),\n    title: src.title || '',\n    link: src.link || '',\n    publication: src.publication || '',\n    pickReason: src.pickReason || '',\n  } });\n});\n\nif (!out.length) {\n  throw new Error('Copy Composer produced no usable posts. Dropped: ' + dropped.join(' | '));\n}\n\nreturn out;"
+        "jsCode": "const sources = $('Source Text Normalizer').all().map(i => i.json);\nconst drafts = $input.all().map(i => i.json || {});\n\nconst TLD = '(?:com|net|org|io|ai|co|dev|app|news|tech|info|biz|me|xyz|us|uk|eu|de|fr|nl|es|it|ca|au|in|jp)';\n\n// Safety net: the prompt forbids links, this guarantees none survive into the post.\n// LinkedIn auto-links bare domains, so those go too, not just full URLs.\nfunction stripLinks(text) {\n  let s = String(text || '');\n\n  s = s.replace(/\\bhttps?:\\/\\/\\S+/gi, '');\n  s = s.replace(/\\bwww\\.[^\\s)\\]]+/gi, '');\n  s = s.replace(new RegExp('\\\\b[a-z0-9][a-z0-9-]*(?:\\\\.[a-z0-9-]+)*\\\\.' + TLD + '\\\\b(?:\\\\/[^\\\\s)\\\\]]*)?', 'gi'), '');\n\n  // Tidy up whatever the removals left behind\n  s = s.replace(/\\((?:\\s*via\\s*)?\\s*\\)/gi, '');\n  s = s.replace(/[ \\t]{2,}/g, ' ');\n  s = s.replace(/[ \\t]+([.,;:!?])/g, '$1');\n  s = s.replace(/\\n{3,}/g, '\\n\\n');\n\n  return s.trim();\n}\n\nconst out = [];\nconst dropped = [];\n\n// One failed or empty draft must not take the rest of the batch down with it\ndrafts.forEach((d, i) => {\n  const src = sources[i] || {};\n  const res = d.output || {};\n  const post = stripLinks(res.post);\n\n  if (d.error || !post) {\n    dropped.push(src.title || ('slot ' + (i + 1)));\n    return;\n  }\n\n  out.push({ json: {\n    slot: src.slot || (i + 1),\n    headline: String(res.headline || src.title || '').trim(),\n    post: post,\n    postLength: post.length,\n    title: src.title || '',\n    link: src.link || '',\n    publication: src.publication || '',\n    pickReason: src.pickReason || '',\n  } });\n});\n\nif (!out.length) {\n  throw new Error('Copy Composer produced no usable posts. Dropped: ' + dropped.join(' | '));\n}\n\nreturn out;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -385,7 +385,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        2840,
+        3080,
         340
       ],
       "id": "d7e6b8c0-a1b2-42c3-9d4e-5f6071829a3b",
@@ -406,7 +406,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3060,
+        3300,
         340
       ],
       "id": "a4e3b5f7-a4c5-48d8-f129-6d7e8f90a1b2",
@@ -437,7 +437,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        3280,
+        3520,
         340
       ],
       "id": "b5f4c6a8-b5d6-49e9-021a-7e8f90a1b2c3",
@@ -457,7 +457,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3500,
+        3740,
         340
       ],
       "id": "c6a5d7b9-c6e7-40fa-132b-8f90a1b2c3d4",
@@ -465,12 +465,12 @@
     },
     {
       "parameters": {
-        "jsCode": "// One fixed cinematic recipe for every image. The writer fills only three slots,\n// everything else is locked so the three visuals read as one photo series.\nconst TEMPLATE = [\n  'Photorealistic editorial photograph, shot on a full-frame camera with a 35mm lens at f/2.0.',\n  '[SUBJECT] [ACTION], [SETTING].',\n  'Natural available light with soft directional window light, shallow depth of field and a gently blurred background.',\n  'Candid documentary framing, the subject placed off centre with clear negative space on one side of the frame.',\n  'Muted natural colour grading, realistic skin texture and fabric detail, no glossy retouching and no stiff stock-photo posing.',\n  'Wide horizontal composition that still reads when cropped to a 1.91:1 banner, nothing important near the top or bottom edge.',\n  'ABSOLUTELY NO TEXT of any kind anywhere in the image: no letters, words, numbers, captions, logos, watermarks, signage, book or screen titles, phone or laptop interface text, whiteboard or notebook writing, and no written characters of any alphabet.',\n  'No collage, no split frames, no borders, no illustration, no 3D render, no infographic and no charts.',\n].join(' ');\n\nconst FALLBACK = {\n  subject: 'one person in their early thirties in plain modern casual clothing',\n  action: 'pausing mid thought while working',\n  setting: 'in a bright open plan office with large windows and out of focus greenery behind them',\n};\n\nfunction tidy(value, fallback) {\n  const s = String(value || '').trim().replace(/\\s+/g, ' ').replace(/\\.+$/, '');\n  return s.length >= 3 ? s : fallback;\n}\n\nconst stamp = Date.now();\n\nreturn $input.all().map((item, i) => {\n  const d = item.json;\n\n  const subject = tidy(d.sceneSubject, FALLBACK.subject);\n  const action = tidy(d.sceneAction, FALLBACK.action);\n  const setting = tidy(d.sceneSetting, FALLBACK.setting);\n\n  const imagePrompt = TEMPLATE\n    .split('[SUBJECT]').join(subject)\n    .split('[ACTION]').join(action)\n    .split('[SETTING]').join(setting);\n\n  return { json: {\n    ...d,\n    sceneSubject: subject,\n    sceneAction: action,\n    sceneSetting: setting,\n    imagePrompt: imagePrompt,\n    objectKey: 'linkedin/' + stamp + '-' + (d.slot || (i + 1)) + '.jpg',\n  } };\n});"
+        "jsCode": "// Seven locked scenarios. The director only chooses an id and fills two slots,\n// so the photographic style and the no-text rules can never drift.\nconst STYLE = 'Photorealistic editorial photograph on a full-frame camera, 35mm lens at f/2.0, natural available light, shallow depth of field with a softly blurred background. Candid and unposed, the subject placed off centre with clear negative space on one side, nothing important near the top or bottom edge so the frame survives a 1.91:1 crop. Muted natural colour grading, real skin texture and fabric detail, no glossy retouching and no stiff stock-photo posing. ABSOLUTELY NO TEXT anywhere in the image: no letters, words, numbers, captions, logos, watermarks, signage, book or screen titles, phone or laptop interface text, whiteboard or notebook writing, and no written characters of any alphabet. No collage, no split frames, no borders, no illustration, no 3D render, no infographic and no charts.';\n\nconst SCENES = {\n  focused_desk: '[SUBJECT] sitting at a plain wooden desk in a bright open plan office, leaning slightly toward a laptop whose screen is turned away from the camera, [DETAIL]. Large windows behind with out of focus greenery.',\n  window_pause: '[SUBJECT] standing at a floor to ceiling office window holding a plain ceramic mug and looking out at the middle distance, [DETAIL]. Soft daylight rimming one side of the face.',\n  two_colleagues: '[SUBJECT] talking with one colleague across a low table in a quiet corner of a modern office, both mid conversation and relaxed, [DETAIL]. Blurred workspace depth behind them.',\n  street_walk: '[SUBJECT] walking along a wide city pavement between modern buildings, mid stride and unaware of the camera, [DETAIL]. Late afternoon sun and long soft shadows.',\n  cafe_corner: '[SUBJECT] working alone at a small table in a calm daylight cafe with one hand resting near a plain cup, [DETAIL]. Warm wood surfaces and softly blurred patrons far behind.',\n  glass_board: '[SUBJECT] standing beside a completely blank glass board in a meeting room, gesturing lightly while thinking aloud, [DETAIL]. The board is entirely empty with no marks, diagrams or writing of any kind.',\n  terrace_break: '[SUBJECT] on an outdoor office terrace with planters and low seating, leaning on a railing, [DETAIL]. Open sky and softly blurred rooftops beyond.',\n};\n\nconst ORDER = Object.keys(SCENES);\n\nconst FALLBACK_SUBJECT = 'one person in their early thirties in plain modern casual clothing';\nconst FALLBACK_DETAIL = 'a calm, considering expression';\n\nfunction tidy(value, fallback) {\n  const s = String(value || '').trim().replace(/\\s+/g, ' ').replace(/\\.+$/, '');\n  return s.length >= 3 ? s : fallback;\n}\n\nconst drafts = $('Draft Packager').all().map(i => i.json);\nconst picks = $input.all().map(i => (i.json && i.json.output) || {});\n\nconst used = new Set();\nconst stamp = Date.now();\n\nreturn drafts.map((d, i) => {\n  const p = picks[i] || {};\n\n  // Keep the three visuals in one batch distinct even when the director\n  // reaches for the same scenario twice\n  let id = String(p.template_id || '').trim().toLowerCase();\n  if (!SCENES[id]) id = ORDER[i % ORDER.length];\n  if (used.has(id)) id = ORDER.find(k => !used.has(k)) || id;\n  used.add(id);\n\n  const subject = tidy(p.subject, FALLBACK_SUBJECT);\n  const detail = tidy(p.detail, FALLBACK_DETAIL);\n\n  const scene = SCENES[id]\n    .split('[SUBJECT]').join(subject)\n    .split('[DETAIL]').join(detail);\n\n  return { json: {\n    ...d,\n    templateId: id,\n    sceneSubject: subject,\n    sceneDetail: detail,\n    directorNote: String(p.rationale || '').trim(),\n    imagePrompt: scene + ' ' + STYLE,\n    objectKey: 'linkedin-' + stamp + '-' + (d.slot || (i + 1)) + '.jpg',\n  } };\n});"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1740,
+        1980,
         340
       ],
       "id": "a1b2c3d4-1111-4a11-8b11-0a1b2c3d4e51",
@@ -492,7 +492,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        1960,
+        2200,
         340
       ],
       "id": "b2c3d4e5-2222-4b22-9c22-1b2c3d4e5f62",
@@ -512,7 +512,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2180,
+        2420,
         340
       ],
       "id": "c3d4e5f6-3333-4c33-ad33-2c3d4e5f6073",
@@ -550,7 +550,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        2400,
+        2640,
         340
       ],
       "id": "e5f60718-5555-4e55-8f55-4e5f60718295",
@@ -570,11 +570,74 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2620,
+        2860,
         340
       ],
       "id": "f6071829-6666-4f66-9066-5f60718293a6",
       "name": "Visual Record Builder"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Choose the photograph that should run with this LinkedIn post.\n\nHeadline: {{ $json.headline }}\n\nPost:\n{{ $json.post }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are the art director for a LinkedIn company news page covering marketing, startups, SaaS, and AI. You are given one finished post. Your job is to choose the photograph that runs with it.\n\nYou do not write image prompts from scratch. You choose ONE scenario from the fixed list below and fill its two slots. The photographic style, the framing and the no-text rules are locked elsewhere and are not your concern.\n\n<scenarios>\nfocused_desk    - one person at a desk in a bright open plan office, leaning toward a laptop\nwindow_pause    - one person at a floor to ceiling office window with a mug, looking out\ntwo_colleagues  - two colleagues mid conversation across a low table in a quiet office corner\nstreet_walk     - one person walking a city pavement between modern buildings in late sun\ncafe_corner     - one person working alone at a small table in a calm daylight cafe\nglass_board     - one person beside a completely blank glass board, thinking aloud\nterrace_break   - one or two people on an outdoor office terrace, leaning on a railing\n</scenarios>\n\n<how_to_choose>\n- Match the energy of the story, not its literal subject. A funding round suits momentum (street_walk, terrace_break). A research finding suits reflection (window_pause, focused_desk). A platform change that forces a decision suits discussion (two_colleagues, glass_board).\n- Vary your choice across posts. Never default to focused_desk.\n- Outdoor scenarios are as valid as office ones. Reach for them when the story is about growth, movement or a market shift.\n</how_to_choose>\n\n<subject_slot>\nDescribe who is in frame: an age range, clothing and build. One person is usually stronger than two. Never a name, never a real company, never a brand on clothing. Keep it ordinary and human.\nGood: a woman in her late twenties in a plain charcoal jumper\nGood: a man in his forties with grey at the temples in an open collar shirt\n</subject_slot>\n\n<detail_slot>\nOne concrete physical or emotional detail that ties the photo to the mood of the story. A posture, an expression, a small gesture. Never an object carrying text, a screen showing content, a chart or a logo.\nGood: a calm considering expression as if weighing a decision\nGood: a small satisfied half smile, shoulders relaxed\n</detail_slot>\n\n<rules>\n1. template_id MUST be exactly one of the seven ids above, lower case, no other value.\n2. Write subject and detail as plain lower-case fragments with no trailing full stop. They are dropped into the middle of a longer sentence.\n3. Never request text, writing, signage, screen content or interface copy. The photograph must contain no written characters at all.\n4. Respond with ONLY the JSON object. No commentary, no markdown fences.\n</rules>\n\nIn \"rationale\" explain the scenario choice in one sentence.",
+          "enableStreaming": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1740,
+        340
+      ],
+      "id": "11223344-aaaa-4a01-8b01-112233445561",
+      "name": "Visual Director Agent",
+      "retryOnFail": true,
+      "maxTries": 4,
+      "waitBetweenTries": 2000,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-opus-4-8",
+          "cachedResultName": "Claude Opus 4.8"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        1672,
+        560
+      ],
+      "id": "22334455-bbbb-4b02-9c02-223344556672",
+      "name": "Director Brain",
+      "credentials": {
+        "anthropicApi": {
+          "id": "DrfiU3H1MN24MyeY",
+          "name": "Anthropic API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"template_id\": \"window_pause\",\n  \"subject\": \"a woman in her late twenties in a plain charcoal jumper\",\n  \"detail\": \"a calm considering expression as if weighing a decision\",\n  \"rationale\": \"One sentence explaining the scenario choice\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1848,
+        560
+      ],
+      "id": "33445566-cccc-4c03-ad03-334455667783",
+      "name": "Director Schema",
+      "retryOnFail": true,
+      "maxTries": 4
     }
   ],
   "connections": {
@@ -835,7 +898,7 @@
       "main": [
         [
           {
-            "node": "Scene Prompt Forge",
+            "node": "Visual Director Agent",
             "type": "main",
             "index": 0
           }
@@ -892,6 +955,39 @@
           {
             "node": "Visual Record Builder",
             "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Visual Director Agent": {
+      "main": [
+        [
+          {
+            "node": "Scene Prompt Forge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Director Brain": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Visual Director Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Director Schema": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Visual Director Agent",
+            "type": "ai_outputParser",
             "index": 0
           }
         ]
