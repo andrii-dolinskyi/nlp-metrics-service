@@ -1,0 +1,126 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Normalizes the state for one pick attempt.\n//\n// Everything the retry loop needs travels in the item JSON, NOT in workflow\n// static data. Static data written before the Telegram approval wait is\n// discarded when the execution resumes, which is what made rejected articles\n// come back and the attempt counter stick at 1.\nconst inp = $input.first().json || {};\n\nconst rejectedLinks = Array.isArray(inp.rejectedLinks) ? inp.rejectedLinks.slice() : [];\nconst rejectedTitles = Array.isArray(inp.rejectedTitles) ? inp.rejectedTitles.slice() : [];\n\n// Picks completed so far this run. 0 on the first pass (Collect Candidates\n// does not set it), then carried forward by Handle Rejection.\nconst attempt = Number(inp.attempt) || 0;\n\nconst all = Array.isArray(inp.candidates) ? inp.candidates : [];\nconst candidates = all.filter(c => c && c.link && !rejectedLinks.includes(c.link));\n\nif (candidates.length === 0) {\n  throw new Error('Loop State got no unrejected candidates. Handle Rejection should have ended the run before reaching the picker.');\n}\n\nreturn [{ json: {\n  candidates: candidates,\n  candidateCount: candidates.length,\n  rejectedLinks: rejectedLinks,\n  rejectedTitles: rejectedTitles,\n  attempt: attempt,\n  usedTopics: Array.isArray(inp.usedTopics) ? inp.usedTopics : [],\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        10096,
+        2704
+      ],
+      "id": "f2a80c31-5b47-4e19-9d62-8a3c14e07b55",
+      "name": "Loop State"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Select exactly ONE article for our LinkedIn company news page.\n\nThis is pick number {{ $json.attempt + 1 }} of this run.\n\nCandidate articles (JSON). You must choose from this list only:\n{{ JSON.stringify($json.candidates) }}\n\nRecently covered topics (avoid anything substantially similar):\n{{ JSON.stringify($json.usedTopics) }}\n\nAlready rejected by the editor during this run. Never select these, and never select a different article covering the same story:\n{{ JSON.stringify($json.rejectedTitles) }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are the content editor of a LinkedIn company news page covering marketing, startups, SaaS, and AI. Your task: from the candidate list you are given, select exactly ONE article that will perform best as a LinkedIn post for an audience of founders, marketers, and SaaS/AI professionals.\n\n<rules>\n1. You MUST pick exactly one article that appears in the provided candidate list. Never invent an article.\n2. Copy the \"title\" and \"link\" values EXACTLY as they appear in the list, character for character. Do not modify, shorten, or fix the link.\n3. Never select anything from the rejected list, and never select a different article that covers the same underlying story as a rejected one. A human editor has already turned those down, so re-proposing them wastes the run.\n4. Respond with ONLY the JSON object in the required format. No commentary, no markdown fences.\n</rules>\n\n<selection_criteria>\nPrefer, in this order:\n1. Concrete, newsworthy developments in marketing, startups, SaaS, or AI: funding rounds, acquisitions, product launches, platform changes, research reports with data.\n2. Articles with specific numbers, percentages, or study findings.\n3. Stories with a clear implication for business professionals (what changes for them).\n4. More recent articles over older ones when quality is comparable.\n</selection_criteria>\n\n<exclusions>\nNever pick:\n- Anything already rejected during this run, or covering the same story as a rejected article.\n- Anything substantially similar to a recently covered topic from the provided list.\n- Press releases, sponsored or promotional content, award announcements, company self-promotion.\n- Entertainment, TV shows, celebrity, sports, or lifestyle content, even if the headline contains keywords like SaaS (for example TV serials).\n- Opinion pieces with no factual news, roundups, digests, or listicles (for example daily funding report digests, top-N lists, job move roundups).\n- Video-only content or paywalled teasers where the snippet has no substance.\n- Local small-town stories with no relevance to an international professional audience.\n</exclusions>\n\nIn the \"reason\" field explain your choice in one sentence.",
+          "enableStreaming": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        10432,
+        2656
+      ],
+      "id": "544079f6-9f0b-45e2-a794-f7a85822e7c4",
+      "name": "News Picker",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop state comes from Loop State via node reference, never from static data:\n// static data written before the approval wait is lost when the run resumes.\nfunction fromNode(name) {\n  try { return $(name).first(0, $runIndex).json; } catch (e) {}\n  try { return $(name).first().json; } catch (e) {}\n  return null;\n}\n\nconst state = fromNode('Loop State') || {};\nconst candidates = Array.isArray(state.candidates) ? state.candidates : [];\nconst rejectedLinks = Array.isArray(state.rejectedLinks) ? state.rejectedLinks : [];\n\nif (candidates.length === 0) {\n  throw new Error('Select Article received no candidate list from Loop State. Unpin Loop State and Collect Candidates and run the full flow.');\n}\n\nconst out = ($input.first().json.output) || {};\nlet picked = out.article;\nif (Array.isArray(picked)) picked = picked[0];\npicked = picked || {};\n\nlet match = candidates.find(c => c.link === picked.link);\nif (!match && picked.title) {\n  const t = String(picked.title).toLowerCase().trim();\n  match = candidates.find(c => String(c.title).toLowerCase().trim() === t);\n}\n\n// Hard guard. The model still re-picks a rejected story now and then, and one\n// bad pick used to send the loop round on the same article forever.\nif (match && rejectedLinks.includes(match.link)) match = null;\n\n// Fall back to the freshest candidate the editor has not already turned down.\nif (!match) {\n  match = candidates\n    .filter(c => !rejectedLinks.includes(c.link))\n    .sort((a, b) => new Date(b.isoDate) - new Date(a.isoDate))[0];\n}\n\nif (!match) {\n  throw new Error('Every remaining candidate has already been rejected this run.');\n}\n\nconst attempt = (Number(state.attempt) || 0) + 1;\n\n// Still set for Prepare Content, which reads it inside this same pre-approval\n// segment where static data is intact.\nconst sd = $getWorkflowStaticData('global');\nsd.currentSelection = { title: match.title, link: match.link };\n\nreturn [{ json: {\n  title: match.title,\n  link: match.link,\n  isoDate: match.isoDate,\n  attempt: attempt,\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        10896,
+        2688
+      ],
+      "id": "1cdd7a29-6c64-4548-9c06-d2eb1fb04634",
+      "name": "Select Article"
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\n\nlet sel = {};\ntry { sel = $('Select Article').first(0, $runIndex).json || {}; } catch (e) {}\nif (!sel.link) { try { sel = $('Select Article').first().json || {}; } catch (e) {} }\nif (!sel.link) sel = sd.currentSelection || {};\n\nconst out = ($input.first().json.output) || {};\nconst post = String(out.post || '').trim();\nconst headline = String(out.headline || sel.title || '').trim();\n\n// Carry the image query forward so nothing downstream has to reach back\n// across the approval wait node to read it off News Reporter.\nconst imageQuery = String(out.image_query || '').trim() || 'business technology';\n\nif (!post) {\n  throw new Error('News Reporter returned an empty post.');\n}\n\n// Attempt number comes from Select Article, not sd.attemptCount: static data\n// set before the approval wait is discarded on resume, so the counter was\n// always reading back as 1.\nconst attempt = Number(sel.attempt) || 1;\n\nreturn [{ json: {\n  headline: headline,\n  post: post,\n  imageQuery: imageQuery,\n  title: sel.title || '',\n  link: sel.link || '',\n  attempt: attempt,\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        12688,
+        2544
+      ],
+      "id": "307be19e-82f7-4d96-bb69-f4ab01774b60",
+      "name": "Format Post"
+    },
+    {
+      "parameters": {
+        "jsCode": "const MAX_ATTEMPTS = 3;\n\nfunction fromNode(name) {\n  try { return $(name).first(0, $runIndex).json; } catch (e) {}\n  try { return $(name).first().json; } catch (e) {}\n  return null;\n}\n\n// Both survive the approval wait because they live in the execution data.\nconst state = fromNode('Loop State') || {};\nconst sel = fromNode('Select Article') || {};\n\nconst candidates = Array.isArray(state.candidates) ? state.candidates : [];\n\nconst rejectedLinks = Array.isArray(state.rejectedLinks) ? state.rejectedLinks.slice() : [];\nconst rejectedTitles = Array.isArray(state.rejectedTitles) ? state.rejectedTitles.slice() : [];\nif (sel.link && !rejectedLinks.includes(sel.link)) rejectedLinks.push(sel.link);\nif (sel.title && !rejectedTitles.includes(sel.title)) rejectedTitles.push(sel.title);\n\nconst remaining = candidates.filter(c => c && c.link && !rejectedLinks.includes(c.link));\nconst attempt = Number(sel.attempt) || (Number(state.attempt) || 0) + 1;\n\n// This node runs after the approval wait, so these writes do reach the end of\n// the execution and get persisted for future runs.\nconst sd = $getWorkflowStaticData('global');\nconst seen = new Set(sd.rejectedLinks || []);\nfor (const link of rejectedLinks) seen.add(link);\nsd.rejectedLinks = Array.from(seen).slice(-100);\n\nif (attempt >= MAX_ATTEMPTS) {\n  return [{ json: { retry: false, reason: 'I tried ' + attempt + ' articles this run and none was approved or usable, so I am stopping this run.' } }];\n}\nif (remaining.length === 0) {\n  return [{ json: { retry: false, reason: 'No candidate articles are left to try after the last rejection.' } }];\n}\n\nreturn [{ json: {\n  retry: true,\n  found: true,\n  candidateCount: remaining.length,\n  candidates: remaining,\n  rejectedLinks: rejectedLinks,\n  rejectedTitles: rejectedTitles,\n  attempt: attempt,\n  usedTopics: Array.isArray(state.usedTopics) ? state.usedTopics : [],\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        13920,
+        2912
+      ],
+      "id": "87b1f2ba-993d-4239-983f-a753b4c39f71",
+      "name": "Handle Rejection"
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst now = Date.now();\nconst SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;\n\n// sd.currentSelection was written before the approval wait and does not\n// survive the resume, so read the pick back off the node instead. This is why\n// Notify Published used to arrive with a blank title and link, and why the\n// published topic never made it into usedTopics.\nlet sel = {};\ntry { sel = $('Select Article').first(0, $runIndex).json || {}; } catch (e) {}\nif (!sel.link) { try { sel = $('Select Article').first().json || {}; } catch (e) {} }\nif (!sel.link) sel = sd.currentSelection || {};\n\n// Prune here rather than in Clean Memory. Clean Memory runs before the wait,\n// so its writes are thrown away and the 7 day expiry never actually ran.\nlet usedTopics = (sd.usedTopics || [])\n  .map(t => typeof t === 'string' ? { title: t, ts: now } : t)\n  .filter(t => t && t.title && (now - (t.ts || 0)) < SEVEN_DAYS);\n\nif (sel.title) {\n  usedTopics = [...usedTopics, { title: sel.title, ts: now }];\n}\n\nsd.usedTopics = usedTopics.slice(-50);\nsd.rejectedLinks = (sd.rejectedLinks || []).slice(-100);\nsd.candidates = [];\nsd.currentSelection = null;\nsd.attemptCount = 0;\n\nreturn [{ json: { published: true, title: sel.title || '', link: sel.link || '' } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        14368,
+        2384
+      ],
+      "id": "4af5e098-9a5e-4806-b0e5-f848c6e03e80",
+      "name": "Update Memory"
+    }
+  ],
+  "connections": {
+    "Loop State": {
+      "main": [
+        [
+          {
+            "node": "News Picker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "News Picker": {
+      "main": [
+        [
+          {
+            "node": "Select Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle Rejection": {
+      "main": [
+        [
+          {
+            "node": "Retry Pick?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
