@@ -1,0 +1,827 @@
+{
+  "name": "LinkedIn Topic Trio to ClickUp",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            },
+            {
+              "triggerAtHour": 17
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1200,
+        400
+      ],
+      "id": "b1f0c2a4-3d5e-4f61-8a72-9c0d1e2f3a41",
+      "name": "Editorial Clock"
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst now = Date.now();\nconst SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;\n\n// Keep the covered-topic ledger, prune anything older than 7 days (migrates the old string format too)\nsd.usedTopics = (sd.usedTopics || [])\n  .map(t => typeof t === 'string' ? { title: t, ts: now } : t)\n  .filter(t => t && t.title && (now - (t.ts || 0)) < SEVEN_DAYS)\n  .slice(-60);\n\n// Fresh per-run state\nsd.candidatePool = [];\nsd.currentBatch = null;\n\n// Drop leftovers from the old approval-loop version of this workflow\ndelete sd.rejectedLinks;\ndelete sd.currentSelection;\ndelete sd.attemptCount;\ndelete sd.candidates;\ndelete sd.runCount;\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -980,
+        400
+      ],
+      "id": "c2a1d3b5-4e6f-4072-9b83-0d1e2f3a4b52",
+      "name": "State Sweeper"
+    },
+    {
+      "parameters": {
+        "url": "https://rss.app/feeds/tnB85iGttJbWQsmo.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -740,
+        100
+      ],
+      "id": "d3b2e4c6-5f70-4183-ac94-1e2f3a4b5c63",
+      "name": "Growth Wire",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://rss.app/feeds/tSjA7vC0jcARKypX.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -740,
+        300
+      ],
+      "id": "e4c3f5d7-6081-4294-bda5-2f3a4b5c6d74",
+      "name": "Venture Wire",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://rss.app/feeds/tJqecbuBNEMI9WYW.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -740,
+        500
+      ],
+      "id": "f5d4a6e8-7192-43a5-ceb6-3a4b5c6d7e85",
+      "name": "Cloud Product Wire",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://rss.app/feeds/t0IREYmhBr3HJ3oF.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -740,
+        700
+      ],
+      "id": "a6e5b7f9-82a3-44b6-dfc7-4b5c6d7e8f96",
+      "name": "Model Visibility Wire",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -500,
+        400
+      ],
+      "id": "b7f6c8a0-93b4-45c7-e0d8-5c6d7e8f90a7",
+      "name": "Wire Consolidator"
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst now = Date.now();\nconst TOPICS_PER_RUN = 3;\n\nconst usedTitles = new Set((sd.usedTopics || []).map(t => String(t.title || '').toLowerCase().trim()));\n\nconst all = $input.all()\n  .map(i => i.json)\n  .filter(a => a && a.title && a.link && a.isoDate);\n\nfunction collect(hours) {\n  const cutoff = now - hours * 60 * 60 * 1000;\n  const seenTitles = new Set();\n  const seenLinks = new Set();\n  const out = [];\n  for (const a of all) {\n    const ts = new Date(a.isoDate).getTime();\n    if (isNaN(ts) || ts < cutoff) continue;\n    const titleKey = String(a.title).toLowerCase().trim();\n    if (seenTitles.has(titleKey) || seenLinks.has(a.link)) continue;\n    seenTitles.add(titleKey);\n    seenLinks.add(a.link);\n    if (usedTitles.has(titleKey)) continue;\n    out.push({\n      title: String(a.title).trim(),\n      link: a.link,\n      snippet: String(a.contentSnippet || '').slice(0, 300),\n      isoDate: a.isoDate,\n    });\n  }\n  return out;\n}\n\n// Widen the window until there is enough material for three separate topics\nlet windowHours = 6;\nlet candidates = [];\nfor (const h of [6, 12, 24, 48]) {\n  windowHours = h;\n  candidates = collect(h);\n  if (candidates.length >= TOPICS_PER_RUN) break;\n}\n\nsd.candidatePool = candidates;\n\nreturn [{ json: {\n  found: candidates.length > 0,\n  topicsPerRun: TOPICS_PER_RUN,\n  windowHours: windowHours,\n  candidateCount: candidates.length,\n  candidates: candidates,\n  usedTopics: (sd.usedTopics || []).map(t => t.title),\n  reason: candidates.length\n    ? ''\n    : 'No publishable articles were found. The window was widened from 6 to 48 hours and the feeds still returned nothing that was not already covered.',\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -280,
+        400
+      ],
+      "id": "c8a7d9b1-a4c5-46d8-f1e9-6d7e8f90a1b8",
+      "name": "Shortlist Builder"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1a2b3c4d-5e6f-4071-8293-a4b5c6d7e8f9",
+              "leftValue": "={{ $json.found }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -60,
+        400
+      ],
+      "id": "d9b8e0c2-b5d6-47e9-021a-7e8f90a1b2c9",
+      "name": "Shortlist Not Empty?"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        180,
+        600
+      ],
+      "id": "e0c9f1d3-c6e7-48fa-132b-8f90a1b2c3da",
+      "name": "Idle Run Terminator",
+      "notesInFlow": true,
+      "notes": "Nothing to publish, run ends quietly"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Select exactly THREE different articles for our LinkedIn company news page.\n\nEach pick must cover a DIFFERENT story. Never return two articles about the same event, company announcement, or funding round.\n\nCandidate articles (JSON). You must choose from this list only:\n{{ JSON.stringify($json.candidates) }}\n\nRecently covered topics (avoid anything substantially similar):\n{{ JSON.stringify($json.usedTopics) }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are the content editor of a LinkedIn company news page covering marketing, startups, SaaS, and AI. Your task: from the candidate list you are given, select exactly THREE articles that will perform best as LinkedIn posts for an audience of founders, marketers, and SaaS/AI professionals.\n\n<rules>\n1. You MUST return exactly three articles, and every one of them must appear in the provided candidate list. Never invent an article.\n2. Copy the \"title\" and \"link\" values EXACTLY as they appear in the list, character for character. Do not modify, shorten, or fix the link.\n3. The three picks must cover three distinct stories. Two articles reporting the same announcement count as one story, so pick only the stronger one and move on to a different subject.\n4. Spread the picks across the themes available in the list (marketing, startups, SaaS, AI) instead of returning three variations of the same theme, unless the list genuinely offers nothing else.\n5. If the list contains fewer than three usable articles, return as many usable ones as exist rather than padding with excluded content.\n6. Respond with ONLY the JSON object in the required format. No commentary, no markdown fences.\n</rules>\n\n<selection_criteria>\nPrefer, in this order:\n1. Concrete, newsworthy developments in marketing, startups, SaaS, or AI: funding rounds, acquisitions, product launches, platform changes, research reports with data.\n2. Articles with specific numbers, percentages, or study findings.\n3. Stories with a clear implication for business professionals (what changes for them).\n4. More recent articles over older ones when quality is comparable.\n</selection_criteria>\n\n<exclusions>\nNever pick:\n- Anything substantially similar to a recently covered topic from the provided list.\n- Press releases, sponsored or promotional content, award announcements, company self-promotion.\n- Entertainment, TV shows, celebrity, sports, or lifestyle content, even if the headline contains keywords like SaaS (for example TV serials).\n- Opinion pieces with no factual news, roundups, digests, or listicles (for example daily funding report digests, top-N lists, job move roundups).\n- Video-only content or paywalled teasers where the snippet has no substance.\n- Local small-town stories with no relevance to an international professional audience.\n</exclusions>\n\nIn each \"reason\" field explain that specific choice in one sentence.",
+          "enableStreaming": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        180,
+        340
+      ],
+      "id": "f1d0a2e4-d7f8-490b-243c-90a1b2c3d4eb",
+      "name": "Story Triage Agent",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.6-luna",
+          "mode": "list",
+          "cachedResultName": "gpt-5.6-luna"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        112,
+        560
+      ],
+      "id": "a2e1b3f5-e809-401c-354d-a1b2c3d4e5fc",
+      "name": "Triage Brain",
+      "credentials": {
+        "openAiApi": {
+          "id": "hMrc0DeKbf8tx9iI",
+          "name": "Article Writing API (Andrii's API)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"articles\": [\n    {\n      \"title\": \"Exact title copied from the candidate list\",\n      \"link\": \"https://example.com/exact-link-copied-from-the-list-1\",\n      \"reason\": \"One sentence explaining why this article was selected\"\n    },\n    {\n      \"title\": \"Exact title copied from the candidate list\",\n      \"link\": \"https://example.com/exact-link-copied-from-the-list-2\",\n      \"reason\": \"One sentence explaining why this article was selected\"\n    },\n    {\n      \"title\": \"Exact title copied from the candidate list\",\n      \"link\": \"https://example.com/exact-link-copied-from-the-list-3\",\n      \"reason\": \"One sentence explaining why this article was selected\"\n    }\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        288,
+        560
+      ],
+      "id": "b3f2c4a6-f91a-412d-465e-b2c3d4e5f60d",
+      "name": "Triage Schema",
+      "retryOnFail": true,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "jsCode": "const WANTED = 3;\n\nlet pool = [];\ntry { pool = $('Shortlist Builder').first().json.candidates || []; } catch (e) {}\nif (!pool.length) {\n  const sdPool = $getWorkflowStaticData('global').candidatePool;\n  pool = Array.isArray(sdPool) ? sdPool : [];\n}\nif (!pool.length) {\n  throw new Error('Trio Resolver received no candidate pool. Unpin Shortlist Builder and run the full flow.');\n}\n\nconst out = ($input.first().json.output) || {};\nlet picked = out.articles;\nif (!Array.isArray(picked)) picked = picked ? [picked] : [];\n\nconst byLink = new Map(pool.map(c => [c.link, c]));\nconst byTitle = new Map(pool.map(c => [String(c.title).toLowerCase().trim(), c]));\n\nconst chosen = [];\nconst taken = new Set();\n\nfor (const p of picked) {\n  if (!p) continue;\n  const match = byLink.get(p.link) || byTitle.get(String(p.title || '').toLowerCase().trim());\n  if (!match || taken.has(match.link)) continue;\n  taken.add(match.link);\n  chosen.push({ ...match, reason: String(p.reason || '').trim() });\n  if (chosen.length === WANTED) break;\n}\n\n// Top up with the freshest untouched candidates if the model returned fewer than three usable picks\nif (chosen.length < WANTED) {\n  const filler = pool\n    .filter(c => c && c.link && !taken.has(c.link))\n    .sort((a, b) => new Date(b.isoDate) - new Date(a.isoDate));\n  for (const c of filler) {\n    taken.add(c.link);\n    chosen.push({ ...c, reason: 'Auto-filled because the model returned fewer usable picks than requested.' });\n    if (chosen.length === WANTED) break;\n  }\n}\n\nif (!chosen.length) {\n  throw new Error('Trio Resolver could not resolve a single article from the candidate pool.');\n}\n\nconst sd = $getWorkflowStaticData('global');\nsd.currentBatch = chosen.map(c => ({ title: c.title, link: c.link }));\n\nreturn chosen.map((c, i) => ({ json: {\n  slot: i + 1,\n  title: c.title,\n  link: c.link,\n  isoDate: c.isoDate,\n  pickReason: c.reason,\n} }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        340
+      ],
+      "id": "c4a3d5b7-0a2b-423e-576f-c3d4e5f6071e",
+      "name": "Trio Resolver"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.link }}",
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.jinaAi",
+      "typeVersion": 1,
+      "position": [
+        740,
+        340
+      ],
+      "id": "d5b4e6c8-1b3c-434f-6870-d4e5f6071829",
+      "name": "Page Text Grabber",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 3000,
+      "alwaysOutputData": true,
+      "credentials": {
+        "jinaAiApi": {
+          "id": "NNDbWo36mt2JCHwE",
+          "name": "JinaAI API"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const MIN_CHARS = 200;\n\nconst picks = $('Trio Resolver').all().map(i => i.json);\nconst fetched = $input.all().map(i => i.json || {});\n\nfunction textOf(j) {\n  if (!j) return '';\n  if (typeof j.content === 'string') return j.content;\n  if (j.data && typeof j.data.content === 'string') return j.data.content;\n  if (typeof j.data === 'string') return j.data;\n  if (typeof j.text === 'string') return j.text;\n  return '';\n}\n\nfunction urlOf(j) {\n  if (!j) return '';\n  return String(j.url || (j.data && j.data.url) || '');\n}\n\nconst out = [];\nconst skipped = [];\n\npicks.forEach((p, idx) => {\n  // Prefer matching by URL, fall back to positional pairing\n  let src = fetched.find(f => urlOf(f) && urlOf(f) === p.link);\n  if (!src) src = fetched[idx];\n\n  const content = textOf(src).trim();\n  if (content.length < MIN_CHARS) {\n    skipped.push(p.title);\n    return;\n  }\n\n  let publication = '';\n  const m = String(p.link || '').match(/^https?:\\/\\/(?:www\\.)?([^\\/]+)/i);\n  if (m) publication = m[1];\n\n  out.push({ json: {\n    slot: p.slot,\n    title: p.title,\n    link: p.link,\n    pickReason: p.pickReason || '',\n    publication: publication,\n    content: content.slice(0, 20000),\n    contentLength: content.length,\n  } });\n});\n\nif (!out.length) {\n  throw new Error('None of the selected articles returned enough readable text. Skipped: ' + skipped.join(' | '));\n}\n\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        340
+      ],
+      "id": "e6c5f7d9-2c4d-4450-7981-e5f60718293a",
+      "name": "Source Text Normalizer"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write one news article for LinkedIn page based on this news piece:\n\nOriginal title: {{ $json.title }}\nPublication: {{ $json.publication }}\n\nArticle content:\n{{ $json.content }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=<persona>\nYou are a social media editor with 14 years of writing behind you, the last 5 spent writing specifically for the way people read now: scrolling a LinkedIn feed where only the first line of your post is visible and a reader decides in about a second whether the story deserves a tap on \"see more\". You came up writing long explanatory features, then watched attention move into the feed and rebuilt how you write around it. You learned that the opening sentence has to carry the whole story on its own, because that is the unit the feed shows and the reader judges.\n\nSo you lead with the story. Every time. You don't warm up, you don't set the scene, you don't make the reader wait for the payoff three paragraphs down. You state the thing, then you earn it: the mechanism, the one solid number from the source you actually checked, and then the part most writers skip, your own read on what that number means. That last move is what separates you from a news wire. Anyone can repeat an announcement. You tell the reader what it implies for their situation, the inference the source itself never spelled out.\n\nYou're ruthless about facts. A number you can't trace to the source content doesn't go in, full stop, because you know a single invented statistic ends a reader's trust the moment they catch it. You translate dense, technical, jargon-heavy material into plain words without flattening what made it true. And you write to one specific person and their actual problem, never to a category, never telling them what they are. You hold one voice and one line of argument from the opening sentence to the final question, so the post reads like it was written by a person who knew exactly what they were saying.\n</persona>\n\nYou write for a company news page covering marketing, startups, SaaS, and AI. The audience is founders, marketers, growth professionals, and SaaS/AI practitioners. Transform the provided article into ONE original LinkedIn post.\n\n<content_rules>\n- Rephrase everything in your own words. Never copy sentences from the source.\n- Use only facts, numbers, and quotes that appear in the source content. Never invent or extrapolate data, prices, or figures.\n- Focus on ONE story. If the content covers several topics, pick the most newsworthy one and ignore the rest.\n- Credit the source naturally in the text, for example \"reports Forbes\" or \"(via techcrunch.com)\". Do NOT put a URL in the post body: LinkedIn reduces the reach of posts with external links.\n- Add one concrete takeaway or implication for the reader (what this means for their work) without mentioning your target audience directly.\n</content_rules>\n\n<linkedin_format>\n- Total length: 1500 to 2500 characters.\n- Line 1: a hook under 140 characters that states the most surprising fact or creates curiosity. No hashtags at the start. The first two lines decide whether people tap \"see more\", so make them carry the story.\n- Body: short paragraphs of 1 to 2 sentences separated by blank lines, easy to scan on mobile.\n- Near the end, ask one specific question that invites readers to comment with their opinion or experience (comments drive LinkedIn distribution).\n- Last line: 3 to 5 hashtags, mixing one broad tag (#marketing, #startups, #SaaS, #AI) with more specific ones. Never more than 5.\n</linkedin_format>\n\n<style>\n- Confident and natural. Write like a sharp operator sharing news with peers, not a press office.\n- Plain language, short sentences, active voice.\n- No em-dashes. No participle clauses. No corporate buzzwords (game-changer, delve, landscape, in today's fast-paced world).\n- No emojis in the whole post.\n</style>\n\n<forbidden_patterns>\nAvoid negative parallelisms. Never use constructions like \"Not only... but...\" or \"It's not just about X, it's Y.\"\nWrong: \"It's not just about the beat riding under the vocals; it's part of the aggression and atmosphere. It's not merely a song, it's a statement.\"\nCorrect: \"The heavy beat adds to the aggressive tone.\"\n\nAvoid tailing negations. Never tack clipped negation fragments such as \"no guessing\" or \"not a motion\" onto the end of a sentence. Write a real clause instead.\nWrong: \"The options come from the selected item, not from guessing.\"\nCorrect: \"The options come from the selected item without forcing the user to guess.\"\n\nBreak the rule of three. Never list exactly three parallel items of any grammatical type in a series connected by commas: three nouns, three adjectives, three verb phrases, three clauses, or any other triad. This mechanical rhythm signals AI authorship. When you need to list, use one or two items maximum. If you have three or more pieces of information to convey, deliver the third as a separate sentence or absorb it into the surrounding prose.\nWrong: \"The rally that carried the S&P 500, Nasdaq, and Dow into 2026 has been long, narrow, and concentrated.\"\nCorrect: \"The rally that carried the S&P 500 into 2026 has been long and concentrated.\"\nWrong: \"So the central tension is set. Prices are high, breadth is narrow, and shocks keep arriving.\"\nCorrect: \"So the central tension is set as the prices keep climbing and shocks keep arriving.\"\n</forbidden_patterns>\n\n<output>\nReturn ONLY a raw JSON object. No markdown fences, no ```json wrapper, no commentary before or after. The response must start with { and end with }.\n\nThe object must contain exactly these three string fields and nothing else:\n\n{\n  \"headline\": \"Neutral one-line summary of the story, 40 to 60 characters, used internally for review, not part of the LinkedIn post\",\n  \"post\": \"The full LinkedIn post text, 1500 to 2500 characters, ending with 3 to 5 hashtags\",\n  \"image_query\": \"a 2-3 word query used to search Unsplash for the post visual. It must work as a wide 1.91:1 hero image on LinkedIn, so favour clean, uncluttered subjects with room around them. No location names, no brand names, keep it general enough that the query is guaranteed to return results.\"\n}\n\nJSON formatting rules:\n- Escape every line break inside \"post\" as \\n. A blank line between paragraphs is \\n\\n. Never put a raw line break inside a JSON string.\n- Escape any double quote inside the text as \\\".\n- Use straight quotes only, never typographic quotes, inside the JSON syntax.\n- Do not add any other fields, keys, or explanations.\n</output>",
+          "enableStreaming": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1180,
+        340
+      ],
+      "id": "f7d6a8e0-3d5e-4461-8a92-f60718293a4b",
+      "name": "Copy Composer",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-opus-4-8",
+          "cachedResultName": "Claude Opus 4.8"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        1112,
+        560
+      ],
+      "id": "a8e7b9f1-4e6f-4472-9ba3-0718293a4b5c",
+      "name": "Composer Brain",
+      "credentials": {
+        "anthropicApi": {
+          "id": "DrfiU3H1MN24MyeY",
+          "name": "Anthropic API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"headline\": \"Neutral one-line summary\",\n  \"post\": \"Full LinkedIn post\",\n  \"image_query\": \"query\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1288,
+        560
+      ],
+      "id": "b9f8c0a2-5f70-4483-acb4-18293a4b5c6d",
+      "name": "Composer Schema",
+      "retryOnFail": true,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "jsCode": "const sources = $('Source Text Normalizer').all().map(i => i.json);\nconst drafts = $input.all().map(i => i.json || {});\n\nreturn drafts.map((d, i) => {\n  const src = sources[i] || {};\n  const out = d.output || {};\n  const post = String(out.post || '').trim();\n\n  if (!post) {\n    throw new Error('Copy Composer returned an empty post for slot ' + (src.slot || (i + 1)));\n  }\n\n  return { json: {\n    slot: src.slot || (i + 1),\n    headline: String(out.headline || src.title || '').trim(),\n    post: post,\n    postLength: post.length,\n    imageQuery: String(out.image_query || '').trim() || 'business technology',\n    title: src.title || '',\n    link: src.link || '',\n    publication: src.publication || '',\n    pickReason: src.pickReason || '',\n  } };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        340
+      ],
+      "id": "c0a9d1b3-6081-4494-bdc5-293a4b5c6d7e",
+      "name": "Draft Packager"
+    },
+    {
+      "parameters": {
+        "url": "https://api.unsplash.com/search/photos",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $json.imageQuery || 'business technology' }}"
+            },
+            {
+              "name": "orientation",
+              "value": "landscape"
+            },
+            {
+              "name": "content_filter",
+              "value": "high"
+            },
+            {
+              "name": "per_page",
+              "value": "24"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Client-ID ooasoDgRd8F2oPNktYCxcqOG6UhpMIF8kkqg0jp-GRU"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept-Version",
+              "value": "v1"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1740,
+        340
+      ],
+      "id": "d1b0e2c4-7192-45a5-ced6-3a4b5c6d7e8f",
+      "name": "Stock Visual Lookup",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// LinkedIn single-image post: 1200 x 627 px, 1.91:1. Same ratio LinkedIn uses for the feed card.\nconst LI_WIDTH = 1200;\nconst LI_HEIGHT = 627;\nconst QUALITY = 80;\n\nconst drafts = $('Draft Packager').all().map(i => i.json);\nconst responses = $input.all().map(i => i.json || {});\n\nfunction linkedInCrop(rawUrl, w, h, q) {\n  const sep = rawUrl.includes('?') ? '&' : '?';\n  return rawUrl + sep\n    + 'fm=jpg&cs=srgb&auto=compress&fit=crop&crop=faces,entropy'\n    + '&w=' + w + '&h=' + h + '&q=' + q;\n}\n\nconst usedIds = new Set();\n\nreturn drafts.map((d, i) => {\n  const res = responses[i] || {};\n  const results = Array.isArray(res.results) ? res.results : [];\n\n  // Wide enough to crop to 1200x627 without upscaling, landscape, and not already used by another topic in this run\n  const clean = results.filter(p =>\n    p && p.id && p.urls && p.urls.raw && !usedIds.has(p.id)\n  );\n  const ideal = clean.filter(p =>\n    (p.width || 0) >= LI_WIDTH &&\n    (p.height || 0) >= LI_HEIGHT &&\n    (p.width || 0) >= (p.height || 0)\n  );\n\n  const photo = ideal[0] || clean[0] || null;\n\n  if (!photo) {\n    return { json: {\n      ...d,\n      hasVisual: false,\n      visualId: '',\n      visualUrl: '',\n      visualPreviewUrl: '',\n      visualAlt: '',\n      visualSpec: LI_WIDTH + 'x' + LI_HEIGHT,\n      visualCredit: '',\n      visualCreditUrl: '',\n      downloadLocation: '',\n    } };\n  }\n\n  usedIds.add(photo.id);\n\n  const author = (photo.user && photo.user.name) || 'Unsplash';\n  const authorUrl = (photo.user && photo.user.links && photo.user.links.html) || 'https://unsplash.com';\n  const utm = '?utm_source=n8n_clickup_bot&utm_medium=referral';\n\n  return { json: {\n    ...d,\n    hasVisual: true,\n    visualId: photo.id,\n    visualUrl: linkedInCrop(photo.urls.raw, LI_WIDTH, LI_HEIGHT, QUALITY),\n    visualPreviewUrl: linkedInCrop(photo.urls.raw, 600, Math.round(600 * LI_HEIGHT / LI_WIDTH), 70),\n    visualAlt: photo.alt_description || '',\n    visualSpec: LI_WIDTH + 'x' + LI_HEIGHT + ' px, 1.91:1, LinkedIn single-image post',\n    visualCredit: 'Photo by ' + author + ' on Unsplash',\n    visualCreditUrl: authorUrl + utm,\n    downloadLocation: (photo.links && photo.links.download_location) || '',\n  } };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1960,
+        340
+      ],
+      "id": "e2c1f3d5-82a3-46b6-df07-4b5c6d7e8f90",
+      "name": "Hero Visual Selector"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.downloadLocation || 'https://api.unsplash.com/photos' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Client-ID ooasoDgRd8F2oPNktYCxcqOG6UhpMIF8kkqg0jp-GRU"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2180,
+        340
+      ],
+      "id": "f3d2a4e6-93b4-47c7-e018-5c6d7e8f90a1",
+      "name": "Unsplash Attribution Ping",
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "onError": "continueRegularOutput",
+      "notes": "Required by Unsplash API terms"
+    },
+    {
+      "parameters": {
+        "jsCode": "const topics = $('Hero Visual Selector').all().map(i => i.json);\nconst total = topics.length;\n\nfunction clean(s) {\n  return String(s || '').split('[').join('').split(']').join('');\n}\n\nreturn topics.map((t, i) => {\n  const lines = [];\n\n  lines.push('**LinkedIn topic ' + (i + 1) + '/' + total + ': ' + clean(t.headline) + '**');\n  lines.push('');\n  lines.push('Source: ' + (t.publication || 'unknown source') + ' - ' + t.link);\n  if (t.pickReason) lines.push('Why this one: ' + t.pickReason);\n  lines.push('');\n\n  if (t.hasVisual) {\n    lines.push('![' + (clean(t.visualAlt) || clean(t.headline)) + '](' + t.visualUrl + ')');\n    lines.push('');\n    lines.push('Visual (' + t.visualSpec + '): ' + t.visualUrl);\n    lines.push(t.visualCredit + ' - ' + t.visualCreditUrl);\n  } else {\n    lines.push('No stock visual matched \"' + t.imageQuery + '\". Pick an image manually before posting.');\n  }\n\n  lines.push('');\n  lines.push('---');\n  lines.push('');\n  lines.push(t.post);\n  lines.push('');\n  lines.push('_' + t.postLength + ' characters_');\n\n  return { json: {\n    slot: t.slot,\n    position: i + 1,\n    total: total,\n    headline: t.headline,\n    title: t.title,\n    link: t.link,\n    visualUrl: t.visualUrl || '',\n    messageMarkdown: lines.join('\\n'),\n  } };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2400,
+        340
+      ],
+      "id": "a4e3b5f7-a4c5-48d8-f129-6d7e8f90a1b2",
+      "name": "Channel Payload Builder"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.clickup.com/api/v3/workspaces/YOUR_CLICKUP_WORKSPACE_ID/chat/channels/YOUR_CLICKUP_CHANNEL_ID/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "clickUpApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ type: 'message', content: $json.messageMarkdown, content_format: 'text/md' }) }}",
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2620,
+        340
+      ],
+      "id": "b5f4c6a8-b5d6-49e9-021a-7e8f90a1b2c3",
+      "name": "ClickUp Channel Dispatch",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "alwaysOutputData": true,
+      "notesInFlow": true,
+      "notes": "Replace WORKSPACE_ID and CHANNEL_ID in the URL"
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst now = Date.now();\nconst SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;\n\nconst batch = $('Hero Visual Selector').all().map(i => i.json);\n\nlet usedTopics = (sd.usedTopics || [])\n  .map(t => typeof t === 'string' ? { title: t, ts: now } : t)\n  .filter(t => t && t.title && (now - (t.ts || 0)) < SEVEN_DAYS);\n\nfor (const b of batch) {\n  if (b && b.title) usedTopics.push({ title: b.title, ts: now });\n}\n\nsd.usedTopics = usedTopics.slice(-60);\nsd.candidatePool = [];\nsd.currentBatch = null;\n\nreturn [{ json: {\n  deliveredTopics: batch.length,\n  withVisual: batch.filter(b => b && b.hasVisual).length,\n  topics: batch.map(b => ({\n    headline: b.headline,\n    title: b.title,\n    link: b.link,\n    visualUrl: b.visualUrl || null,\n  })),\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2840,
+        340
+      ],
+      "id": "c6a5d7b9-c6e7-40fa-132b-8f90a1b2c3d4",
+      "name": "Topic Ledger Writer"
+    }
+  ],
+  "connections": {
+    "Editorial Clock": {
+      "main": [
+        [
+          {
+            "node": "State Sweeper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "State Sweeper": {
+      "main": [
+        [
+          {
+            "node": "Growth Wire",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Venture Wire",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Cloud Product Wire",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Model Visibility Wire",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Growth Wire": {
+      "main": [
+        [
+          {
+            "node": "Wire Consolidator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Venture Wire": {
+      "main": [
+        [
+          {
+            "node": "Wire Consolidator",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Cloud Product Wire": {
+      "main": [
+        [
+          {
+            "node": "Wire Consolidator",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Model Visibility Wire": {
+      "main": [
+        [
+          {
+            "node": "Wire Consolidator",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Wire Consolidator": {
+      "main": [
+        [
+          {
+            "node": "Shortlist Builder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shortlist Builder": {
+      "main": [
+        [
+          {
+            "node": "Shortlist Not Empty?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shortlist Not Empty?": {
+      "main": [
+        [
+          {
+            "node": "Story Triage Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Idle Run Terminator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Triage Brain": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Story Triage Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Triage Schema": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Story Triage Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Story Triage Agent": {
+      "main": [
+        [
+          {
+            "node": "Trio Resolver",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trio Resolver": {
+      "main": [
+        [
+          {
+            "node": "Page Text Grabber",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Page Text Grabber": {
+      "main": [
+        [
+          {
+            "node": "Source Text Normalizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Source Text Normalizer": {
+      "main": [
+        [
+          {
+            "node": "Copy Composer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Composer Brain": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Copy Composer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Composer Schema": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Copy Composer",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy Composer": {
+      "main": [
+        [
+          {
+            "node": "Draft Packager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft Packager": {
+      "main": [
+        [
+          {
+            "node": "Stock Visual Lookup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stock Visual Lookup": {
+      "main": [
+        [
+          {
+            "node": "Hero Visual Selector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hero Visual Selector": {
+      "main": [
+        [
+          {
+            "node": "Unsplash Attribution Ping",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unsplash Attribution Ping": {
+      "main": [
+        [
+          {
+            "node": "Channel Payload Builder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Channel Payload Builder": {
+      "main": [
+        [
+          {
+            "node": "ClickUp Channel Dispatch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ClickUp Channel Dispatch": {
+      "main": [
+        [
+          {
+            "node": "Topic Ledger Writer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a6740e20b8df4b0f2232ee7d723b289903c7e14e81e1ddef83935bd01161123c"
+  }
+}
