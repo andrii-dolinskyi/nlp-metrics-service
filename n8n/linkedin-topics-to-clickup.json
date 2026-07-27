@@ -308,7 +308,8 @@
       "name": "Copy Composer",
       "retryOnFail": true,
       "maxTries": 5,
-      "waitBetweenTries": 2000
+      "waitBetweenTries": 2000,
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -352,7 +353,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const sources = $('Source Text Normalizer').all().map(i => i.json);\nconst drafts = $input.all().map(i => i.json || {});\n\nreturn drafts.map((d, i) => {\n  const src = sources[i] || {};\n  const out = d.output || {};\n  const post = String(out.post || '').trim();\n\n  if (!post) {\n    throw new Error('Copy Composer returned an empty post for slot ' + (src.slot || (i + 1)));\n  }\n\n  return { json: {\n    slot: src.slot || (i + 1),\n    headline: String(out.headline || src.title || '').trim(),\n    post: post,\n    postLength: post.length,\n    imageQuery: String(out.image_query || '').trim() || 'business technology',\n    title: src.title || '',\n    link: src.link || '',\n    publication: src.publication || '',\n    pickReason: src.pickReason || '',\n  } };\n});"
+        "jsCode": "const sources = $('Source Text Normalizer').all().map(i => i.json);\nconst drafts = $input.all().map(i => i.json || {});\n\nconst out = [];\nconst dropped = [];\n\n// One failed or empty draft must not take the rest of the batch down with it\ndrafts.forEach((d, i) => {\n  const src = sources[i] || {};\n  const res = d.output || {};\n  const post = String(res.post || '').trim();\n\n  if (d.error || !post) {\n    dropped.push(src.title || ('slot ' + (i + 1)));\n    return;\n  }\n\n  out.push({ json: {\n    slot: src.slot || (i + 1),\n    headline: String(res.headline || src.title || '').trim(),\n    post: post,\n    postLength: post.length,\n    imageQuery: String(res.image_query || '').trim() || 'business technology',\n    title: src.title || '',\n    link: src.link || '',\n    publication: src.publication || '',\n    pickReason: src.pickReason || '',\n  } });\n});\n\nif (!out.length) {\n  throw new Error('Copy Composer produced no usable posts. Dropped: ' + dropped.join(' | '));\n}\n\nreturn out;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -512,11 +513,12 @@
       "waitBetweenTries": 3000,
       "alwaysOutputData": true,
       "notesInFlow": true,
+      "onError": "continueRegularOutput",
       "notes": "Replace WORKSPACE_ID and CHANNEL_ID in the URL"
     },
     {
       "parameters": {
-        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst now = Date.now();\nconst SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;\n\nconst batch = $('Hero Visual Selector').all().map(i => i.json);\n\nlet usedTopics = (sd.usedTopics || [])\n  .map(t => typeof t === 'string' ? { title: t, ts: now } : t)\n  .filter(t => t && t.title && (now - (t.ts || 0)) < SEVEN_DAYS);\n\nfor (const b of batch) {\n  if (b && b.title) usedTopics.push({ title: b.title, ts: now });\n}\n\nsd.usedTopics = usedTopics.slice(-60);\nsd.candidatePool = [];\nsd.currentBatch = null;\n\nreturn [{ json: {\n  deliveredTopics: batch.length,\n  withVisual: batch.filter(b => b && b.hasVisual).length,\n  topics: batch.map(b => ({\n    headline: b.headline,\n    title: b.title,\n    link: b.link,\n    visualUrl: b.visualUrl || null,\n  })),\n} }];"
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst now = Date.now();\nconst SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;\n\nconst batch = $('Hero Visual Selector').all().map(i => i.json);\nconst dispatch = $input.all().map(i => i.json || {});\n\nlet usedTopics = (sd.usedTopics || [])\n  .map(t => typeof t === 'string' ? { title: t, ts: now } : t)\n  .filter(t => t && t.title && (now - (t.ts || 0)) < SEVEN_DAYS);\n\nconst sent = [];\nconst failed = [];\n\n// Only mark a topic as covered once ClickUp actually accepted it, so a failed\n// send comes back around on the next run instead of being silently burned\nbatch.forEach((b, i) => {\n  if (!b || !b.title) return;\n  const res = dispatch[i];\n  if (res && !res.error) {\n    usedTopics.push({ title: b.title, ts: now });\n    sent.push(b);\n  } else {\n    failed.push(b.title);\n  }\n});\n\nsd.usedTopics = usedTopics.slice(-60);\nsd.candidatePool = [];\nsd.currentBatch = null;\n\nreturn [{ json: {\n  deliveredTopics: sent.length,\n  failedTopics: failed,\n  withVisual: sent.filter(b => b.hasVisual).length,\n  topics: sent.map(b => ({\n    headline: b.headline,\n    title: b.title,\n    link: b.link,\n    visualUrl: b.visualUrl || null,\n  })),\n} }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
