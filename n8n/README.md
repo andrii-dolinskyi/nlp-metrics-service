@@ -62,6 +62,24 @@ and the FAQ fan-out**, per the research's industry-vs-solution table. Language s
 
 `POST /webhook/industry-solution-page`
 
+Two complete, ready-to-POST payloads live in `examples/`:
+
+| file | page type | language | route exercised |
+|---|---|---|---|
+| `examples/webhook-industry-page.json` | industry | English | `industry_en` — no DeepL |
+| `examples/webhook-solution-page.json` | solution | Spanish | `solution_lang` — full DeepL round trip |
+
+```bash
+curl -X POST https://<your-n8n>/webhook/industry-solution-page \
+  -H 'Content-Type: application/json' \
+  -d @n8n/examples/webhook-industry-page.json
+```
+
+The Spanish example has every human-written field in Spanish, which is how a localised request should
+arrive: the flow translates the brief to English for research and drafting, writes the page, then
+translates it back and re-cites it against Spanish-language sources. Structured proof comes back to you
+verbatim in `proofUsed` regardless of the round trip.
+
 ### Required
 
 | field | type | notes |

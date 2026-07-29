@@ -1,0 +1,147 @@
+{
+  "taskId": "task_01J8ZQ4M7XKD3P",
+  "brandId": "brand_chairside",
+  "userId": "user_amelia_ruiz",
+  "callback_url": "https://api.yourapp.com/webhooks/n8n",
+
+  "pageType": "industry",
+
+  "primaryKeyword": "practice management software for dental clinics",
+  "secondaryKeywords": "dental practice management system, dental clinic scheduling software, patient billing software for dentists, dental insurance verification software",
+  "targetLanguage": "English",
+
+  "industry": "dental clinics",
+  "industryRegulations": "HIPAA Privacy Rule and Security Rule, HITECH breach notification within 60 days, state dental board record-retention periods (commonly 7 years after last treatment, 7 years past age of majority for minors), CMS claim submission rules for state Medicaid dental programs, PCI DSS for card-present terminals at the front desk",
+  "industryJargon": "chair-time utilization, operatory, no-show rate, recall and recare, hygiene column, treatment plan acceptance rate, insurance eligibility check, real-time benefits verification, claim rejection, EOB posting, production per operatory, unscheduled treatment, block scheduling",
+
+  "clientName": "Chairside",
+  "clientUrl": "https://chairside.example.com",
+  "productCategory": "practice management software",
+  "productDescription": "Chairside is practice management software for independent and small-group dental clinics. Scheduling, patient recall, real-time insurance eligibility checks and patient billing all run off one patient record. It is used mainly by practices running 2 to 12 operatories, including multi-location groups that share a hygiene schedule across sites.",
+
+  "features": [
+    {
+      "name": "Real-time eligibility checks",
+      "description": "Runs a live benefits check against the payer when the appointment is booked and again 48 hours before, and flags plan changes on the schedule."
+    },
+    {
+      "name": "Automated recall and recare",
+      "description": "Tracks each patient's recare interval and sends reminders by SMS and email, with two-way replies that write straight back onto the schedule."
+    },
+    {
+      "name": "Waitlist auto-fill",
+      "description": "When an appointment cancels, the open slot is offered to waitlisted patients by SMS in priority order until one accepts."
+    },
+    {
+      "name": "Treatment plan presentation",
+      "description": "Builds a phased treatment plan with the patient's actual out-of-pocket cost after benefits, printable or sendable to the patient portal."
+    },
+    {
+      "name": "Claims and EOB posting",
+      "description": "Submits claims electronically through the clearinghouse and auto-posts EOB payments against the ledger, queueing only the exceptions for review."
+    },
+    {
+      "name": "Per-record access logging",
+      "description": "Logs every view and edit of a patient chart against the user and the reason, exportable as a HIPAA audit report."
+    }
+  ],
+  "integrations": "Dentrix, Open Dental, Eaglesoft, DentalXChange, Stripe, Twilio, QuickBooks Online, Google Calendar",
+  "pricingModel": "per operatory, from $149 per operatory per month with unlimited user seats, no per-claim fee",
+  "implementationTime": "14 days from signed contract to the first live appointment, including data migration and one training session",
+  "migrationNotes": "Direct import from Dentrix and Open Dental backups, carrying completed treatment history, ledgers, recall status and imaging pointers. Eaglesoft requires an exported CSV. Historical claims older than 24 months are archived read-only rather than migrated.",
+
+  "caseStudies": [
+    {
+      "title": "Northgate Dental cut no-shows in one quarter",
+      "client": "Northgate Dental",
+      "industry": "dental clinics",
+      "result": "No-show rate fell from 14% to 6% in the first quarter after switching on waitlist auto-fill",
+      "url": "https://chairside.example.com/customers/northgate-dental"
+    },
+    {
+      "title": "Ridgeway Family Dentistry recovered unbilled hygiene",
+      "client": "Ridgeway Family Dentistry",
+      "industry": "dental clinics",
+      "result": "Recovered $47,000 in unscheduled hygiene recare across three locations in six months",
+      "url": "https://chairside.example.com/customers/ridgeway"
+    }
+  ],
+  "clientLogos": [
+    { "name": "Northgate Dental", "industry": "dental clinics", "url": "https://chairside.example.com/logos/northgate.svg" },
+    { "name": "Ridgeway Family Dentistry", "industry": "dental clinics", "url": "https://chairside.example.com/logos/ridgeway.svg" },
+    { "name": "Coastline Dental Group", "industry": "dental clinics", "url": "https://chairside.example.com/logos/coastline.svg" },
+    { "name": "Fairmount Pediatric Dental", "industry": "pediatric dental", "url": "https://chairside.example.com/logos/fairmount.svg" }
+  ],
+  "certifications": [
+    "HIPAA compliant, third-party audited",
+    "SOC 2 Type II",
+    "PCI DSS Level 1"
+  ],
+  "clientMetrics": [
+    {
+      "metric": "no-show rate down from 14% to 6%",
+      "context": "Northgate Dental, first quarter after switching on waitlist auto-fill, 2025",
+      "source": "https://chairside.example.com/customers/northgate-dental"
+    },
+    {
+      "metric": "$47,000 in unscheduled hygiene recare recovered",
+      "context": "Ridgeway Family Dentistry, three locations over six months, 2025",
+      "source": "https://chairside.example.com/customers/ridgeway"
+    },
+    {
+      "metric": "claim rejection rate of 2.1% across the customer base",
+      "context": "Chairside platform average for the 12 months to March 2026, measured on first-pass submissions",
+      "source": "https://chairside.example.com/reports/claims-2026"
+    }
+  ],
+  "testimonials": [
+    {
+      "quote": "We stopped calling the insurer to check benefits. The check is already on the appointment when the patient walks in.",
+      "author": "Priya Raman",
+      "role": "Practice Manager",
+      "company": "Northgate Dental"
+    },
+    {
+      "quote": "The recare list used to be a spreadsheet somebody remembered to open. Now it fills the hygiene column by itself.",
+      "author": "Tom Alvarez",
+      "role": "Owner and DDS",
+      "company": "Ridgeway Family Dentistry"
+    }
+  ],
+
+  "primaryCta": {
+    "label": "Book a 20-minute walkthrough",
+    "url": "https://chairside.example.com/demo"
+  },
+  "secondaryCta": {
+    "label": "Download the no-show recovery checklist",
+    "url": "https://chairside.example.com/resources/no-show-checklist"
+  },
+  "frictionStrippers": "no credit card required, and we never ask for live patient data to run the demo",
+  "ctaRules": "Name Chairside explicitly in the closing CTA and tie it to the clinic's own schedule. Never promise a specific no-show reduction to a prospect, only report what named customers measured.",
+
+  "urlPath": "/industries/dental-clinics",
+  "breadcrumb": [
+    { "name": "Home", "url": "/" },
+    { "name": "Industries", "url": "/industries" }
+  ],
+  "faqSeeds": [
+    "Is Chairside HIPAA compliant?",
+    "How long does migration from Dentrix take?",
+    "Does it check insurance eligibility in real time?",
+    "How is it priced for a two-operatory practice?",
+    "Can it handle multiple locations on one hygiene schedule?",
+    "What happens to our old treatment history when we switch?"
+  ],
+  "writingPreferences": "Address the reader as \"you\" and assume they run or manage the practice. Say \"clinic\" rather than \"office\". Never use the word \"solution\" as a noun. Do not use the phrase \"dental professionals\".",
+  "whitelistDomains": [],
+  "blacklistDomains": [
+    "wikipedia.org",
+    "dentrix.com",
+    "opendental.com",
+    "patterson.com"
+  ],
+
+  "pineconeIndex": "chairside-prod",
+  "pineconeNamespace": "chairside-site"
+}
