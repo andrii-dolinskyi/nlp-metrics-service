@@ -62,12 +62,12 @@ and the FAQ fan-out**, per the research's industry-vs-solution table. Language s
 
 `POST /webhook/industry-solution-page`
 
-Two complete, ready-to-POST payloads live in `examples/`:
+Two complete, ready-to-POST payloads live in `examples/`, both English:
 
-| file | page type | language | route exercised |
-|---|---|---|---|
-| `examples/webhook-industry-page.json` | industry | English | `industry_en` — no DeepL |
-| `examples/webhook-solution-page.json` | solution | Spanish | `solution_lang` — full DeepL round trip |
+| file | page type | example |
+|---|---|---|
+| `examples/webhook-industry-page.json` | industry | `practice management software for dental clinics` |
+| `examples/webhook-solution-page.json` | solution | `software for incident management` |
 
 ```bash
 curl -X POST https://<your-n8n>/webhook/industry-solution-page \
@@ -75,10 +75,10 @@ curl -X POST https://<your-n8n>/webhook/industry-solution-page \
   -d @n8n/examples/webhook-industry-page.json
 ```
 
-The Spanish example has every human-written field in Spanish, which is how a localised request should
-arrive: the flow translates the brief to English for research and drafting, writes the page, then
-translates it back and re-cites it against Spanish-language sources. Structured proof comes back to you
-verbatim in `proofUsed` regardless of the round trip.
+To generate a localised page from either example, set `targetLanguage` to the language name
+(`"Spanish"`, `"German"`, ...) and write the human-authored fields in that language. The flow
+translates the brief to English for research and drafting, then translates the page back and re-cites
+it against target-language sources.
 
 ### Required
 

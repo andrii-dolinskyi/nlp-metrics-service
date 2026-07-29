@@ -6,133 +6,133 @@
 
   "pageType": "solution",
 
-  "primaryKeyword": "software para gestión de incidentes",
-  "secondaryKeywords": "plataforma de gestión de incidentes, respuesta a incidentes, rotación de guardias, postmortem de incidentes",
-  "targetLanguage": "Spanish",
+  "primaryKeyword": "software for incident management",
+  "secondaryKeywords": "incident management platform, incident response tooling, on-call rotation software, incident postmortem tool",
+  "targetLanguage": "English",
 
-  "useCase": "gestión de incidentes",
-  "jobToBeDone": "coordinar la respuesta cuando un servicio crítico se cae, desde que salta la alerta hasta que se cierra el postmortem, sin que el equipo tenga que improvisar en un canal de chat",
+  "useCase": "incident management",
+  "jobToBeDone": "coordinate the response when a critical service goes down, from the moment the alert fires to the moment the postmortem closes, without the team improvising in a chat channel",
   "adjacentTools": "Slack, Microsoft Teams, PagerDuty, Opsgenie, Jira, Datadog, Grafana, Prometheus, Statuspage",
 
   "clientName": "Guardia",
   "clientUrl": "https://guardia.example.com",
-  "productCategory": "plataforma de gestión de incidentes",
-  "productDescription": "Guardia es una plataforma de gestión de incidentes para equipos de ingeniería de entre 15 y 300 personas. Abre un canal dedicado en cuanto entra la alerta, asigna los roles de la respuesta, registra la cronología de forma automática y genera el borrador del postmortem con los datos que ya se han capturado. Se usa sobre todo en empresas que han superado la fase de responder incidentes a mano pero no quieren montar un proceso de nivel empresarial.",
+  "productCategory": "incident management platform",
+  "productDescription": "Guardia is an incident management platform for engineering teams of 15 to 300 people. It opens a dedicated channel the moment an alert arrives, assigns the response roles, records the timeline automatically and drafts the postmortem from what it already captured. It is used mostly by companies that have outgrown handling incidents by hand but do not want to stand up an enterprise-grade process.",
 
   "features": [
     {
-      "name": "Apertura automática del canal de incidente",
-      "description": "Al recibir la alerta crea el canal en Slack o Teams, invita a la guardia correspondiente y publica el contexto de la alerta como primer mensaje."
+      "name": "Automatic incident channel",
+      "description": "Creates the Slack or Teams channel when the alert arrives, pulls in whoever is on call and posts the alert context as the first message."
     },
     {
-      "name": "Asignación de roles de respuesta",
-      "description": "Reparte los roles de comandante del incidente, responsable de comunicación y de operaciones, y deja visible quién tiene cada uno durante toda la respuesta."
+      "name": "Response role assignment",
+      "description": "Assigns incident commander, communications lead and operations lead, and keeps who holds each role visible for the whole response."
     },
     {
-      "name": "Cronología automática",
-      "description": "Registra cada cambio de estado, cada despliegue y cada decisión marcada en el canal, con marca de tiempo, sin que nadie tenga que ir apuntándolo."
+      "name": "Automatic timeline",
+      "description": "Records every status change, deploy and flagged decision in the channel with a timestamp, without anyone having to take notes."
     },
     {
-      "name": "Página de estado y avisos a clientes",
-      "description": "Publica y actualiza la página de estado pública desde el propio canal del incidente, sin cambiar de herramienta."
+      "name": "Status page and customer updates",
+      "description": "Publishes and updates the public status page from inside the incident channel, without switching tools."
     },
     {
-      "name": "Borrador de postmortem",
-      "description": "Genera el borrador del postmortem a partir de la cronología registrada, con los tiempos de detección y de resolución ya calculados."
+      "name": "Postmortem draft",
+      "description": "Drafts the postmortem from the recorded timeline, with time-to-detect and time-to-resolve already calculated."
     },
     {
-      "name": "Rotación de guardias y escalado",
-      "description": "Gestiona el calendario de guardias, los relevos y el escalado por niveles cuando la primera persona no responde en el plazo definido."
+      "name": "On-call rotation and escalation",
+      "description": "Runs the on-call calendar, handovers and tiered escalation when the first responder does not acknowledge inside the set window."
     }
   ],
   "integrations": "Slack, Microsoft Teams, PagerDuty, Opsgenie, Jira, Linear, Datadog, Grafana, Prometheus, GitHub Actions, Statuspage",
-  "pricingModel": "por persona de guardia, desde 21 euros por responder al mes; los espectadores del canal no cuentan y no se factura por incidente",
-  "implementationTime": "una tarde para el primer incidente real: la conexión con Slack y con el proveedor de alertas tarda unos 30 minutos y el calendario de guardias se importa desde PagerDuty u Opsgenie",
-  "migrationNotes": "Importa calendarios de guardia, políticas de escalado y servicios desde PagerDuty y Opsgenie mediante API. El histórico de incidentes anteriores se puede cargar en modo lectura para conservar las métricas, pero no se reconstruyen las cronologías antiguas.",
+  "pricingModel": "per responder, from $24 per on-call responder per month, channel observers are free and there is no per-incident charge",
+  "implementationTime": "one afternoon to the first real incident: the Slack and alerting connections take about 30 minutes and the on-call calendar imports from PagerDuty or Opsgenie",
+  "migrationNotes": "Imports on-call calendars, escalation policies and services from PagerDuty and Opsgenie over API. Historical incidents can be loaded read-only to preserve metrics, but old timelines are not reconstructed.",
 
   "caseStudies": [
     {
-      "title": "Nubeo redujo el tiempo hasta la mitigación",
+      "title": "Nubeo cut time to mitigation",
       "client": "Nubeo",
-      "industry": "SaaS B2B",
-      "result": "El tiempo medio hasta la mitigación pasó de 47 a 19 minutos en cuatro meses",
-      "url": "https://guardia.example.com/clientes/nubeo"
+      "industry": "B2B SaaS",
+      "result": "Mean time to mitigation fell from 47 minutes to 19 minutes in four months",
+      "url": "https://guardia.example.com/customers/nubeo"
     },
     {
-      "title": "Cadena Retail Sur cerró el hueco de los postmortems",
+      "title": "Retail Sur closed the postmortem gap",
       "client": "Retail Sur",
-      "industry": "comercio electrónico",
-      "result": "El 92% de los incidentes graves cierran postmortem en menos de cinco días, frente al 40% anterior",
-      "url": "https://guardia.example.com/clientes/retail-sur"
+      "industry": "ecommerce",
+      "result": "92% of severe incidents close a postmortem within five days, up from 40%",
+      "url": "https://guardia.example.com/customers/retail-sur"
     }
   ],
   "clientLogos": [
-    { "name": "Nubeo", "industry": "SaaS B2B", "url": "https://guardia.example.com/logos/nubeo.svg" },
-    { "name": "Retail Sur", "industry": "comercio electrónico", "url": "https://guardia.example.com/logos/retail-sur.svg" },
+    { "name": "Nubeo", "industry": "B2B SaaS", "url": "https://guardia.example.com/logos/nubeo.svg" },
+    { "name": "Retail Sur", "industry": "ecommerce", "url": "https://guardia.example.com/logos/retail-sur.svg" },
     { "name": "Finteca", "industry": "fintech", "url": "https://guardia.example.com/logos/finteca.svg" }
   ],
   "certifications": [
     "ISO/IEC 27001",
     "SOC 2 Type II",
-    "Conformidad con el RGPD, datos alojados en la UE"
+    "GDPR compliant, data hosted in the EU"
   ],
   "clientMetrics": [
     {
-      "metric": "tiempo medio hasta la mitigación de 47 a 19 minutos",
-      "context": "Nubeo, cuatro meses tras la implantación, 2025",
-      "source": "https://guardia.example.com/clientes/nubeo"
+      "metric": "mean time to mitigation from 47 to 19 minutes",
+      "context": "Nubeo, four months after rollout, 2025",
+      "source": "https://guardia.example.com/customers/nubeo"
     },
     {
-      "metric": "92% de los incidentes graves con postmortem cerrado en menos de cinco días",
-      "context": "Retail Sur, segundo semestre de 2025, frente al 40% del año anterior",
-      "source": "https://guardia.example.com/clientes/retail-sur"
+      "metric": "92% of severe incidents with a postmortem closed within five days",
+      "context": "Retail Sur, second half of 2025, up from 40% the year before",
+      "source": "https://guardia.example.com/customers/retail-sur"
     },
     {
-      "metric": "31 minutos de media recuperados por incidente en tareas de coordinación manual",
-      "context": "Media de la plataforma Guardia sobre 4.100 incidentes registrados en 2025",
-      "source": "https://guardia.example.com/informes/coordinacion-2025"
+      "metric": "31 minutes per incident recovered from manual coordination work",
+      "context": "Guardia platform average across 4,100 incidents recorded in 2025",
+      "source": "https://guardia.example.com/reports/coordination-2025"
     }
   ],
   "testimonials": [
     {
-      "quote": "Antes el primer cuarto de hora se iba en averiguar quién estaba al mando. Ahora eso ya está decidido cuando entras al canal.",
-      "author": "Elena Sáez",
-      "role": "Responsable de Fiabilidad",
+      "quote": "The first fifteen minutes used to go on working out who was running it. Now that is already decided when you join the channel.",
+      "author": "Elena Saez",
+      "role": "Reliability Lead",
       "company": "Nubeo"
     },
     {
-      "quote": "El postmortem se escribe solo con lo que ya pasó en el canal. Dejamos de discutir la cronología.",
-      "author": "Iván Torres",
-      "role": "Jefe de Plataforma",
+      "quote": "The postmortem writes itself from what already happened in the channel. We stopped arguing about the timeline.",
+      "author": "Ivan Torres",
+      "role": "Head of Platform",
       "company": "Retail Sur"
     }
   ],
 
   "primaryCta": {
-    "label": "Solicita una demostración de 20 minutos",
+    "label": "Book a 20-minute walkthrough",
     "url": "https://guardia.example.com/demo"
   },
   "secondaryCta": {
-    "label": "Descarga la plantilla de postmortem",
-    "url": "https://guardia.example.com/recursos/plantilla-postmortem"
+    "label": "Download the postmortem template",
+    "url": "https://guardia.example.com/resources/postmortem-template"
   },
-  "frictionStrippers": "sin tarjeta de crédito y sin conectar producción para la prueba",
-  "ctaRules": "Menciona Guardia de forma explícita en la llamada a la acción final y enlázala con el flujo de trabajo del lector. No prometas una reducción concreta del tiempo de resolución: cita solo lo que han medido clientes con nombre.",
+  "frictionStrippers": "no credit card required and no production access needed for the trial",
+  "ctaRules": "Name Guardia explicitly in the closing CTA and tie it to the reader's own on-call rotation. Never promise a specific reduction in resolution time, only report what named customers measured.",
 
-  "urlPath": "/soluciones/gestion-de-incidentes",
+  "urlPath": "/solutions/incident-management",
   "breadcrumb": [
-    { "name": "Inicio", "url": "/" },
-    { "name": "Soluciones", "url": "/soluciones" }
+    { "name": "Home", "url": "/" },
+    { "name": "Solutions", "url": "/solutions" }
   ],
   "faqSeeds": [
-    "¿Cómo funciona exactamente Guardia durante un incidente?",
-    "¿Cuánto se tarda en ponerlo en marcha?",
-    "¿Se puede migrar la rotación de guardias desde PagerDuty?",
-    "¿Sustituye a PagerDuty o se usa junto a él?",
-    "¿Qué pasa si el incidente empieza fuera de una alerta automática?",
-    "¿Cómo se factura si tenemos muchas personas mirando el canal?"
+    "How does Guardia actually work during an incident?",
+    "How long does it take to set up?",
+    "Can we migrate our on-call rotation from PagerDuty?",
+    "Does it replace PagerDuty or run alongside it?",
+    "What happens when an incident starts without an automated alert?",
+    "How are we billed if a lot of people are watching the channel?"
   ],
-  "writingPreferences": "Trata al lector de tú. Dirígete a quien está de guardia, no a la dirección. No uses \"solución\" como sustantivo. Evita anglicismos cuando exista el término en español, salvo \"postmortem\" y \"on-call\", que el sector usa así.",
+  "writingPreferences": "Address the reader as \"you\" and write to the person who is on call, not to their director. Never use \"solution\" as a noun. Do not use the phrase \"engineering leaders\".",
   "whitelistDomains": [],
   "blacklistDomains": [
     "wikipedia.org",
@@ -141,5 +141,5 @@
   ],
 
   "pineconeIndex": "guardia-prod",
-  "pineconeNamespace": "guardia-sitio"
+  "pineconeNamespace": "guardia-site"
 }
