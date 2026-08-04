@@ -1,34 +1,37 @@
-# Page Maker 1.0 — Industry & Solution Pages
+# Page Maker — Industry & Solution Pages
 
-`page-maker-industry-solution.json` — a single n8n workflow that generates both **industry pages**
-(`[category] for [industry]`) and **solution pages** (`[category] for [use case/job]`). The page type is a
-webhook field and the branching happens inside the flow, so there is one workflow to maintain, not two.
+`page-maker-industry-solution.json` — one n8n workflow that writes the body text for **industry pages**
+and **solution pages**. `pageType` in the webhook is the switch; the branching happens inside the flow.
 
-Built from scratch against the *Industry & Solutions Pages (SEO + GEO)* research. It reuses the article
-flow's architecture — execution-context logging, DeepL round trip, parallel style scanners, Pinecone
-internal linking, the STRAPI converter — but every prompt, gate and threshold is page-specific.
+It is deliberately the article flow with a different subject. Same node names, same order, same DeepL
+round trip, same parallel style scanners, same Pinecone internal linking, same STRAPI converter. What
+changed is what the outliner researches, what the writer is told to put in each section, and the fact
+that the H1 arrives from the webhook instead of being written.
 
-77 nodes. Import into n8n and the credential references resolve against the existing article-flow credentials.
+**Text only.** The output is the page copy: H1, an opening answer, and the body sections. No layout, no
+CTA button objects, no schema, no image direction.
+
+74 nodes. Import into n8n and the credential references resolve against the existing article-flow credentials.
 
 ---
 
-## Flow at a glance
+## Flow
 
 ```
 Party Starter (webhook)
-  └─ request-parser ──┬─ Execution Data ─ Send Execution Data          (callback: /execution-started)
+  └─ request-parser ──┬─ Execution Data ─ Send Execution Data       (callback: /execution-started)
                       └─ Init Execution Context ─ Save to Sheet ─ Restore
-                           └─ Route Classifier          industry|solution × en|lang  →  4 routes
-                                └─ Brief Parser         DeepL codes, country, domain lists, proof inventory
-                                     └─ Translate Inputs?  ─(lang)→ DeepL Prep ─ Translate Inputs ─┐
-                                          └────────────────────────────────────────── Brief EN ────┘
-                                               └─ Prep Page Architect ─ Page Architect   (+ Vertical Researcher)
-                                                    └─ Blueprint Cleanser
-                                                         └─ Prep Writer ─ Page Writer    (+ Researcher)
-                                                              └─ 6 parallel style scanners
+                           └─ Route Classifier      industry|solution × en|lang → 4 routes
+                                └─ Brief Parser
+                                     └─ Translate Inputs? ─(lang)→ DeepL Prep ─ Translate Inputs ─┐
+                                          └───────────────────────────────────────── Brief EN ────┘
+                                               └─ Prep Outline ─ Outliner            (+ Internet)
+                                                    └─ Outline Cleanser
+                                                         └─ Prep Writer ─ Writer     (+ Researcher)
+                                                              └─ 5 parallel peelers
                                                                    └─ Feedback Merger ─ Stabilizer
                                                                         └─ Prep Update ─ Style Updater
-                                                                             └─ Localize?  ─(lang)→ Links Remover
+                                                                             └─ Localize? ─(lang)→ Links Remover
                                                                                   ─ Translation Prep ─ Translate Page
                                                                                   ─ Unwrapper ─ Page Researcher
                                                                                        └─ Page Ready
@@ -38,13 +41,10 @@ Party Starter (webhook)
                                                                                                            └─ Final Page
                                                                                                                 ├─ Text Cleaner ─ STRAPI Converter ─┐
                                                                                                                 └─ Prep Meta ─ Meta Lang? ─ DeepL   │
-                                                                                                                     ─ Metadata Generator            │
-                                                                                                                     ─ Schema Builder ───────────────┤
-                                                                                                                                        Final Merger ┘
+                                                                                                                     ─ Metadata Generator ──────────┤
+                                                                                                                                        Final Merger┘
                                                                                                                                              └─ Send Page  (callback: /page)
 ```
-
-### The four routes
 
 | route | page type | language | behaviour |
 |---|---|---|---|
@@ -53,8 +53,10 @@ Party Starter (webhook)
 | `solution_en` | solution | English | no DeepL |
 | `solution_lang` | solution | other | brief → EN, page → target, re-cited in target |
 
-Page type switches the **research plan, the burden of proof, the pain-point framing, the proof framing
-and the FAQ fan-out**, per the research's industry-vs-solution table. Language switches the DeepL legs.
+`pageType` changes what the Outliner researches and what burden of proof the page carries. An industry
+page has to show the client knows the vertical's regulations, workflow and vocabulary. A solution page
+has to show the client knows the job to be done: the workflow, the before and after, the tools around
+it. That difference runs through the pain points, the proof and the FAQ focus.
 
 ---
 
@@ -62,12 +64,8 @@ and the FAQ fan-out**, per the research's industry-vs-solution table. Language s
 
 `POST /webhook/industry-solution-page`
 
-Two complete, ready-to-POST payloads live in `examples/`, both English:
-
-| file | page type | example |
-|---|---|---|
-| `examples/webhook-industry-page.json` | industry | `practice management software for dental clinics` |
-| `examples/webhook-solution-page.json` | solution | `software for incident management` |
+Ready-to-POST examples, both English: `examples/webhook-industry-page.json`,
+`examples/webhook-solution-page.json`.
 
 ```bash
 curl -X POST https://<your-n8n>/webhook/industry-solution-page \
@@ -75,99 +73,61 @@ curl -X POST https://<your-n8n>/webhook/industry-solution-page \
   -d @n8n/examples/webhook-industry-page.json
 ```
 
-To generate a localised page from either example, set `targetLanguage` to the language name
-(`"Spanish"`, `"German"`, ...) and write the human-authored fields in that language. The flow
-translates the brief to English for research and drafting, then translates the page back and re-cites
-it against target-language sources.
-
-### Required
-
-| field | type | notes |
-|---|---|---|
-| `pageType` | `"industry" \| "solution"` | the master switch. Anything else throws. |
-| `primaryKeyword` | string | one intent per page. `[category] for [industry]` or `[category] for [use case]`. |
-| `clientName` | string | proof, CTA and quick-answer blocks can't be written without it. |
-| `industry` | string | **required when `pageType: "industry"`** — e.g. `"law firms"`. |
-| `useCase` | string | **required when `pageType: "solution"`** — e.g. `"appointment scheduling"`. |
-
-Each of these throws a descriptive error rather than producing a degraded page.
-
-### Everything else
-
 ```jsonc
 {
   "taskId": "", "brandId": "", "userId": "",
-  "callback_url": "https://api.example.com/hooks",
+  "callback_url": "https://api.yourapp.com/webhooks/n8n",
 
-  "pageType": "industry",
-  "primaryKeyword": "CRM for law firms",
-  "secondaryKeywords": "legal CRM, law firm client management",   // string or array, 3–6 recommended
-  "targetLanguage": "English",                                    // any DeepL-supported language name
+  "pageType": "industry",                    // REQUIRED — "industry" or "solution"
+  "h1": "Practice management software for dental clinics",   // REQUIRED — used verbatim, never rewritten
+  "coreKeyword": "practice management software for dental clinics",  // REQUIRED
+  "secondaryKeywords": "dental practice management system, dental clinic scheduling software",
+  "targetLanguage": "English",               // any DeepL-supported language name
 
-  // industry pages
-  "industry": "law firms",
-  "industryRegulations": "ABA Model Rule 1.6, state bar advertising rules",
-  "industryJargon": "billable-hour leakage, conflict checks, matter management",
+  "industry": "dental clinics",              // industry pages
+  "useCase": "incident management",          // solution pages
+  "contentIdea": "What the page should argue, in a sentence or three.",
 
-  // solution pages
-  "useCase": "appointment scheduling",
-  "jobToBeDone": "let clients book without phone tag",
-  "adjacentTools": "Google Calendar, Outlook, Zoom",
+  "clientName": "Chairside",
+  "productDescription": "What the client does. Put pricing, setup time and integrations here — the FAQ needs them.",
 
-  // client + product
-  "clientName": "Lexwork",
-  "clientUrl": "https://lexwork.example.com",
-  "productCategory": "CRM",
-  "productDescription": "Lexwork is a client relationship system for small and mid-size law firms.",
-  "features": [{ "name": "Conflict check engine", "description": "Screens new matters against client history." }],
-  "integrations": "Clio, QuickBooks, Outlook",
-  "pricingModel": "per-seat, from $59/user/month",
-  "implementationTime": "11 days",
-  "migrationNotes": "Imports from Clio and MyCase exports.",
+  "clientProof": "Free text. Client metrics with dates and source URLs, customer names, testimonials.",
+  "certifications": "HIPAA compliant (third-party audited), SOC 2 Type II, PCI DSS Level 1",
 
-  // proof — client-supplied only, never invented (see below)
-  "caseStudies":   [{ "title": "", "client": "", "industry": "", "result": "", "url": "" }],
-  "clientLogos":   [{ "name": "", "industry": "", "url": "" }],
-  "certifications": ["SOC 2 Type II", "GDPR"],
-  "clientMetrics": [{ "metric": "40% faster client intake", "context": "Barrett & Cole, 2024", "source": "https://..." }],
-  "testimonials":  [{ "quote": "", "author": "", "role": "", "company": "" }],
+  "ctaRules": "How the closing CTA should behave.",
+  "writingPreferences": "Custom rules. These override the built-in writing rules where they conflict.",
 
-  // conversion
-  "primaryCta":   { "label": "Book a 20-minute walkthrough", "url": "https://..." },
-  "secondaryCta": { "label": "Download the checklist", "url": "https://..." },
-  "frictionStrippers": "no credit card required",
-  "ctaRules": "Always name the client explicitly in the closing CTA.",
+  "whitelistDomains": [],
+  "blacklistDomains": ["wikipedia.org"],
 
-  // page + seo scaffolding
-  "urlPath": "/industries/law-firms",
-  "breadcrumb": [{ "name": "Home", "url": "/" }, { "name": "Industries", "url": "/industries" }],
-  "faqSeeds": ["Is X compliant with attorney-client confidentiality requirements?"],
-  "writingPreferences": "Refer to the reader as \"you\".",
-  "whitelistDomains": [], "blacklistDomains": ["competitor.com"],
-
-  // internal linking
-  "pineconeIndex": "lexwork-index",
-  "pineconeNamespace": "lexwork"
+  "pineconeIndex": "chairside-prod",
+  "pineconeNamespace": "chairside-site"
 }
 ```
 
-**Why these fields.** `pricingModel`, `implementationTime`, `migrationNotes` and `integrations` exist
-because the research names those five fan-out sub-questions (compliance, pricing, integrations,
-migration, implementation) as what the FAQ block must cover. `faqSeeds` carries real phrasings from
-People Also Ask, sales calls and support chats — the research is explicit that FAQ wording should be
-lifted from how buyers actually ask, not invented. `industryJargon` and `industryRegulations` seed the
-vocabulary research so pain points land in the buyer's own language.
+Only three fields are required: `pageType`, `h1`, `coreKeyword`. Each throws a descriptive error rather
+than producing a degraded page. Everything else degrades gracefully — an unsupplied field reaches the
+prompts as `not supplied` rather than as an empty string the model might paper over.
 
-### The proof contract
+### The H1 is never touched
 
-Proof is the one place the flow refuses to be creative. Client results come **only** from
-`caseStudies`, `clientLogos`, `certifications`, `clientMetrics` and `testimonials`. The architect prompt,
-the writer prompt and the citation prompt each forbid inventing a customer, a logo or a number, and the
-`Promo Peeler` flags any unsourced statistic that slips through.
+It goes into the webhook and comes out on the page byte-identical. The Outliner is told not to plan one,
+the Writer is told to reproduce it exactly, and on localised routes the `Unwrapper` restores the client's
+original string after DeepL round-trips it. `Page Ready` re-asserts it a second time, and the SEO applier
+is given it as a locked value. Verified on all four routes, including a German run where DeepL translated
+the heading and the flow put it back.
 
-When a proof category is empty the block renders shorter rather than padded — no industry-stat
-substitution, since that wasn't selected. Client metrics are quoted verbatim: the style editor and the
-SEO applier are both forbidden from rounding or reframing a number.
+### The proof rule
+
+`clientProof` and `certifications` are the only sources the page may use for a customer name, a metric or
+a case study. The Outliner, the Writer and the citation agent are each told never to invent one, and the
+citation agent is told to leave client results unlinked because they came from the client rather than a
+publisher. If `clientProof` is empty, the proof section is written from certifications alone and stays
+short rather than padding with invented specifics.
+
+Put pricing, setup time, integrations and migration notes into `productDescription`. The FAQ section is
+required to answer those five buyer questions — compliance, pricing model, integrations, switching, and
+setup time — and it can only answer them from what you supply.
 
 ---
 
@@ -181,144 +141,80 @@ SEO applier are both forbidden from rounding or reframing a number.
 
   "pageType": "industry",
   "targetLanguage": "English",
-  "industry": "law firms",
-  "useCase": "",
+  "h1": "Practice management software for dental clinics",
+  "coreKeyword": "practice management software for dental clinics",
+  "secondaryKeywords": "dental practice management system, ...",
 
-  "primaryKeyword": "CRM for law firms",
-  "secondaryKeywords": "legal CRM, law firm client management",
-  "keywordNote": {
-    "supplied": "CRM for law firms",
-    "architectConfirmed": "CRM for law firms",
-    "appliedToPage": "CRM for law firms",
-    "architectChangedIt": false
-  },
+  "slug": "practice-management-software-dental-clinics",
+  "metaTitle": "Practice management software for dental clinics",
+  "metaDescription": "See how practice management software for dental clinics keeps eligibility checks on the appointment...",
 
-  "slug": "crm-for-law-firms",
-  "metaTitle": "CRM for law firms built on the matter record",
-  "metaDescription": "See how a CRM for law firms keeps conflict checks on the matter record...",
-  "pageUrl": "https://lexwork.example.com/industries/law-firms",
-  "lastUpdated": "2026-07-29",
-
-  "pageText": { /* STRAPI rich-text tree — identical shape to the article flow */ },
-  "pageTextMd": "# CRM for law firms\n...",
-
-  "faq": [{ "question": "...", "answer": "..." }],
-  "schemaJsonLd": { "@context": "https://schema.org", "@graph": [ /* Organization, Service, BreadcrumbList, FAQPage */ ] },
-
-  "cta": { "primary": {...}, "secondary": {...}, "frictionStrippers": "no credit card required" },
-  "proofUsed": { "caseStudies": [], "clientLogos": [], "certifications": [], "clientMetrics": [], "testimonials": [] },
+  "pageText":   { /* STRAPI rich-text tree — same shape the article flow sends */ },
+  "pageTextMd": "# Practice management software for dental clinics\n...",
 
   "seo": {
     "totalWords": 940,
-    "primaryKeywordCount": 9,
-    "primaryKeywordPercentage": 0.96,
-    "secondaryKeywords": [{ "keyword": "legal crm", "count": 3, "percentage": 0.32, "inHeading": true }],
+    "coreKeywordCount": 9,
+    "coreKeywordPercentage": 0.96,
+    "secondaryKeywords": [{ "keyword": "...", "count": 3, "percentage": 0.32, "inHeading": true }],
     "structural": { "coreInH1": true, "coreInAnyH2": true, "coreInFirst60": true, "anySecondaryInHeading": true, "h2Count": 5, "h3Count": 9 },
     "listsCount": 2
   }
 }
 ```
 
-`pageText` is produced by the same `STRAPI Converter` code as the article flow, unchanged, so it drops
-into the existing content type with no Strapi-side work.
-
-`keywordNote` surfaces a disagreement rather than hiding it: the architect is instructed to replace the
-client's internal naming with search-demand phrasing (the Miro "Mind Map" vs "Diagramming Module" case
-in the research). On English routes the correction is applied; on localised routes the client's own
-target-language keyword wins, because round-tripping a corrected English phrase through DeepL is more
-likely to hurt than help. Either way `architectChangedIt` tells you it happened.
+`pageText` comes out of the article flow's `STRAPI Converter`, unchanged, so it drops into the existing
+content type with no Strapi-side work.
 
 ---
 
-## How the research maps onto the flow
+## What the page contains
 
-| Research requirement | Where it lives |
-|---|---|
-| One intent = one page, BOFU over volume | `Prep Page Architect` scope rules |
-| Primary keyword from search demand, not internal naming | architect returns `confirmedPrimaryKeyword`; surfaced as `keywordNote` |
-| 1 primary + 3–6 secondary + 4–8 FAQ | blueprint schema, enforced by the structured output parser |
-| Hero: H1 = search pattern, subheadline = outcome not technology | writer block rules 1 |
-| Quick answer: 40–80 words, neutral, zero promo, AI-liftable | writer block rules 2 + template |
-| Pain points in the vertical's own vocabulary, 3–5, sourced | architect research plan → `verticalVocabulary` + `sourceUrl`; writer block rules 3 |
-| Solution mapping: feature → vertical outcome, buying-committee layering, product visual | `solutionMapping.audienceLayer` + `visualHint`; writer emits `Visual:` lines for design |
-| Proof same-vertical, quantified, adjacent to CTA | writer block rules 5 — proof block ends with the CTA sentence |
-| FAQ 4–8, ~40–60 words, answer-first, fan-out coverage | `fanoutCategory` in the blueprint; writer block rules 6 |
-| CTA repeated + lower-commitment alternative + friction strippers | writer block rules 7, fed from `primaryCta`/`secondaryCta`/`frictionStrippers` |
-| Internal links to siblings, case studies, blog | `Internal Linker` over Pinecone, prioritised in that order |
-| Schema stack: Organization + Service + FAQPage + BreadcrumbList in one graph | `Schema Builder` (deterministic code, no model) |
-| Visible "last updated" date | `lastUpdated` in the payload |
-| Answer-first everywhere | writer structural rule 1, per-block |
-| Paragraphs 2–3 sentences | writer structural rule 2 |
-| H2s as real questions | architect H2 rules |
-| Zero superlatives / promotional language | writer structural rule 4 **and** the `Promo Peeler` scanner |
-| Every statistic carries a named source | writer SEO rules; `Promo Peeler` criteria 7 flags unsourced numbers |
-| Specific and verifiable beats vague | writer structural rule 5, editor fix guidance |
-| Real differentiation per page | architect critical rule: "if two clients could swap this page, it failed" |
+The Outliner plans 5 H2s under the supplied H1, and the Writer fills them:
 
-### GEO expectation
+1. **Opening** (no H2). One outcome sentence, then a 40–80 word plain-language answer that stands alone
+   away from the page. Neutral, no links, no promotional wording.
+2. **Pain points.** One H3 per pain, 3–5 of them, in the reader's own vocabulary. Regulatory and
+   workflow pains on an industry page, process and task pains on a solution page.
+3. **What the client does about it.** One H3 per capability, each written as an outcome for this reader
+   and then the mechanism. Outcome and cost framing in the earlier H3s, workflow detail in the later ones.
+4. **Proof.** Client-supplied only, ending with the primary ask so proof sits next to the decision.
+5. **FAQ.** One H3 per question, 4–8 of them, 40–60 words each, answer first.
+6. **Closing CTA.** Primary ask plus a lower-commitment alternative.
 
-The research is blunt that these pages rarely earn direct AI citations — their GEO job is to be
-accurately machine-legible so engines describe the client correctly. That shaped three choices: the
-quick-answer block is written to stand alone away from the page, the schema graph is deterministic
-rather than model-generated, and the FAQ is parsed straight out of the rendered Markdown so
-`FAQPage` always matches what's actually on the page.
-
-The technical items the research lists that live **outside** this workflow, for whoever owns the CMS:
-server-rendered HTML including tab/accordion content, AI crawlers unblocked in `robots.txt` and CDN
-settings (Cloudflare blocks AI bots by default), and a 3–6 month refresh cycle against `lastUpdated`.
+Style is enforced twice: the writing rules live in the Writer's prompt, then five scanners run in
+parallel on the draft (`Ing Peeler`, `Three Rule Peeler`, `Hedging Peeler`, `Negative Parallelism`,
+`Tailing Negations`) and one editor applies every fix in a single pass. Same five as the article flow.
 
 ---
 
-## Style enforcement
+## Differences from the article flow
 
-Six scanners run in parallel on the draft, each returning verbatim offending sentences, then one editor
-applies every fix in a single pass:
+**Dropped:** the `SEO Route?` gate (both page types are keyword-led, so the SEO check always runs), the
+FAQ Writer agent (the FAQ is a page section, so the Writer produces it inline), the EEAT agent, and the
+whole evaluation branch.
 
-| scanner | catches |
-|---|---|
-| `Ing Peeler` | present-participle pile-ups, `including`/`depending on` tails |
-| `Three Rule Peeler` | three-or-more parallel series (15 grammatical types) — Markdown bullet lists exempt |
-| `Hedging Peeler` | modal/frequency/possibility/attribution hedges, intensifiers — real conditionals exempt |
-| `Negative Parallelism` | "not X, it's Y" constructions |
-| `Tailing Negations` | clipped negation fragments |
-| `Promo Peeler` | **new** — superlatives, hype adjectives, unverifiable trust claims, urgency tactics, imagined scenarios, technology-first claims, unsourced statistics |
+**Changed:** `articleTitle` became `h1` and is now locked end to end rather than being a suggestion. The
+outliner researches a vertical or a job instead of an audience. The SEO gate emits structured `edits`
+objects rather than pre-translated sentences, which removed ~30 hardcoded language blocks — the phrasing
+lives in the system prompt, which already goes through DeepL. Keyword bands are page-appropriate
+(core 0.6–1.8%, secondary 0.15–0.6%). Heading placement is reported but never auto-edited.
 
-`Promo Peeler` was added because the research names promotional language as a filtering trigger for AI
-models and an active conversion cost. Its scope exceptions keep it from flagging legitimate CTAs,
-named certifications and client-attributed metrics.
-
----
-
-## Deliberate differences from the article flow
-
-**Dropped.** All `Execute Article Progress` sub-workflow calls. The whole evaluation branch (`Eval Gate`,
-`Calculate Metrics`, `Calculate SEO Metrics`, `Rules Compliance Evaluation`, `Final Calculations`,
-`Evaluation Recorder`). The standalone `FAQ Writer` — the FAQ is a page block, so the writer produces it
-inline and `Schema Builder` parses it back out. The `EEAT Analysis` agent. The `SEO Route?` gate, since
-both page types are keyword-led and both need the check.
-
-**Kept.** Execution-context logging to Sheets with `retryOnFail`, the `/execution-started` callback with
-`onError: continueRegularOutput`, `retryOnFail`/`maxTries: 5`/`waitBetweenTries: 2000` on every agent,
-HTTP and parser node, `executeOnce` on the expensive legs, and the fail-fast validation throws in
-`request-parser`, `Brief Parser`, `Brief EN`, `Unwrapper` and `Blueprint Cleanser`.
-
-**Changed.** The SEO gate emits language-neutral structured `edits` objects (`action`, `keyword`,
-`currentCount`, `targetCount`, `diff`, `placement`) instead of pre-translated natural-language sentences.
-That removed ~30 hardcoded language blocks from the article flow's `SEO Check` — the phrasing now lives
-in the system prompt, which already goes through DeepL. Keyword density bands are page-appropriate
-(primary 0.6–1.8%, secondary 0.15–0.6%) rather than article-appropriate, and heading placement is
-reported but never auto-edited so the architect's outline survives intact.
+**Kept:** execution-context logging to Sheets with `retryOnFail`, the `/execution-started` callback with
+`onError: continueRegularOutput`, `retryOnFail` / `maxTries: 5` / `waitBetweenTries: 2000` on every
+agent, HTTP and parser node, `executeOnce` on the expensive legs, and fail-fast throws in
+`request-parser`, `Brief Parser`, `Brief EN`, `Outline Cleanser` and `Unwrapper`.
 
 ---
 
 ## Setup
 
-Credentials referenced by ID, matching the article flow: `main-sheet` (Google Sheets), `DeepL API`,
-`Tavily API`, `Pinecone API`, `Article Writing API` (OpenAI), `Anthropic API`, `Gemini API`.
+Credentials referenced by ID, matching the article flow: `main-sheet`, `DeepL API`, `Tavily API`,
+`Pinecone API`, `Article Writing API` (OpenAI), `Anthropic API`, `Gemini API`.
 
-Models: Claude Opus 4.8 drives the architect and the writer. Gemini 3.5 Flash leads the six scanners,
-the SEO edit finder and the metadata generator, with GPT as the configured fallback leg. GPT drives the
-style editor, the localised citation pass, the internal linker and the SEO applier.
+Claude Opus 4.8 drives the Outliner and the Writer. Gemini 3.5 Flash leads the five scanners, the SEO
+edit finder and the metadata generator, with GPT as the configured fallback leg. GPT drives the style
+editor, the localised citation pass, the internal linker and the SEO applier.
 
-The execution-context sheet needs a `pageType` column added alongside the existing article columns; the
-primary keyword is written into the existing `coreKeyword` column.
+The execution-context sheet needs a `pageType` column alongside the existing article columns; the core
+keyword writes into the existing `coreKeyword` column.

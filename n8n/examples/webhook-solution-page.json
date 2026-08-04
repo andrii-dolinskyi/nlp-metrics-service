@@ -6,139 +6,25 @@
 
   "pageType": "solution",
 
-  "primaryKeyword": "software for incident management",
-  "secondaryKeywords": "incident management platform, incident response tooling, on-call rotation software, incident postmortem tool",
+  "h1": "Incident management software for engineering teams",
+  "coreKeyword": "incident management software",
+  "secondaryKeywords": "incident response platform, on-call rotation software, incident postmortem tool",
   "targetLanguage": "English",
 
   "useCase": "incident management",
-  "jobToBeDone": "coordinate the response when a critical service goes down, from the moment the alert fires to the moment the postmortem closes, without the team improvising in a chat channel",
-  "adjacentTools": "Slack, Microsoft Teams, PagerDuty, Opsgenie, Jira, Datadog, Grafana, Prometheus, Statuspage",
+  "contentIdea": "Show that the expensive part of an incident is coordination, not diagnosis. The argument is that the first fifteen minutes go on working out who is running the response and where it is being run, and that fixing those two things shortens the whole incident without anyone debugging faster.",
 
   "clientName": "Guardia",
-  "clientUrl": "https://guardia.example.com",
-  "productCategory": "incident management platform",
-  "productDescription": "Guardia is an incident management platform for engineering teams of 15 to 300 people. It opens a dedicated channel the moment an alert arrives, assigns the response roles, records the timeline automatically and drafts the postmortem from what it already captured. It is used mostly by companies that have outgrown handling incidents by hand but do not want to stand up an enterprise-grade process.",
+  "productDescription": "Guardia is an incident management platform for engineering teams of 15 to 300 people. It opens a dedicated Slack or Teams channel the moment an alert arrives, assigns the incident commander and communications roles, records the timeline automatically and drafts the postmortem from what it captured. It also runs the on-call calendar, handovers and tiered escalation. Setup takes about half a day: the Slack and alerting connections take 30 minutes and the on-call calendar imports from PagerDuty or Opsgenie over API. Pricing is per responder from $24 per on-call responder per month, with free channel observers and no per-incident charge. It integrates with Slack, Microsoft Teams, PagerDuty, Opsgenie, Jira, Datadog, Grafana and Statuspage.",
 
-  "features": [
-    {
-      "name": "Automatic incident channel",
-      "description": "Creates the Slack or Teams channel when the alert arrives, pulls in whoever is on call and posts the alert context as the first message."
-    },
-    {
-      "name": "Response role assignment",
-      "description": "Assigns incident commander, communications lead and operations lead, and keeps who holds each role visible for the whole response."
-    },
-    {
-      "name": "Automatic timeline",
-      "description": "Records every status change, deploy and flagged decision in the channel with a timestamp, without anyone having to take notes."
-    },
-    {
-      "name": "Status page and customer updates",
-      "description": "Publishes and updates the public status page from inside the incident channel, without switching tools."
-    },
-    {
-      "name": "Postmortem draft",
-      "description": "Drafts the postmortem from the recorded timeline, with time-to-detect and time-to-resolve already calculated."
-    },
-    {
-      "name": "On-call rotation and escalation",
-      "description": "Runs the on-call calendar, handovers and tiered escalation when the first responder does not acknowledge inside the set window."
-    }
-  ],
-  "integrations": "Slack, Microsoft Teams, PagerDuty, Opsgenie, Jira, Linear, Datadog, Grafana, Prometheus, GitHub Actions, Statuspage",
-  "pricingModel": "per responder, from $24 per on-call responder per month, channel observers are free and there is no per-incident charge",
-  "implementationTime": "one afternoon to the first real incident: the Slack and alerting connections take about 30 minutes and the on-call calendar imports from PagerDuty or Opsgenie",
-  "migrationNotes": "Imports on-call calendars, escalation policies and services from PagerDuty and Opsgenie over API. Historical incidents can be loaded read-only to preserve metrics, but old timelines are not reconstructed.",
+  "clientProof": "Nubeo cut mean time to mitigation from 47 minutes to 19 minutes over four months (2025, https://guardia.example.com/customers/nubeo). Retail Sur now closes a postmortem within five days on 92% of severe incidents, up from 40% the year before (2025, https://guardia.example.com/customers/retail-sur). Platform average is 31 minutes per incident recovered from manual coordination work, across 4,100 incidents recorded in 2025. Customers include Nubeo, Retail Sur and Finteca. Elena Saez, Reliability Lead at Nubeo: \"The first fifteen minutes used to go on working out who was running it. Now that is already decided when you join the channel.\"",
+  "certifications": "ISO/IEC 27001, SOC 2 Type II, GDPR compliant with data hosted in the EU",
 
-  "caseStudies": [
-    {
-      "title": "Nubeo cut time to mitigation",
-      "client": "Nubeo",
-      "industry": "B2B SaaS",
-      "result": "Mean time to mitigation fell from 47 minutes to 19 minutes in four months",
-      "url": "https://guardia.example.com/customers/nubeo"
-    },
-    {
-      "title": "Retail Sur closed the postmortem gap",
-      "client": "Retail Sur",
-      "industry": "ecommerce",
-      "result": "92% of severe incidents close a postmortem within five days, up from 40%",
-      "url": "https://guardia.example.com/customers/retail-sur"
-    }
-  ],
-  "clientLogos": [
-    { "name": "Nubeo", "industry": "B2B SaaS", "url": "https://guardia.example.com/logos/nubeo.svg" },
-    { "name": "Retail Sur", "industry": "ecommerce", "url": "https://guardia.example.com/logos/retail-sur.svg" },
-    { "name": "Finteca", "industry": "fintech", "url": "https://guardia.example.com/logos/finteca.svg" }
-  ],
-  "certifications": [
-    "ISO/IEC 27001",
-    "SOC 2 Type II",
-    "GDPR compliant, data hosted in the EU"
-  ],
-  "clientMetrics": [
-    {
-      "metric": "mean time to mitigation from 47 to 19 minutes",
-      "context": "Nubeo, four months after rollout, 2025",
-      "source": "https://guardia.example.com/customers/nubeo"
-    },
-    {
-      "metric": "92% of severe incidents with a postmortem closed within five days",
-      "context": "Retail Sur, second half of 2025, up from 40% the year before",
-      "source": "https://guardia.example.com/customers/retail-sur"
-    },
-    {
-      "metric": "31 minutes per incident recovered from manual coordination work",
-      "context": "Guardia platform average across 4,100 incidents recorded in 2025",
-      "source": "https://guardia.example.com/reports/coordination-2025"
-    }
-  ],
-  "testimonials": [
-    {
-      "quote": "The first fifteen minutes used to go on working out who was running it. Now that is already decided when you join the channel.",
-      "author": "Elena Saez",
-      "role": "Reliability Lead",
-      "company": "Nubeo"
-    },
-    {
-      "quote": "The postmortem writes itself from what already happened in the channel. We stopped arguing about the timeline.",
-      "author": "Ivan Torres",
-      "role": "Head of Platform",
-      "company": "Retail Sur"
-    }
-  ],
-
-  "primaryCta": {
-    "label": "Book a 20-minute walkthrough",
-    "url": "https://guardia.example.com/demo"
-  },
-  "secondaryCta": {
-    "label": "Download the postmortem template",
-    "url": "https://guardia.example.com/resources/postmortem-template"
-  },
-  "frictionStrippers": "no credit card required and no production access needed for the trial",
-  "ctaRules": "Name Guardia explicitly in the closing CTA and tie it to the reader's own on-call rotation. Never promise a specific reduction in resolution time, only report what named customers measured.",
-
-  "urlPath": "/solutions/incident-management",
-  "breadcrumb": [
-    { "name": "Home", "url": "/" },
-    { "name": "Solutions", "url": "/solutions" }
-  ],
-  "faqSeeds": [
-    "How does Guardia actually work during an incident?",
-    "How long does it take to set up?",
-    "Can we migrate our on-call rotation from PagerDuty?",
-    "Does it replace PagerDuty or run alongside it?",
-    "What happens when an incident starts without an automated alert?",
-    "How are we billed if a lot of people are watching the channel?"
-  ],
+  "ctaRules": "Name Guardia explicitly in the closing CTA and tie it to the reader's own on-call rotation. Offer the postmortem template as the lower-commitment option. Never promise a specific reduction in resolution time, only report what named customers measured.",
   "writingPreferences": "Address the reader as \"you\" and write to the person who is on call, not to their director. Never use \"solution\" as a noun. Do not use the phrase \"engineering leaders\".",
+
   "whitelistDomains": [],
-  "blacklistDomains": [
-    "wikipedia.org",
-    "pagerduty.com",
-    "atlassian.com"
-  ],
+  "blacklistDomains": ["wikipedia.org", "pagerduty.com", "atlassian.com"],
 
   "pineconeIndex": "guardia-prod",
   "pineconeNamespace": "guardia-site"
