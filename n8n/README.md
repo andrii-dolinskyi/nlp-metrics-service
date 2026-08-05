@@ -12,7 +12,7 @@ one pass.
 **Text only.** The output is the page copy: H1, an opening answer, and the body sections. No layout, no
 CTA button objects, no schema, no image direction.
 
-69 nodes. Import into n8n and the credential references resolve against the existing article-flow credentials.
+70 nodes. Import into n8n and the credential references resolve against the existing article-flow credentials.
 
 ---
 
@@ -32,7 +32,7 @@ Party Starter (webhook)
                                                                         └─ Prep Update ─ Style Updater
                                                                              └─ Localize? ─(lang)→ Links Remover
                                                                                   ─ Translation Prep ─ Translate Page
-                                                                                  ─ Unwrapper ─ Page Researcher
+                                                                                  ─ Unwrapper ─ Cite? ─(research on)→ Page Researcher
                                                                                        └─ Page Ready
                                                                                             └─ Internal Linker (Pinecone)
                                                                                                  └─ SEO Check ─ SEO OK?
@@ -133,9 +133,14 @@ information does not support a section, it writes that section shorter rather th
 
 The Researcher tool node stays wired in both cases, because n8n cannot detach a tool conditionally. When
 research is off its description is replaced with an explicit instruction not to call it, which combined
-with the system-prompt block is what enforces the mode. Worth knowing: that is prompt-level enforcement
-rather than a hard block, so a determined model could still call it. If you want a guaranteed hard stop,
-say so and I will split the Writer into two nodes behind an IF.
+with the system-prompt block is what enforces the mode at the Writer. That much is prompt-level
+enforcement, so a determined model could still call it. If you want a guaranteed hard stop there, say so
+and I will split the Writer into two nodes behind an IF.
+
+On localised routes the citation pass **is** hard-gated. A `Cite?` IF sits between `Unwrapper` and
+`Page Researcher`, so with research off the citation agent never runs at all and the page reaches
+`Page Ready` straight from the translation. Without that gate the flow would translate the page, then
+send the citation agent to add external links the run was never supposed to have.
 
 ### The proof rule
 
