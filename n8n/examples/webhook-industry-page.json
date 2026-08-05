@@ -2,13 +2,13 @@
   "taskId": "task_01J8ZQ4M7XKD3P",
   "brandId": "brand_chairside",
   "userId": "user_amelia_ruiz",
-  "callback_url": "https://api.yourapp.com/webhooks/n8n",
+  "callback_url": "https://backend-production.snoika.com/n8n/webhook",
 
   "pageType": "industry",
 
   "h1": "Practice management software for dental clinics",
   "coreKeyword": "practice management software for dental clinics",
-  "secondaryKeywords": "dental practice management system, dental clinic scheduling software, patient billing software for dentists",
+  "secondaryKeywords": "dental practice management system, dental clinic scheduling software",
   "targetLanguage": "English",
 
   "industry": "dental clinics",
@@ -20,12 +20,13 @@
   "clientProof": "Northgate Dental cut its no-show rate from 14% to 6% in the first quarter after switching on waitlist auto-fill (2025, https://chairside.example.com/customers/northgate-dental). Ridgeway Family Dentistry recovered $47,000 in unscheduled hygiene recare across three locations in six months (2025, https://chairside.example.com/customers/ridgeway). Platform-wide first-pass claim rejection rate is 2.1% for the 12 months to March 2026. Customers include Northgate Dental, Ridgeway Family Dentistry, Coastline Dental Group and Fairmount Pediatric Dental. Priya Raman, Practice Manager at Northgate Dental: \"We stopped calling the insurer to check benefits. The check is already on the appointment when the patient walks in.\"",
   "certifications": "HIPAA compliant (third-party audited), SOC 2 Type II, PCI DSS Level 1",
 
-  "ctaRules": "Name Chairside explicitly in the closing CTA and tie it to the clinic's own schedule. Offer the no-show recovery checklist as the lower-commitment option. Never promise a specific no-show reduction to a prospect, only report what named customers measured.",
   "writingPreferences": "Address the reader as \"you\" and assume they run or manage the practice. Say \"clinic\" rather than \"office\". Never use the word \"solution\" as a noun. Do not use the phrase \"dental professionals\".",
 
-  "whitelistDomains": [],
-  "blacklistDomains": ["wikipedia.org", "dentrix.com", "opendental.com", "patterson.com"],
+  "researchEnabled": false,
 
-  "pineconeIndex": "chairside-prod",
-  "pineconeNamespace": "chairside-site"
+  "whitelistDomains": [],
+  "blacklistDomains": ["wikipedia.org", "dentrix.com", "opendental.com"],
+
+  "pineconeIndex": "snoika",
+  "pineconeNamespace": "snoika-internal-linking"
 }

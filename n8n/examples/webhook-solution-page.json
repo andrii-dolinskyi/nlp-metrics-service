@@ -2,16 +2,15 @@
   "taskId": "task_01J8ZR2P4NVB7Q",
   "brandId": "brand_guardia",
   "userId": "user_marcos_delgado",
-  "callback_url": "https://api.yourapp.com/webhooks/n8n",
+  "callback_url": "https://backend-production.snoika.com/n8n/webhook",
 
   "pageType": "solution",
 
   "h1": "Incident management software for engineering teams",
   "coreKeyword": "incident management software",
-  "secondaryKeywords": "incident response platform, on-call rotation software, incident postmortem tool",
+  "secondaryKeywords": "incident response platform, incident postmortem tool",
   "targetLanguage": "English",
 
-  "useCase": "incident management",
   "contentIdea": "Show that the expensive part of an incident is coordination, not diagnosis. The argument is that the first fifteen minutes go on working out who is running the response and where it is being run, and that fixing those two things shortens the whole incident without anyone debugging faster.",
 
   "clientName": "Guardia",
@@ -20,12 +19,13 @@
   "clientProof": "Nubeo cut mean time to mitigation from 47 minutes to 19 minutes over four months (2025, https://guardia.example.com/customers/nubeo). Retail Sur now closes a postmortem within five days on 92% of severe incidents, up from 40% the year before (2025, https://guardia.example.com/customers/retail-sur). Platform average is 31 minutes per incident recovered from manual coordination work, across 4,100 incidents recorded in 2025. Customers include Nubeo, Retail Sur and Finteca. Elena Saez, Reliability Lead at Nubeo: \"The first fifteen minutes used to go on working out who was running it. Now that is already decided when you join the channel.\"",
   "certifications": "ISO/IEC 27001, SOC 2 Type II, GDPR compliant with data hosted in the EU",
 
-  "ctaRules": "Name Guardia explicitly in the closing CTA and tie it to the reader's own on-call rotation. Offer the postmortem template as the lower-commitment option. Never promise a specific reduction in resolution time, only report what named customers measured.",
   "writingPreferences": "Address the reader as \"you\" and write to the person who is on call, not to their director. Never use \"solution\" as a noun. Do not use the phrase \"engineering leaders\".",
+
+  "researchEnabled": true,
 
   "whitelistDomains": [],
   "blacklistDomains": ["wikipedia.org", "pagerduty.com", "atlassian.com"],
 
-  "pineconeIndex": "guardia-prod",
-  "pineconeNamespace": "guardia-site"
+  "pineconeIndex": "snoika",
+  "pineconeNamespace": "snoika-internal-linking"
 }
