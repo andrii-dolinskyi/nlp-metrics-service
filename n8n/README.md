@@ -5,8 +5,9 @@ and **solution pages**. `pageType` in the webhook is the switch; the branching h
 
 It is deliberately the article flow with a different subject. Same node names, same order, same DeepL
 round trip, same parallel style scanners, same Pinecone internal linking, same STRAPI converter. What
-changed is what the outliner researches, what the writer is told to put in each section, and the fact
-that the H1 arrives from the webhook instead of being written.
+changed is what the writer is told to put in each section, the fact that the H1 arrives from the webhook
+instead of being written, and that there is no outliner: at 500-700 words the writer plans and writes in
+one pass.
 
 **Text only.** The output is the page copy: H1, an opening answer, and the body sections. No layout, no
 CTA button objects, no schema, no image direction.
@@ -51,10 +52,10 @@ Party Starter (webhook)
 | `solution_en` | solution | English | no DeepL |
 | `solution_lang` | solution | other | brief → EN, page → target, re-cited in target |
 
-`pageType` changes what the Outliner researches and what burden of proof the page carries. An industry
-page has to show the client knows the vertical's regulations, workflow and vocabulary. A solution page
-has to show the client knows the job to be done: the workflow, the before and after, the tools around
-it. That difference runs through the pain points, the proof and the FAQ focus.
+`pageType` selects which block of section rules the writer gets, and with it the burden of proof. An
+industry page has to show the client knows the vertical's regulations, workflow and vocabulary, with
+same-vertical proof. A solution page has to show the client knows the job to be done: how the work goes
+wrong today, the before and after, and how it sits alongside the adjacent tools.
 
 ---
 
@@ -89,7 +90,7 @@ curl -X POST https://<your-n8n>/webhook/industry-solution-page \
   "contentIdea": "What the page should argue, in a sentence or three.",
 
   "clientName": "Chairside",
-  "productDescription": "What the client does. Put pricing, setup time and integrations here — the FAQ needs them.",
+  "productDescription": "What the client does. Put pricing, setup time and integrations here — with research off these are the only concrete facts the page has.",
 
   "clientProof": "Free text. Client metrics with dates and source URLs, customer names, testimonials.",
   "certifications": "HIPAA compliant (third-party audited), SOC 2 Type II, PCI DSS Level 1",
@@ -112,8 +113,8 @@ prompts as `not supplied` rather than as an empty string the model might paper o
 
 ### The H1 is never touched
 
-It goes into the webhook and comes out on the page byte-identical. The Outliner is told not to plan one,
-the Writer is told to reproduce it exactly, and on localised routes the `Unwrapper` restores the client's
+It goes into the webhook and comes out on the page byte-identical. The Writer is told to reproduce it
+exactly, and on localised routes the `Unwrapper` restores the client's
 original string after DeepL round-trips it. `Page Ready` re-asserts it a second time, and the SEO applier
 is given it as a locked value. Verified on all four routes, including a German run where DeepL translated
 the heading and the flow put it back.
