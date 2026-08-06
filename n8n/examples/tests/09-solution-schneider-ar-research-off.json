@@ -1,0 +1,30 @@
+{
+  "taskId": "task_test_09_solution_schneider_ar",
+  "brandId": "brand_schneider_electric",
+  "userId": "user_andrii",
+  "callback_url": "https://backend-production.snoika.com/n8n/webhook",
+
+  "pageType": "solution",
+
+  "h1": "برنامج إدارة البنية التحتية لمراكز البيانات",
+  "coreKeyword": "إدارة البنية التحتية لمراكز البيانات",
+  "secondaryKeywords": "برنامج DCIM, مراقبة الطاقة في مراكز البيانات, كفاءة استخدام الطاقة",
+  "targetLanguage": "Arabic",
+
+  "clientName": "Schneider Electric",
+  "productDescription": "EcoStruxure IT is Schneider Electric's data centre infrastructure management software. It monitors power, cooling and capacity across a data centre estate, tracks energy consumption against that same telemetry, and generates sustainability reporting from it rather than from a separate spreadsheet exercise. One view covers on-premise rooms, colocation space and distributed edge sites together. Schneider Electric works in energy management and industrial automation and traces its origins to 1836. Source: se.com. No pricing, deployment timeline or integration list is published, so do not state one.",
+
+  "clientProof": "Source: figures published by Schneider Electric on se.com and in its own press releases. The Wellcome Sanger Institute in Cambridge runs a 4.5 MW genomic data centre on EcoStruxure IT Advisor and saves roughly 1 million dollars and 1,000 MWh each year. Schneider Electric's own smart factory in Lexington, Kentucky cut energy consumption by 30% in the second half of 2023 against the first half, working from EcoStruxure IT insights. Schneider Electric states an expectation of 5 to 10 percent savings in power and energy for data centres running EcoStruxure IT DCIM. Corporate Knights named Schneider Electric the World's Most Sustainable Corporation in 2021 and again in 2025, making it the only company to have ranked first in the Global 100 twice; it has appeared in the Global 100 every year for 14 years and reached the top ten seven times. No other customer names or outcome figures are published, so do not state any.",
+
+  "certifications": "ISO 14001:2015 for environmental management and ISO 45001:2018 for occupational health and safety at all locations. ISO 9001 for quality at factory operations and R&D locations. ISO 50001 for energy management, implemented across more than 20 sites. ISO-certified management systems at more than 200 sites across the global supply chain. Source: se.com. Name these exactly as written and never add a certification that is not on this list.",
+
+  "writingPreferences": "Address the reader as \"you\" and assume they run data centre operations or facilities engineering. Say \"data centre\" rather than \"server room\". Reproduce every figure exactly as supplied, including the unit and the year, and write all numerals in Western Arabic digits (0-9) rather than Eastern Arabic-Indic digits. Do not state a price, a deployment time or a PUE figure, because none has been supplied. Do not name a competing DCIM product.",
+
+  "researchEnabled": false,
+
+  "whitelistDomains": [],
+  "blacklistDomains": ["wikipedia.org"],
+
+  "pineconeIndex": "snoika",
+  "pineconeNamespace": "snoika-internal-linking"
+}
