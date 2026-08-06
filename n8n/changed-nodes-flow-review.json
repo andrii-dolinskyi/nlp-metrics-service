@@ -1,0 +1,140 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a1c0f7d2-4b3e-4a91-9c22-7d8e1f0b6a54",
+              "leftValue": "={{ $('Brief EN').first().json.researchEnabled }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        14880,
+        3616
+      ],
+      "id": "0e7b2a44-3c19-4d6f-9a71-52c8b0d3e177",
+      "name": "Cite?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const T = {};\n\nT.finderUser = `Find the sentences to edit for the following keyword adjustments.`;\n\nT.finderSystem = `You are a precision SEO analysis agent. Your only task is to scan the page, pick the best candidate sentences for each keyword adjustment, and return them.\n\n<criteria>\nEach instruction is a sentence naming a keyword, whether to inject it or remove it, and how many changes to make. Some instructions also say which headings must be left alone.\n\n**Inject candidates:**\n- Criteria 1 - near-miss wording: the sentence already uses a phrase close to the keyword that a small edit would turn into it.\n- Criteria 2 - topical fit: the sentence is genuinely about what the keyword names.\n- Criteria 3 - not already present: the sentence does not contain the keyword.\n- Criteria 4 - natural swap: the keyword can replace a synonym, a generic phrase or a pronoun without changing the meaning or adding a fact.\n- Criteria 5 - body text only: not a heading and not inside a Markdown link's anchor text.\n- Criteria 6 - spread: where the page has enough sections, take candidates for the same keyword from different sections. This page runs 500 to 700 words and usually has only three sections, so more than one candidate per section is expected and fine. Never take two from the same paragraph.\n\n**Remove candidates:**\n- Criteria 1 - present: the sentence contains the keyword.\n- Criteria 2 - redundant: a pronoun or synonym would carry the sentence just as well.\n- Criteria 3 - not a heading and not link anchor text. Honour any instruction that tells you to leave the H1 or an H2 alone.\n- Criteria 4 - still complete: the sentence stays grammatical once the keyword is gone.\n- Criteria 5 - spread: prefer different sections, but more than one per section is fine on a short page. Never two from the same paragraph.\n</criteria>\n\n<action_plan>\n**Step 1.** Read the whole page.\n**Step 2.** Read every instruction and note the keyword, the action and the number of changes it asks for.\n**Step 3.** For each instruction, select that many candidate sentences.\n**Step 4.** Return them as a JSON object with a single key \"seoEdits\".\n</action_plan>\n\n<evaluation_principles>\n- Return up to the number of candidates requested across all instructions combined. Treat it as a target, not a quota.\n- If the page genuinely cannot supply that many workable sentences, return as many as it can. Fewer good candidates beats forcing a bad one.\n- Never return an empty list while at least one workable sentence exists. On a page of this length that is almost never the case.\n- The sentence field carries the exact verbatim text from the page, unmodified.\n- Never return the same sentence twice for the same keyword.\n- Never return the H1, a heading, or a sentence inside a direct quote from a named person.\n</evaluation_principles>`;\n\nT.applierUser = `Apply the following keyword edits to the page.`;\n\nT.applierSystem = `You are a professional page editor. You'll receive a page and a list of sentences that need a keyword injected or removed. Rewrite only those sentences and leave everything else unchanged.\n\n<how_to_apply>\n**Inject:** find the exact sentence, then work the keyword in by replacing a synonym, a generic phrase or a pronoun, or by extending the sentence naturally. The result must read as though it was written that way.\n\n**Remove:** find the exact sentence, then replace the keyword with a pronoun or a synonym, or restructure so the sentence reads naturally without it.\n\nIn both cases, never introduce a rule-of-three series, an -ing pile-up, a negative parallelism, a tailing negation, a hedge or a superlative while making the edit.\n</how_to_apply>\n\n<action_plan>\n**Step 1.** Read the whole page.\n**Step 2.** Apply each edit at its named sentence and confirm the result reads naturally in place.\n**Step 3.** Re-read and confirm no unflagged sentence changed.\n**Step 4.** Verify the H1 is exactly \"{{LOCKED_H1}}\", character for character. If it differs in any way, restore it to that exact string.\n**Step 5.** Verify every H2 is unchanged from the input.\n**Step 6.** Return the page as a JSON object where the seogoodPage field holds the complete Markdown page.\n</action_plan>\n\n<critical_rules>\n- The H1 must be exactly \"{{LOCKED_H1}}\". This is not negotiable.\n- Never change any heading text.\n- Never change a Markdown link's anchor text or URL.\n- Never change a number, a percentage, a date, a certification name or a client metric.\n- Keep the opening answer paragraph between 40 and 80 words and free of links.\n- Never introduce salesy language, a superlative, or a vague attribution such as \"experts say\".\n</critical_rules>`;\n\nconst brief = $('Brief EN').first().json;\nconst lockedH1 = brief.originalH1 || brief.h1;\n\nconst prompts = {\n  finderUser:    T.finderUser,\n  finderSystem:  T.finderSystem,\n  applierUser:   T.applierUser,\n  applierSystem: T.applierSystem\n};\n\nconst fieldNames = Object.keys(prompts);\n\nreturn [{ json: {\n  prompts,\n  lockedH1,\n  fieldNames,\n  fieldTexts: fieldNames.map(n => prompts[n]),\n  targetSource: brief.targetSource\n} }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        17088,
+        3936
+      ],
+      "id": "39f4c115-8835-403c-84ef-2cdd9b0ceda0",
+      "name": "Prep SEO Edits"
+    },
+    {
+      "parameters": {
+        "jsCode": "const prep = $('Prep SEO Edits').first().json;\nconst j = $input.first().json;\n\nconst decode = s => typeof s === 'string'\n  ? s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')\n     .replace(/&quot;/g, '\"').replace(/&#39;/g, \"'\").replace(/&#x2F;/g, '/')\n  : s;\n\nconst out = { ...prep.prompts };\nif (j.translations) {\n  prep.fieldNames.forEach((n, i) => { out[n] = decode(j.translations[i].text); });\n}\n\nconst lockedH1 = prep.lockedH1 || '';\nconst token = /\\{\\{\\s*LOCKED_H1\\s*\\}\\}/g;\n\nif (token.test(out.applierSystem)) {\n  out.applierSystem = out.applierSystem.replace(/\\{\\{\\s*LOCKED_H1\\s*\\}\\}/g, lockedH1);\n} else {\n  out.applierSystem += `\\n\\n<locked_h1>\\n${lockedH1}\\n</locked_h1>\\nThe first line of the page is \"# \" followed by exactly the string above, character for character. If it differs in any way, restore it.`;\n}\n\nreturn [{ json: { ...out, lockedH1 } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        17984,
+        4160
+      ],
+      "id": "c9e2e101-c800-4c6d-bb12-150e3cd88404",
+      "name": "SEO Prompts"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "efe42527-f3c0-caac-1e28-b6138da7753e",
+              "name": "finalPage",
+              "type": "string",
+              "value": "={{ (() => {\n  const brief = $('Brief EN').first().json;\n  const h1 = brief.originalH1 || brief.h1 || '';\n  const page = $json.output?.seogoodPage || $('Internal Linker').first().json.output.linksPage || '';\n  if (!h1) return page;\n  return /^#\\s+.+$/m.test(page) ? page.replace(/^#\\s+.+$/m, '# ' + h1) : ('# ' + h1 + '\\n\\n' + page);\n})() }}"
+            },
+            {
+              "id": "50b18d74-5620-5943-5d8b-698b73ba3996",
+              "name": "primaryKeyword",
+              "type": "string",
+              "value": "={{ $('request-parser').first().json.coreKeyword }}"
+            },
+            {
+              "id": "e6c50df8-ba99-9059-f66a-3f790a31584a",
+              "name": "secondaryKeywords",
+              "type": "string",
+              "value": "={{ $('request-parser').first().json.secondaryKeywords }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        19280,
+        3744
+      ],
+      "id": "70c45760-beef-4a22-b3fe-ae0ced3d6195",
+      "name": "Final Page"
+    },
+    {
+      "parameters": {
+        "jsCode": "const T = {};\n\nT.user = `Write the URL slug and meta description for the following page:`;\n\nT.system = `You are an SEO copywriter. Your task is to write the URL slug, the meta title and the meta description for a __F_pageTypeLabel__. You MUST follow the strict requirements exactly and then provide the output in JSON.\n\n<strict_requirements>\n\n**URL slug rules:**\n- Use ONLY lowercase letters, with words separated by hyphens.\n- Do NOT use special characters or punctuation.\n- The URL slug MUST include the core keyword: {{CORE_KEYWORD}}\n- Do NOT use prepositions or articles unless one is part of the core keyword.\n- Keep the slug to a maximum of six words.\n- If words or letters are separated by a dot, merge them into one word.\n- The slug must describe this page and no other page in the set.\n\n**Meta title rules:**\n- Maximum 60 characters including spaces.\n- MUST include the core keyword: {{CORE_KEYWORD}}\n- Place the core keyword as close to the front as reads naturally.\n- State the outcome or the fit rather than the technology.\n- Never use a superlative, a promotional adjective or an exclamation mark.\n- Do not append the brand name. The CMS adds it.\n\n**Meta description rules:**\n- Maximum 150 characters including spaces and punctuation.\n- MUST name the client explicitly: {{CLIENT_NAME}}\n- MUST describe how {{CLIENT_NAME}} provides what this page is about. Name the client, then what they provide, then what the reader gets from it.\n- Write it as a factual statement of what {{CLIENT_NAME}} does, not as an invitation to read the page. Never write \"learn how\", \"discover how\", \"find out how\" or \"see how\".\n- MUST include the core keyword within the first 60 characters, and the keyword must not be the opening word or phrase. Opening with the client's name is the natural way to satisfy this.\n- Use the client's name exactly as written above. Never abbreviate it, expand it, translate it, or add a legal suffix it does not already have.\n- Reproduce the core keyword exactly as written above, character for character.\n- Address the reader directly as \"you\" where the sentence needs a second party.\n- Use plain language.\n- Never use generic or hyped words used by sales people.\n- Never use an intensifier such as very, really, absolutely, clearly or obviously.\n- Never use a vague attribution such as \"experts say\" or \"studies show\".\n- Never use AI vocabulary such as leverage, robust, seamless, unlock or transform.\n- Never use an -ing pile-up such as \"helping you understand\" or \"providing insights into\".\n- Never list exactly three parallel items in a comma series.\n- Never use a negative parallelism such as \"it's not just X, it's Y\".\n- Never use a tailing negation such as \"no guesswork\".\n- Never use an em dash, a semicolon or an ampersand.\n- Never claim a result, a number or a certification that is not already on the page.\n\nShape to follow: \"[Client] provides [what, carrying the core keyword] so you [the concrete outcome].\"\nWorked example: \"Chairside provides practice management software for dental clinics, so eligibility checks land on the appointment before the patient arrives.\"\n</strict_requirements>\n\nProvide the output in the JSON format.`;\n\nconst fill = (t, vals) => Object.entries(vals).reduce(\n  (s, [k, v]) => s.split('__F_' + k + '__').join(v == null ? '' : String(v)), t);\n\nconst brief = $('Brief EN').first().json;\nconst req = $('request-parser').first().json;\n\nconst clientName = (req.clientName || brief.clientName || '').trim();\nif (!clientName) {\n  throw new Error('Prep Meta: clientName is required because the meta description must name the client.');\n}\n\nconst coreKeyword = (brief.isLang ? brief.originalCoreKeyword : brief.coreKeyword) || req.coreKeyword || '';\n\nconst prompts = {\n  metaUser: T.user,\n  metaSystem: fill(T.system, {\n    pageTypeLabel: brief.isIndustry ? 'industry landing page' : 'solution landing page'\n  })\n};\n\nconst fieldNames = Object.keys(prompts);\n\nreturn [{ json: {\n  prompts,\n  clientName,\n  coreKeyword,\n  fieldNames,\n  fieldTexts: fieldNames.map(n => prompts[n]),\n  targetSource: brief.targetSource\n} }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        19648,
+        3872
+      ],
+      "id": "a63ad64d-3de9-40dc-be1b-b5952b116bb4",
+      "name": "Prep Meta"
+    },
+    {
+      "parameters": {
+        "jsCode": "const prep = $('Prep Meta').first().json;\nconst j = $input.first().json;\n\nconst decode = s => typeof s === 'string'\n  ? s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')\n     .replace(/&quot;/g, '\"').replace(/&#39;/g, \"'\").replace(/&#x2F;/g, '/')\n  : s;\n\nconst out = { ...prep.prompts };\nif (j.translations) {\n  prep.fieldNames.forEach((n, i) => { out[n] = decode(j.translations[i].text); });\n}\n\nconst clientName = prep.clientName || '';\nconst coreKeyword = prep.coreKeyword || '';\n\nconst hasCore = /\\{\\{\\s*CORE_KEYWORD\\s*\\}\\}/.test(out.metaSystem);\nconst hasClient = /\\{\\{\\s*CLIENT_NAME\\s*\\}\\}/.test(out.metaSystem);\n\nout.metaSystem = out.metaSystem\n  .replace(/\\{\\{\\s*CORE_KEYWORD\\s*\\}\\}/g, coreKeyword)\n  .replace(/\\{\\{\\s*CLIENT_NAME\\s*\\}\\}/g, clientName);\n\nif (!hasCore || !hasClient) {\n  out.metaSystem += `\\n\\n<locked_values>\\ncore keyword = \"${coreKeyword}\"\\nclient name = \"${clientName}\"\\n</locked_values>\\nReproduce both strings above character for character. Never translate, abbreviate or reword either one.`;\n}\n\nreturn [{ json: { ...out, clientName, coreKeyword } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        20368,
+        4000
+      ],
+      "id": "2c696d31-f9d9-428e-9093-725579d11a5f",
+      "name": "Meta Prompts"
+    },
+    {
+      "parameters": {
+        "jsCode": "let body = $input.first().json.body ?? $input.first().json ?? {};\nif (Array.isArray(body)) body = body[0] || {};\n\nconst s = v => (v === undefined || v === null) ? '' : String(v).trim();\n\nconst pageType = s(body.pageType).toLowerCase();\nif (!['industry', 'solution'].includes(pageType)) {\n  throw new Error(`pageType is required and must be \"industry\" or \"solution\". Received: \"${s(body.pageType)}\"`);\n}\nif (!s(body.h1)) {\n  throw new Error('h1 is required. It is used verbatim as the page H1 and is never rewritten.');\n}\nif (!s(body.coreKeyword)) {\n  throw new Error('coreKeyword is required.');\n}\nif (!s(body.clientName)) {\n  throw new Error('clientName is required. The page names the client throughout and the meta description has to open with it.');\n}\n\nreturn [{ json: {\n  taskId: s(body.taskId),\n  brandId: s(body.brandId),\n  userId: s(body.userId),\n  callback_url: s(body.callback_url),\n\n  pageType,\n  h1: s(body.h1),\n  coreKeyword: s(body.coreKeyword),\n  secondaryKeywords: s(body.secondaryKeywords),\n  targetLanguage: s(body.targetLanguage) || 'English',\n\n  industry: s(body.industry),\n  contentIdea: s(body.contentIdea),\n\n  clientName: s(body.clientName),\n  productDescription: s(body.productDescription),\n  clientProof: s(body.clientProof),\n  certifications: s(body.certifications),\n\n  writingPreferences: s(body.writingPreferences),\n\n  researchEnabled: body.researchEnabled === true || String(body.researchEnabled).toLowerCase() === 'true',\n\n  whitelistDomains: body.whitelistDomains ?? [],\n  blacklistDomains: body.blacklistDomains ?? [],\n\n  pineconeIndex: s(body.pineconeIndex),\n  pineconeNamespace: s(body.pineconeNamespace)\n} }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7408,
+        3696
+      ],
+      "id": "2542502b-ae6e-4847-a7ba-5c4dcb5680f6",
+      "name": "request-parser"
+    }
+  ],
+  "connections": {},
+  "pinData": {}
+}
