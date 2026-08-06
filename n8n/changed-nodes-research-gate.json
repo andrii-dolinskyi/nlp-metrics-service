@@ -1,0 +1,79 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a1c0f7d2-4b3e-4a91-9c22-7d8e1f0b6a54",
+              "leftValue": "={{ $('Brief EN').first().json.researchEnabled }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        14896,
+        3600
+      ],
+      "id": "0e7b2a44-3c19-4d6f-9a71-52c8b0d3e177",
+      "name": "Research?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const j = $input.first().json;\nconst brief = $('Brief EN').first().json;\nconst research = brief.researchEnabled === true;\n\n// The translated page as it stood BEFORE the citation agent ran. Absent on the\n// English route, where Unwrapper never executed.\nlet preCitation = null;\ntry {\n  preCitation = $('Unwrapper').first().json.translatedPage || null;\n} catch (error) {\n  preCitation = null;\n}\n\nlet page = (!research && preCitation)\n  ? preCitation\n  : (j.output?.citedPage || j.output?.editedPage || j.citedPage || j.editedPage || j.translatedPage || '');\n\nif (!page) throw new Error('Page Ready: no page found. Keys: ' + Object.keys(j));\n\n// researchEnabled false means the page ships with zero external links, on every\n// route. Internal links are added later by Internal Linker and are untouched here.\nif (!research) {\n  page = page\n    .replace(/!\\[([^\\]]*)\\]\\((https?:\\/\\/[^\\s)]+)\\)/g, '')\n    .replace(/\\[([^\\]]+)\\]\\((https?:\\/\\/[^\\s)]+)\\)/g, '$1')\n    .replace(/<(https?:\\/\\/[^\\s>]+)>/g, '')\n    .replace(/(?<![[(])(https?:\\/\\/[^\\s)\\]]+)/g, '');\n}\n\nconst wantedH1 = brief.originalH1 || brief.h1;\nif (wantedH1) {\n  if (/^#\\s+.+$/m.test(page)) {\n    page = page.replace(/^#\\s+.+$/m, `# ${wantedH1}`);\n  } else {\n    page = `# ${wantedH1}\\n\\n${page}`;\n  }\n}\n\nreturn [{ json: { page } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        15648,
+        3792
+      ],
+      "id": "166a008c-7b63-4beb-9904-4f829b50987e",
+      "name": "Page Ready"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst brief = $('Brief Parser').first().json;\n\nconst page = item.editedPage || '';\nif (!page) throw new Error('No page found in input. Expected editedPage.');\n\nconst lang = brief.targetLanguage;\nconst research = brief.researchEnabled === true;\n\nconst userPromptTemplate = research\n  ? `Find references for the following page: {{PAGE_PLACEHOLDER}}`\n  : `Return the following page unchanged: {{PAGE_PLACEHOLDER}}`;\n\nconst tavilyQueryDescription = `A focused search query of 3 to 7 words to find authoritative information.`;\n\nconst tavilyToolDescription = research\n  ? `Search the web for current, authoritative information. Use this tool to support a specific data point or claim on the page with a citation URL. Do NOT search in English: every query must be in ${lang} only.`\n  : `EXTERNAL RESEARCH IS DISABLED FOR THIS RUN. Do not call this tool under any circumstances. The page must be returned exactly as received. Any call to this tool is a mistake.`;\n\nconst systemPromptResearch = `You are a professional editorial citation specialist. You will receive a Markdown page in ${lang} that contains specific data points, statistics, percentages, dates, named standards and named regulations, all without citations. Your only task is to find authoritative external sources for each citable claim and insert Markdown links inline so every claim is attributed.\n\n<what_must_be_cited>\n- Every specific figure: percentages, currency amounts, counts, durations.\n- Every regulatory, statutory or compliance claim, cited to the regulator, the statute or a recognised industry body.\n- Every named standard or certification framework where an authoritative definition exists.\n- Direct quotes attributed to a named person.\n</what_must_be_cited>\n\n<what_must_never_be_cited>\n- The client's own results, customer names, case studies or testimonials. These came from the client and need no external source. Leave them untouched.\n- Anything in the H1, in the opening block before the first H2, or inside any heading.\n</what_must_never_be_cited>\n\n<anchor_text_rules>\n- Keep anchor text between 2 and 5 words.\n- Make the anchor specific to the data point rather than generic.\n- Where a number is present the anchor carries that number and what it refers to, for example \"37% of clinics\" or \"11-day deployment\".\n- When citing a study or survey, link the data point and never the study's name.\n- When citing a named law, decree, regulation or standard, use that name as the anchor.\n- Where a sentence has both a named person and a data point, put the link on the data point.\n- Never use a generic anchor such as \"click here\", \"read more\" or \"learn more\".\n</anchor_text_rules>\n\n<one_citation_per_source_rule>\nIf one sentence carries two data points from the same source, link only the first. If they come from different sources, link both on their own anchors.\n</one_citation_per_source_rule>\n\n<source_quality_rules>\nSources must be authoritative and verifiable. Do not cite Wikipedia, Medium, Quora, Reddit, YouTube, personal blogs, social media posts, or press-release distribution sites.\n</source_quality_rules>\n\n<query_language>\n- Every query to the Info Looker tool must be in ${lang} only, because that is the language of the page.\n- Only select sources written in ${lang}.\n- Never use an English-language source anywhere on this page.\n</query_language>\n\n<verification_requirements>\n1. Use Info Looker to find a source that actually contains the specific claim.\n2. Read the returned snippet and confirm the source states that figure, name or rule in ${lang}. If it does not, search again with different terms.\n3. Never cite a source on topic relevance alone.\n4. Never invent a URL.\n5. Keep queries specific and 3 to 7 words long.\n6. If one sentence has two figures likely from the same source, query them together.\n7. If no acceptable source exists for a claim, leave that claim unlinked rather than citing a weaker source.\n</verification_requirements>\n\n<preservation_rules>\n- Never change the wording, sentence structure, paragraph breaks, headings or order of the page.\n- Only insert Markdown link syntax around existing text.\n- Preserve all existing Markdown: headings, lists, line breaks and paragraph spacing.\n- Never modify the H1 and never link inside it.\n- Never insert a link in the opening block between the H1 and the first H2.\n- Never insert a link inside a heading.\n</preservation_rules>\n\n<action_plan>\n**Step 1.** Read the whole page and mark every citable claim.\n**Step 2.** For each, write a precise query in ${lang} containing the specific figure, name or rule.\n**Step 3.** Run the search, read the snippets and pick the source that supports the claim most directly.\n**Step 4.** Choose the anchor per the anchor rules.\n**Step 5.** Insert the Markdown link inline and change nothing else in the sentence.\n**Step 6.** Move to the next claim.\n**Step 7.** Return the page as a JSON object where the citedPage field holds the complete Markdown page with citations inserted.\n</action_plan>`;\n\nconst systemPromptNoResearch = `You are a passthrough step. External research is DISABLED for this run, so there is nothing to cite and nothing to change.\n\n<your_only_task>\nReturn the page you receive exactly as it was given to you, character for character, in the citedPage field.\n</your_only_task>\n\n<absolute_rules>\n- Do NOT call the Info Looker tool. It is unavailable for this run and any call to it is a mistake.\n- Do NOT add a Markdown link, a bare URL, a footnote or a citation of any kind. This page ships with zero external links.\n- Do NOT add a statistic, a percentage, a currency figure, a date, a regulation name, a standard name or a study name.\n- Do NOT reword, reorder, shorten, expand, summarise or improve anything.\n- Do NOT touch the H1, any H2, any paragraph break, any list or any line break.\n- Do NOT translate the page. It is already in ${lang} and must stay in ${lang}.\n</absolute_rules>\n\n<action_plan>\n**Step 1.** Read the page the user supplies.\n**Step 2.** Copy it verbatim into the citedPage field of a JSON object.\n**Step 3.** Return that object. Nothing else.\n</action_plan>`;\n\nconst systemPrompt = research ? systemPromptResearch : systemPromptNoResearch;\n\nconst fields = [\n  { name: 'page',                   value: page },\n  { name: 'userPromptTemplate',     value: userPromptTemplate },\n  { name: 'systemPrompt',           value: systemPrompt },\n  { name: 'tavilyQueryDescription', value: tavilyQueryDescription },\n  { name: 'tavilyToolDescription',  value: tavilyToolDescription }\n];\n\nreturn [{ json: {\n  fieldNames: fields.map(f => f.name),\n  fieldTexts: fields.map(f => f.value),\n  targetSource: brief.targetSource,\n  researchEnabled: research\n} }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        14192,
+        3504
+      ],
+      "id": "7ad48b48-56d5-425b-b28b-653bde989369",
+      "name": "Translation Prep"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst pageText = item.output?.editedPage || item.editedPage || '';\n\nif (!pageText) {\n  throw new Error('No page text found in input. Expected output.editedPage or editedPage.');\n}\n\nconst cleaned = pageText\n  .replace(/!\\[([^\\]]*)\\]\\((https?:\\/\\/[^\\s)]+)\\)/g, '')\n  .replace(/\\[([^\\]]+)\\]\\((https?:\\/\\/[^\\s)]+)\\)/g, '$1')\n  .replace(/<(https?:\\/\\/[^\\s>]+)>/g, '')\n  .replace(/(?<![[(])(https?:\\/\\/[^\\s)\\]]+)/g, '');\n\nreturn [{ json: { editedPage: cleaned } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        13952,
+        3536
+      ],
+      "id": "4fc1c0f1-d2ca-4036-86c5-333b9dbfd2ec",
+      "name": "Links Remover"
+    }
+  ],
+  "connections": {},
+  "pinData": {}
+}
