@@ -1,0 +1,32 @@
+{
+  "taskId": "task_test_06_industry_acudo_uk",
+  "brandId": "brand_acudo",
+  "userId": "user_andrii",
+  "callback_url": "https://backend-production.snoika.com/n8n/webhook",
+
+  "pageType": "industry",
+
+  "h1": "Валідація номерів телефону для ecommerce і роздрібної торгівлі",
+  "coreKeyword": "валідація номерів телефону",
+  "secondaryKeywords": "перевірка номера телефону, масові SMS-розсилки, валідація номерів для ecommerce",
+  "targetLanguage": "Ukrainian",
+
+  "industry": "ecommerce and retail",
+  "contentIdea": "In retail the phone number is the delivery channel: the order confirmation, the courier's call, the OTP at checkout. A wrong or dead number is a failed delivery, a chargeback and a support ticket, and none of that shows up until the parcel is already out. Show that Acudo knows this vertical — checkout, delivery notifications and returns — and that validating the number at the point of capture is cheaper than handling the failure later.",
+
+  "clientName": "Acudo",
+  "productDescription": "Acudo provides real-time global phone number validation and verification, plus bulk SMS sending. Numbers are checked at the point of capture rather than at send time. Acudo serves retail, enterprise, healthcare, logistics and courier companies, travel and hospitality, and financial services. Source: acudo.com. No pricing, integration list or onboarding timeline is published, so do not state one.",
+
+  "clientProof": "Source: figures published by Acudo on acudo.com. More than 4,000,000 numbers validated daily. More than 1,160 active accounts. Coverage across 200 countries. A 99.99% uptime SLA. No named customers, case studies or outcome percentages are published — do not state a delivery-rate improvement, a cost saving or a failed-delivery reduction.",
+  "certifications": "GDPR compliance is referenced on acudo.com. No third-party audited certification such as ISO 27001 or SOC 2 is published — do not claim one.",
+
+  "writingPreferences": "Address the reader as \"you\" and assume they run ecommerce operations or a retail CRM. Write \"мобільний номер\" rather than \"телефонний контакт\" once the page is in Ukrainian. Reproduce every figure exactly as supplied and never round it. Do not name any SMS aggregator, carrier or competitor.",
+
+  "researchEnabled": true,
+
+  "whitelistDomains": [],
+  "blacklistDomains": ["wikipedia.org"],
+
+  "pineconeIndex": "snoika",
+  "pineconeNamespace": "snoika-internal-linking"
+}

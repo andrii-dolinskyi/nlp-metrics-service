@@ -1,0 +1,32 @@
+{
+  "taskId": "task_test_08_industry_snoika_en_research_off",
+  "brandId": "brand_snoika",
+  "userId": "user_andrii",
+  "callback_url": "https://backend-production.snoika.com/n8n/webhook",
+
+  "pageType": "industry",
+
+  "h1": "SEO and AI visibility for fintech and regtech companies",
+  "coreKeyword": "SEO for fintech companies",
+  "secondaryKeywords": "AI visibility for fintech, content marketing for regtech, fintech SEO agency",
+  "targetLanguage": "English",
+
+  "industry": "fintech and regtech",
+  "contentIdea": "Show that Snoika has actually worked inside regulated verticals rather than borrowing generic SaaS playbooks. The argument is that fintech and regtech content carries a compliance review nobody else's content carries, that the buying committee reads differently — risk and legal sit in it, not only marketing — and that this is where Snoika's own client results come from: identity verification, VAT compliance and e-signature companies.",
+
+  "clientName": "Snoika",
+  "productDescription": "Snoika is an AI marketing agency working with regulated B2B companies in fintech, regtech and compliance software. Work runs on a retainer: AI+SEO Lite starts at 2 published articles per week and AI+SEO Pro at 3 per week, both including keyword and prompt research, on-page work and publishing. Add-ons cover programmatic SEO (200-500+ generated pages built around jurisdiction, rule or use case), Reddit organic posting and community strategy, Quora answers, LinkedIn posting at 3-4 posts per week, Trustpilot review generation at 2+ reviews per week, backlink placement on DA 85+ domains, content repurposing and full website rework. Typical timeline: first movement in rankings and LLM mentions in months 1-3, a steady inbound lead flow around months 5-6, full scale at 9-12 months.",
+
+  "clientProof": "Source: Snoika internal client reporting. Every figure is measured against that client's own baseline over the stated window. Vespia (identity verification and AML), 180 days: 2-3 inbound leads per day, 220% increase in LLM brand mentions, average keyword position improved by 18 places, 85% traffic growth, 52% form-submission conversion. 1StopVAT (VAT registration and compliance), 16 weeks: ChatGPT visibility from 2.7% to 28.3%, average LLM position from 4.8 to 3.5, traffic up 8.5%. Agrello (digital identity and e-signature), 30 days: 51,800 impressions at an average position of 9.2, sessions up 125.6% year on year. Outside the vertical, for scale: 3DPrinterOS, 180 days, 3-4 qualified inbound leads per day and 185% increase in organic users.",
+  "certifications": "",
+
+  "writingPreferences": "Address the reader as \"you\" and assume they run marketing at a regulated financial or compliance software company. Never call Snoika a \"solution\" or a \"platform\" — it is an agency. Assume every claim on this page will be read by someone in legal or compliance, so make no promise about outcomes that is not already attached to a named client and a stated window. Reproduce every percentage exactly as supplied and never round it.",
+
+  "researchEnabled": false,
+
+  "whitelistDomains": [],
+  "blacklistDomains": ["wikipedia.org"],
+
+  "pineconeIndex": "snoika",
+  "pineconeNamespace": "snoika-internal-linking"
+}

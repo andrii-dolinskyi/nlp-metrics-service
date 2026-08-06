@@ -1,0 +1,31 @@
+{
+  "taskId": "task_test_02a_solution_smartbet_en",
+  "brandId": "brand_smartbet",
+  "userId": "user_andrii",
+  "callback_url": "https://backend-production.snoika.com/n8n/webhook",
+
+  "pageType": "solution",
+
+  "h1": "Sportsbook trading infrastructure for regulated operators",
+  "coreKeyword": "sportsbook trading infrastructure",
+  "secondaryKeywords": "real-time odds pricing, sportsbook exposure control, betting platform architecture",
+  "targetLanguage": "English",
+
+  "contentIdea": "A regulated sportsbook loses money in the seconds between a market moving and the book reacting, and it loses its licence over limits that were enforced by hand. Argue that both problems are architectural rather than staffing problems: pricing, exposure and limit enforcement have to sit on one event-driven core that reacts as the market state changes, instead of on trading screens that people watch. Smartbet builds that core.",
+
+  "clientName": "Smartbet",
+  "productDescription": "Smartbet builds infrastructure architecture for regulated sportsbook operators. The stack covers real-time pricing, exposure control, event-driven architecture, market state orchestration and automated limit enforcement. Source: smartbet.do. No pricing, implementation timeline or integration list is published, so do not state one.",
+
+  "clientProof": "",
+  "certifications": "",
+
+  "writingPreferences": "Address the reader as \"you\" and assume they are a CTO or head of trading at a licensed operator. Use \"operator\" rather than \"bookmaker\". Do not name any regulator, licence regime or jurisdiction, and do not state any latency, throughput or uptime number — none has been supplied. Keep the proof section short rather than padding it.",
+
+  "researchEnabled": true,
+
+  "whitelistDomains": [],
+  "blacklistDomains": ["wikipedia.org"],
+
+  "pineconeIndex": "snoika",
+  "pineconeNamespace": "snoika-internal-linking"
+}

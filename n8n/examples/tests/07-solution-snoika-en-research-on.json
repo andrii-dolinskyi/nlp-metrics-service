@@ -1,0 +1,31 @@
+{
+  "taskId": "task_test_07_solution_snoika_en_research_on",
+  "brandId": "brand_snoika",
+  "userId": "user_andrii",
+  "callback_url": "https://backend-production.snoika.com/n8n/webhook",
+
+  "pageType": "solution",
+
+  "h1": "AI search visibility for B2B SaaS companies",
+  "coreKeyword": "AI search visibility",
+  "secondaryKeywords": "generative engine optimization, LLM brand mentions, ChatGPT visibility, AI visibility agency",
+  "targetLanguage": "English",
+
+  "contentIdea": "Buyers now start in ChatGPT, Perplexity and AI Overviews, and a brand those systems cannot find is off the shortlist before a human ever compares vendors. Argue that AI visibility is won with the same substance that wins classic search — published answers, third-party mentions and community presence — and that Snoika runs both at once instead of treating AI search as a separate channel bolted on later.",
+
+  "clientName": "Snoika",
+  "productDescription": "Snoika is an AI marketing agency that makes B2B brands findable in AI assistants and in classic search at the same time. Work runs on a retainer: AI+SEO Lite starts at 2 published articles per week and AI+SEO Pro at 3 per week, both including keyword and prompt research, on-page work and publishing. Add-ons cover programmatic SEO (200-500+ generated pages), Reddit organic posting and community strategy, Quora answers, LinkedIn posting at 3-4 posts per week, Trustpilot review generation at 2+ reviews per week, backlink placement on DA 85+ domains, content repurposing and full website rework. Typical timeline: first movement in rankings and LLM mentions in months 1-3, a steady inbound lead flow around months 5-6, full scale at 9-12 months.",
+
+  "clientProof": "Source: Snoika internal client reporting. Every figure is measured against that client's own baseline over the stated window. 3DPrinterOS, 180 days: 3-4 qualified inbound leads per day, first position in ChatGPT for its core prompts, 87% increase in LLM brand mentions, 185% increase in organic users, 45% CTR. Vespia, 180 days: 2-3 inbound leads per day, 220% increase in LLM brand mentions, average keyword position improved by 18 places, 85% traffic growth, 52% form-submission conversion. 1StopVAT, 16 weeks: ChatGPT visibility from 2.7% to 28.3%, average LLM position from 4.8 to 3.5, traffic up 8.5%. 3DOS, 180 days: 2-3 B2B leads per week, B2C users from 200,000 to 500,000. ABS Technologies, 30 days: 6x SERP impressions, 55% of tracked keywords indexed. Agrello, 30 days: 51,800 impressions at an average position of 9.2, sessions up 125.6% year on year.",
+  "certifications": "",
+
+  "writingPreferences": "Address the reader as \"you\" and assume they own marketing or demand generation at a B2B software company. Never call Snoika a \"solution\" or a \"platform\" — it is an agency. Do not use the phrase \"in today's digital landscape\". Reproduce every percentage and multiple exactly as supplied and never round them.",
+
+  "researchEnabled": true,
+
+  "whitelistDomains": [],
+  "blacklistDomains": ["wikipedia.org"],
+
+  "pineconeIndex": "snoika",
+  "pineconeNamespace": "snoika-internal-linking"
+}

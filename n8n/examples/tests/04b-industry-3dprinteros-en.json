@@ -1,0 +1,32 @@
+{
+  "taskId": "task_test_04b_industry_3dprinteros_en",
+  "brandId": "brand_3dprinteros",
+  "userId": "user_andrii",
+  "callback_url": "https://backend-production.snoika.com/n8n/webhook",
+
+  "pageType": "industry",
+
+  "h1": "3D printer management software for universities and research labs",
+  "coreKeyword": "3D printer management software for universities",
+  "secondaryKeywords": "makerspace management software, 3D printing lab software, university 3D print queue",
+  "targetLanguage": "English",
+
+  "industry": "higher education",
+  "contentIdea": "A university makerspace runs a mixed fleet nobody standardised, opens it to hundreds of students a semester, and is staffed by one technician and a rota of student workers. Show that 3DPrinterOS was built for exactly that: one queue across mixed hardware, per-user permissions and quotas, and a record of who printed what — so the lab scales with enrolment rather than with staff hours.",
+
+  "clientName": "3DPrinterOS",
+  "productDescription": "3DPrinterOS is cloud software for managing 3D printer fleets: queueing and scheduling print jobs, remote monitoring, file preparation and slicing in the browser, user permissions and access control, and usage reporting across a mixed fleet. It supports more than 150 printer models, so a lab that bought different hardware over several years runs it all from one place. Source: 3dprinteros.com. No pricing tier or deployment timeline is published, so do not state one.",
+
+  "clientProof": "Source: figures published by 3DPrinterOS on 3dprinteros.com. More than 300,000 active users. More than 4,000,000 parts printed through the platform. More than 300 educational institutions. More than 6,000 partners. Support for over 150 printer models. Named users include Yale, Duke University, MIT, UC Berkeley, Google, NASA, Bosch, HP, Microsoft and Koenigsegg — for an education page lead with Yale, Duke, MIT and UC Berkeley. No percentage improvements, cost savings or utilisation figures are published, so do not state any.",
+  "certifications": "GDPR compliance is stated on 3dprinteros.com. No third-party audited certification such as ISO 27001 or SOC 2 is published — do not claim one, and do not imply FERPA certification exists, because no such certification exists.",
+
+  "writingPreferences": "Address the reader as \"you\" and assume they run the makerspace, the engineering lab or campus IT. Say \"lab\" or \"makerspace\" rather than \"facility\". Do not state a number of students, a cost per print or a utilisation rate — none has been supplied.",
+
+  "researchEnabled": true,
+
+  "whitelistDomains": [],
+  "blacklistDomains": ["wikipedia.org"],
+
+  "pineconeIndex": "snoika",
+  "pineconeNamespace": "snoika-internal-linking"
+}

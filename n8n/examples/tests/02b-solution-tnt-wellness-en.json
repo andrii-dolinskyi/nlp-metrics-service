@@ -1,0 +1,31 @@
+{
+  "taskId": "task_test_02b_solution_tnt_wellness_en",
+  "brandId": "brand_tnt_wellness",
+  "userId": "user_andrii",
+  "callback_url": "https://backend-production.snoika.com/n8n/webhook",
+
+  "pageType": "solution",
+
+  "h1": "Medical nutrition therapy for lasting weight loss",
+  "coreKeyword": "medical nutrition therapy",
+  "secondaryKeywords": "registered dietitian Charlotte NC, functional medicine nutrition, hormone and gut testing",
+  "targetLanguage": "English",
+
+  "contentIdea": "Most weight-loss programmes treat the calorie count and stop there, which is why the weight comes back. Argue that when the cause is hormonal, digestive or a food sensitivity, no calorie target fixes it, and that the point of medical nutrition therapy is to test first and then build the plan around what the testing found — under a registered dietitian, not a coach.",
+
+  "clientName": "TNT Wellness",
+  "productDescription": "TNT Wellness (Total Nutrition Technology) is a nutrition and functional medicine practice in Charlotte, North Carolina, at 10400 Mallard Creek Rd Suite 340. Services include medical nutrition therapy, functional medicine, bio-identical hormone replacement therapy, hormone testing, gut health testing, food sensitivity testing, DNA testing, mycotoxin testing, sports nutrition, corporate wellness programmes and Styku 3D body scanning. The practice has been in operation since 1993. Source: tnt-wellness.com. No pricing, programme length or insurance coverage is published, so do not state one.",
+
+  "clientProof": "Source: tnt-wellness.com. The practice states over 30 years of operation, opened in 1993, working out of Charlotte, North Carolina. No client metrics, named clients, outcome statistics or case studies are published. Do not state a success rate, an average weight loss or any employer cost saving.",
+  "certifications": "",
+
+  "writingPreferences": "Address the reader as \"you\" and assume they have already tried at least one diet that did not hold. Say \"registered dietitian\" rather than \"nutritionist\". Do not make a medical claim, do not promise an outcome, and do not state any number of pounds, percentage or timeframe — none has been supplied. Keep the proof section short rather than padding it.",
+
+  "researchEnabled": true,
+
+  "whitelistDomains": [],
+  "blacklistDomains": ["wikipedia.org"],
+
+  "pineconeIndex": "snoika",
+  "pineconeNamespace": "snoika-internal-linking"
+}

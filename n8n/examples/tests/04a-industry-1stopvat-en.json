@@ -1,0 +1,32 @@
+{
+  "taskId": "task_test_04a_industry_1stopvat_en",
+  "brandId": "brand_1stopvat",
+  "userId": "user_andrii",
+  "callback_url": "https://backend-production.snoika.com/n8n/webhook",
+
+  "pageType": "industry",
+
+  "h1": "VAT compliance for ecommerce and digital services companies",
+  "coreKeyword": "VAT compliance for ecommerce",
+  "secondaryKeywords": "VAT registration for online sellers, digital services VAT, ecommerce VAT filing",
+  "targetLanguage": "English",
+
+  "industry": "ecommerce and digital services",
+  "contentIdea": "An online seller crosses a registration threshold in a country it has never had an office in, and the obligation starts before anyone in finance notices. Show that 1StopVAT knows this vertical specifically: where the thresholds bite for goods versus digital services, what EPR and CBAM added on top, and what a voluntary disclosure looks like when the registration was already missed.",
+
+  "clientName": "1StopVAT",
+  "productDescription": "1StopVAT handles VAT registration, ongoing VAT compliance and VAT filing for companies selling across borders, plus EPR (extended producer responsibility) registration, CBAM reporting and voluntary disclosure agreements where an obligation was missed. Source: 1stopvat.com. No pricing or onboarding timeline is published, so do not state one.",
+
+  "clientProof": "Source: figures published by 1StopVAT on 1stopvat.com. More than 40 tax experts on the team. More than 1,000 clients served. Working knowledge of how VAT operates in 100 locations. Named clients on the site: Surfshark, Kilo Health, Nord Security and Hempo. No percentage outcomes, penalty savings or time savings are published, so do not state any.",
+  "certifications": "Certified members of the International VAT Association (IVA), AITC and VAT Forum. Source: 1stopvat.com. These are professional association memberships, not audited security certifications — describe them as memberships and do not upgrade them to ISO, SOC 2 or an audit.",
+
+  "writingPreferences": "Address the reader as \"you\" and assume they run finance or operations at a company selling into more than one country. Say \"obligation\" rather than \"requirement\". Do not state a threshold amount, a filing deadline, a penalty rate or a rate of VAT for any specific country unless research returns it with a source, because those change and a wrong number here is a real liability.",
+
+  "researchEnabled": true,
+
+  "whitelistDomains": [],
+  "blacklistDomains": ["wikipedia.org"],
+
+  "pineconeIndex": "snoika",
+  "pineconeNamespace": "snoika-internal-linking"
+}
