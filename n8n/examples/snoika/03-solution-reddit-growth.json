@@ -1,0 +1,30 @@
+{
+  "taskId": "snoika_rewrite_reddit_growth",
+  "brandId": "brand_snoika",
+  "userId": "user_andrii",
+  "callback_url": "https://backend-production.snoika.com/n8n/webhook",
+
+  "pageType": "solution",
+
+  "h1": "Reddit marketing for B2B brands",
+  "coreKeyword": "Reddit marketing",
+  "secondaryKeywords": "subreddit strategy, brand presence on Reddit",
+  "targetLanguage": "English",
+
+  "clientName": "Snoika",
+  "productDescription": "Snoika builds and runs a brand's presence in the subreddits where its buyers ask questions and compare vendors. The work covers keyword-driven subreddit targeting, organic posting inside those communities, strategic commenting, branded account management, and building a subreddit for the brand where that fits. Snoika reports on share of voice in high-intent conversations, brand presence across keyword discussions, citations in AI-generated answers, and visibility across search and AI discovery, because Reddit threads are among the sources AI assistants quote back to buyers. A free AI Visibility Report is available. Snoika names CLM and e-signature software, bulk SMS software and IT infrastructure management among the categories it has run this for. Source: snoika.com/solutions/reddit-growth. No standalone price or posting volume is published for this service, so do not state one.",
+
+  "clientProof": "Source: results published by Snoika at snoika.com/customers. Agrello, e-signature: 125.6% increase in organic search sessions year on year, and 51,800 impressions from Snoika-created pages. ABS Technologies, IT services: 6x SERP impressions within the first 30 days. 3DPrinterOS, 3D printing SaaS: 3 to 4 qualified inbound leads per day, and first position in ChatGPT for industry-specific queries. Vespia, fintech SaaS: 220% increase in AI brand mentions. 1StopVAT, tax and fintech: 10x growth in ChatGPT visibility, achieved in 7 weeks. 3DOS, 3D printing network: 2x growth in registered users. Snoika publishes no Reddit-specific figure: no karma, no upvote count, no subreddit subscriber number and no share-of-voice percentage. Do not attribute the results above to Reddit alone and do not state a Reddit-specific metric.",
+
+  "certifications": "Member of the NVIDIA Inception Program. Source: snoika.com. This is a startup programme membership rather than an audited certification, so describe it as a membership and never present it as ISO, SOC 2 or an audit. Snoika publishes no security or compliance certification, so never claim one.",
+
+  "writingPreferences": "Address the reader as \"you\" and assume they know Reddit punishes obvious marketing and are wary of getting the brand banned. Never call Snoika a \"platform\" or a \"solution\" — it is an agency. Say \"subreddit\" rather than \"forum\" or \"community board\". Do not name a specific subreddit. Do not describe anything that reads as astroturfing or undisclosed promotion. Reproduce every figure exactly as supplied and never round it.",
+
+  "researchEnabled": false,
+
+  "whitelistDomains": [],
+  "blacklistDomains": ["wikipedia.org"],
+
+  "pineconeIndex": "snoika",
+  "pineconeNamespace": "snoika-internal-linking"
+}

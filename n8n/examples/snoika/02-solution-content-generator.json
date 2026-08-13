@@ -1,0 +1,30 @@
+{
+  "taskId": "snoika_rewrite_content_generator",
+  "brandId": "brand_snoika",
+  "userId": "user_andrii",
+  "callback_url": "https://backend-production.snoika.com/n8n/webhook",
+
+  "pageType": "solution",
+
+  "h1": "AI content generator for SEO and AI search",
+  "coreKeyword": "AI content generator",
+  "secondaryKeywords": "SEO content generation, topic clusters",
+  "targetLanguage": "English",
+
+  "clientName": "Snoika",
+  "productDescription": "Snoika's AI content generator produces long-form SEO content written for classic search and for AI assistants at the same time, covering ChatGPT, Perplexity and Google AI Overviews. It combines keyword intelligence, topic clustering and AI-native formatting. Output covers long-form blog posts, multilingual versions of the same piece, interconnected topic clusters that build topical authority, keyword mapping, internal linking suggestions and structured data recommendations. Every article is reviewed by a human before it is published. Retainers start at 2 published articles per week on AI+SEO Lite and 3 per week on AI+SEO Pro. Snoika states the service lets a team produce 10 times more optimised content without losing quality or brand consistency. Source: snoika.com/solutions/content-generator.",
+
+  "clientProof": "Source: results published by Snoika at snoika.com/customers. Agrello, e-signature: 125.6% increase in organic search sessions year on year, and 51,800 impressions from Snoika-created pages. 3DPrinterOS, 3D printing SaaS: 3 to 4 qualified inbound leads per day, and first position in ChatGPT for industry-specific queries. 1StopVAT, tax and fintech: 10x growth in ChatGPT visibility, achieved in 7 weeks. Vespia, fintech SaaS: 220% increase in AI brand mentions. ABS Technologies, IT services: 6x SERP impressions within the first 30 days. 3DOS, 3D printing network: 2x growth in registered users. The 10x content-volume figure is Snoika's own statement about output capacity, so present it as a capacity claim and never as a measured client result.",
+
+  "certifications": "Member of the NVIDIA Inception Program. Source: snoika.com. This is a startup programme membership rather than an audited certification, so describe it as a membership and never present it as ISO, SOC 2 or an audit. Snoika publishes no security or compliance certification, so never claim one.",
+
+  "writingPreferences": "Address the reader as \"you\" and assume they run content or demand generation and have already tried generic AI writing tools. Never call Snoika a \"platform\" or a \"solution\" — it is an agency. Do not use the words \"effortless\", \"unlimited\" or \"autopilot\". Make the human review step explicit rather than implied. Reproduce every figure exactly as supplied and never round it.",
+
+  "researchEnabled": false,
+
+  "whitelistDomains": [],
+  "blacklistDomains": ["wikipedia.org"],
+
+  "pineconeIndex": "snoika",
+  "pineconeNamespace": "snoika-internal-linking"
+}

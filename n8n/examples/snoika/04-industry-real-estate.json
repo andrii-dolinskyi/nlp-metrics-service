@@ -1,0 +1,31 @@
+{
+  "taskId": "snoika_rewrite_real_estate",
+  "brandId": "brand_snoika",
+  "userId": "user_andrii",
+  "callback_url": "https://backend-production.snoika.com/n8n/webhook",
+
+  "pageType": "industry",
+
+  "h1": "AI visibility for real estate",
+  "coreKeyword": "AI visibility for real estate",
+  "secondaryKeywords": "real estate AI search, AI search for property marketing",
+  "targetLanguage": "English",
+
+  "industry": "real estate",
+  "clientName": "Snoika",
+  "productDescription": "Snoika makes real estate brands visible inside AI search, so an agency or portal gets recommended when a prospect asks ChatGPT, Gemini or Perplexity about properties or local real estate services. The work covers getting property listings surfaced through AI answers, positioning a regional agency in AI results for its own area, and turning AI-led property searches into qualified leads. Delivery runs on a retainer combining published content, third-party mentions and community presence, with programmatic pages where the vertical supports them. Source: snoika.com/solutions/real-estate. No price is published for this vertical, so do not state one.",
+
+  "clientProof": "Source: results published by Snoika at snoika.com/customers. IMPORTANT: Snoika has no real estate customer in its published list, so there is no same-vertical proof available for this page. Never invent a real estate client, a property portal or an agency name, and never imply that one exists. Write the proof section from the results below, label them as coming from other verticals, and keep the section short rather than padding it. 3DPrinterOS, 3D printing SaaS: 3 to 4 qualified inbound leads per day, and first position in ChatGPT for industry-specific queries. Vespia, fintech SaaS: 220% increase in AI brand mentions. 1StopVAT, tax and fintech: 10x growth in ChatGPT visibility, achieved in 7 weeks. Agrello, e-signature: 125.6% increase in organic search sessions year on year, and 51,800 impressions from Snoika-created pages. ABS Technologies, IT services: 6x SERP impressions within the first 30 days. 3DOS, 3D printing network: 2x growth in registered users. The figures 250% AI mentions growth, top 3 local AI rankings and 3x lead volume that appear elsewhere on snoika.com carry no customer name and no stated window, so do not use them anywhere on this page.",
+
+  "certifications": "Member of the NVIDIA Inception Program. Source: snoika.com. This is a startup programme membership rather than an audited certification, so describe it as a membership and never present it as ISO, SOC 2 or an audit. Snoika publishes no security or compliance certification, so never claim one.",
+
+  "writingPreferences": "Address the reader as \"you\" and assume they run marketing for an agency, a brokerage or a property portal. Never call Snoika a \"platform\" or a \"solution\" — it is an agency. Use the vocabulary of the trade: listing, brokerage, portal, agent, viewing. Do not state a property price, a commission rate, a market size or a transaction volume, because none has been supplied. Do not name a competing portal or listing site. Reproduce every figure exactly as supplied and never round it.",
+
+  "researchEnabled": true,
+
+  "whitelistDomains": [],
+  "blacklistDomains": ["wikipedia.org"],
+
+  "pineconeIndex": "snoika",
+  "pineconeNamespace": "snoika-internal-linking"
+}

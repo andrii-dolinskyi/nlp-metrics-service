@@ -1,0 +1,31 @@
+{
+  "taskId": "snoika_rewrite_startups",
+  "brandId": "brand_snoika",
+  "userId": "user_andrii",
+  "callback_url": "https://backend-production.snoika.com/n8n/webhook",
+
+  "pageType": "industry",
+
+  "h1": "AI visibility for startups",
+  "coreKeyword": "AI visibility for startups",
+  "secondaryKeywords": "startup AI search, early stage brand visibility",
+  "targetLanguage": "English",
+
+  "industry": "early-stage startups",
+  "clientName": "Snoika",
+  "productDescription": "Snoika builds a startup's brand visibility in AI search from day one, without the marketing budget an incumbent has. Setup takes about 3 minutes and pricing starts at 248 euros per week. The work combines published content, third-party mentions and community presence, so a brand nobody has heard of can appear in AI answers next to established competitors. It needs no engineering time to start, and the programme scales as the company grows. Snoika states results are measurable from the first week. Source: snoika.com/solutions/startups.",
+
+  "clientProof": "Source: results published by Snoika at snoika.com/customers. Every customer below is a startup or scale-up, so this is same-vertical proof. 3DPrinterOS, 3D printing SaaS: 3 to 4 qualified inbound leads per day, and first position in ChatGPT for industry-specific queries. Vespia, fintech SaaS: 220% increase in AI brand mentions. 1StopVAT, tax and fintech: 10x growth in ChatGPT visibility, achieved in 7 weeks. 3DOS, 3D printing network: 2x growth in registered users. ABS Technologies, IT services: 6x SERP impressions within the first 30 days. Agrello, e-signature: 125.6% increase in organic search sessions year on year, and 51,800 impressions from Snoika-created pages. The 10x visibility growth figure on the startups page is Snoika's own headline claim and matches 1StopVAT's published 10x ChatGPT visibility result, so attribute it to 1StopVAT rather than presenting it as a general promise. Snoika publishes no funding stage, headcount or customer count for any of these, so do not state one.",
+
+  "certifications": "Member of the NVIDIA Inception Program. Source: snoika.com. This is a startup programme membership rather than an audited certification, so describe it as a membership and never present it as ISO, SOC 2 or an audit. Snoika publishes no security or compliance certification, so never claim one.",
+
+  "writingPreferences": "Address the reader as \"you\" and assume they are a founder or the first marketing hire, with more urgency than budget. Never call Snoika a \"platform\" or a \"solution\" — it is an agency. Do not use the words \"disrupt\", \"unicorn\", \"hustle\" or \"growth hacking\". Write the price as 248 euros per week exactly as supplied. Do not state a funding amount, a runway figure or a headcount, because none has been supplied. Reproduce every figure exactly as supplied and never round it.",
+
+  "researchEnabled": true,
+
+  "whitelistDomains": [],
+  "blacklistDomains": ["wikipedia.org"],
+
+  "pineconeIndex": "snoika",
+  "pineconeNamespace": "snoika-internal-linking"
+}
