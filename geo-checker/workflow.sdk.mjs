@@ -141,7 +141,7 @@ function render(r){
   var off=circ*(1-r.totalScore/100);
   var html='';
   html+='<div class="scorecard"><div class="ring"><svg width="150" height="150"><circle cx="75" cy="75" r="62" fill="none" stroke="var(--card2)" stroke-width="12"></circle><circle cx="75" cy="75" r="62" fill="none" stroke="'+ringColor(r.totalScore)+'" stroke-width="12" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'"></circle></svg><div class="num"><b>'+r.totalScore+'</b><span>/ 100</span></div></div>';
-  html+='<div class="sc-info"><span class="gradechip" style="background:'+gc[0]+';color:'+gc[1]+'">Grade '+h(r.grade)+'</span><div class="verdict">'+h(r.verdict)+'</div><div class="chips"><span class="chip">'+r.meta.wordCount+' words analyzed</span><span class="chip">Article via '+h(r.meta.articleSource)+'</span><span class="chip">HTML '+r.meta.htmlKB+' KB</span><span class="chip">HTTP '+r.meta.pageStatus+'</span></div></div></div>';
+  html+='<div class="sc-info"><span class="gradechip" style="background:'+gc[0]+';color:'+gc[1]+'">Grade '+h(r.grade)+'</span><div class="verdict">'+h(r.verdict)+'</div><div class="chips"><span class="chip">'+r.meta.wordCount+' words analyzed</span><span class="chip">Article via '+h(r.meta.articleSource)+'</span><span class="chip">Page fetch: '+h(r.meta.pageFetch||'direct')+'</span><span class="chip">HTML '+r.meta.htmlKB+' KB</span><span class="chip">HTTP '+r.meta.pageStatus+'</span></div></div></div>';
   html+='<div class="toolbar"><span class="iss"><b>'+r.issuesCount+' issues</b> &bull; +'+r.pointsAvailable+' pts available</span><button class="cpy" id="fixall">Copy Fix-All Prompt</button></div>';
   for(var i=0;i<r.categories.length;i++){
     var cat=r.categories[i];
@@ -274,7 +274,7 @@ const fetchArticle = node({
     name: 'Fetch Article Markdown',
     parameters: {
       method: 'GET',
-      url: expr("https://r.jina.ai/{{ $('Normalize URL').item.json.url }}"),
+      url: expr("https://r.jina.ai/{{ $('Normalize URL').first().json.url }}"),
       sendHeaders: true,
       headerParameters: { parameters: [{ name: 'X-Return-Format', value: 'markdown' }] },
       options: {
@@ -283,7 +283,7 @@ const fetchArticle = node({
       }
     },
     onError: 'continueRegularOutput',
-    position: [1020, 520]
+    position: [1600, 520]
   },
   output: [{ data: '# Article title\n\nMarkdown content...', statusCode: 200, headers: {} }]
 });
@@ -295,7 +295,7 @@ const fetchLlms = node({
     name: 'Fetch llms.txt',
     parameters: {
       method: 'GET',
-      url: expr("{{ $('Normalize URL').item.json.origin }}/llms.txt"),
+      url: expr("{{ $('Normalize URL').first().json.origin }}/llms.txt"),
       options: {
         timeout: 4000,
         redirect: { redirect: { followRedirects: true, maxRedirects: 4 } },
@@ -303,7 +303,7 @@ const fetchLlms = node({
       }
     },
     onError: 'continueRegularOutput',
-    position: [1280, 520]
+    position: [1820, 520]
   },
   output: [{ body: '# llms.txt', statusCode: 200, headers: {} }]
 });
@@ -315,7 +315,7 @@ const fetchRobots = node({
     name: 'Fetch robots.txt',
     parameters: {
       method: 'GET',
-      url: expr("{{ $('Normalize URL').item.json.origin }}/robots.txt"),
+      url: expr("{{ $('Normalize URL').first().json.origin }}/robots.txt"),
       options: {
         timeout: 4000,
         redirect: { redirect: { followRedirects: true, maxRedirects: 4 } },
@@ -323,9 +323,67 @@ const fetchRobots = node({
       }
     },
     onError: 'continueRegularOutput',
-    position: [1540, 520]
+    position: [2040, 520]
   },
   output: [{ body: 'User-agent: *\nAllow: /', statusCode: 200, headers: {} }]
+});
+
+const assessFetch = node({
+  type: 'n8n-nodes-base.code',
+  version: 2,
+  config: {
+    name: 'Assess Page Fetch',
+    parameters: {
+      mode: 'runOnceForAllItems',
+      language: 'javaScript',
+      jsCode: `var j = $input.first().json;
+var body = typeof j.body === 'string' ? j.body : '';
+var sc = j.statusCode || 0;
+var challenge = /_cf_chl|cf-browser-verification|challenge-platform|<title>[^<]*(just a moment|attention required|access denied|verifying you are human)[^<]*<\\/title>/i.test(body.slice(0, 6000));
+var blocked = !body || sc >= 400 || body.length < 1500 || challenge;
+return [{ json: { blocked: blocked, statusCode: sc } }];`
+    },
+    position: [980, 520]
+  },
+  output: [{ blocked: false, statusCode: 200 }]
+});
+
+const originBlocked = node({
+  type: 'n8n-nodes-base.if',
+  version: 2.3,
+  config: {
+    name: 'Origin Blocked?',
+    parameters: {
+      conditions: {
+        options: { caseSensitive: true, typeValidation: 'loose' },
+        combinator: 'and',
+        conditions: [{ id: 'blocked-check', leftValue: expr('{{ $json.blocked }}'), rightValue: true, operator: { type: 'boolean', operation: 'true' } }]
+      },
+      looseTypeValidation: true
+    },
+    position: [1180, 520]
+  }
+});
+
+const fetchPageJina = node({
+  type: 'n8n-nodes-base.httpRequest',
+  version: 4.4,
+  config: {
+    name: 'Fetch Page via Jina',
+    parameters: {
+      method: 'GET',
+      url: expr("https://r.jina.ai/{{ $('Normalize URL').first().json.url }}"),
+      sendHeaders: true,
+      headerParameters: { parameters: [{ name: 'X-Return-Format', value: 'html' }] },
+      options: {
+        timeout: 15000,
+        response: { response: { fullResponse: true, neverError: true, responseFormat: 'text', outputPropertyName: 'body' } }
+      }
+    },
+    onError: 'continueRegularOutput',
+    position: [1380, 660]
+  },
+  output: [{ body: '<html>rendered DOM...</html>', statusCode: 200, headers: {} }]
 });
 
 const scoreEngine = node({
@@ -351,8 +409,17 @@ var jinaStatus = jinaRes.statusCode || 0;
 var jinaRaw = (typeof jinaRes.data === 'string') ? jinaRes.data : (typeof jinaRes.body === 'string' ? jinaRes.body : '');
 if (jinaStatus && jinaStatus !== 200) { jinaRaw = ''; }
 
+var proxyRes = grab('Fetch Page via Jina');
+var proxyHtml = (proxyRes.statusCode === 200 && typeof proxyRes.body === 'string') ? proxyRes.body : '';
+function looksBlocked(h) { return !h || h.length < 1500 || /_cf_chl|cf-browser-verification|challenge-platform|<title>[^<]*(just a moment|attention required|access denied|verifying you are human)[^<]*<\\/title>/i.test(h.slice(0, 6000)); }
+var fetchMode = 'direct';
+if ((looksBlocked(html) || pageStatus >= 400) && proxyHtml.length > 1500) {
+  html = proxyHtml;
+  fetchMode = 'rendered (Jina proxy)';
+}
+
 if ((!html || html.length < 300) && jinaRaw.length < 300) {
-  return [{ json: { ok: false, error: 'Could not fetch the page (HTTP ' + (pageStatus || 'no response') + '). The site may block automated access.' } }];
+  return [{ json: { ok: false, error: 'Could not fetch the page (HTTP ' + (pageStatus || 'no response') + '). The site blocks automated access (Cloudflare or similar) and the rendered-proxy fallback also failed.' } }];
 }
 
 var BT = String.fromCharCode(96);
@@ -720,13 +787,19 @@ addCheck('access', 'llmsManifest', 'llms.txt manifest', llmsOk ? 2 : 0, 2,
   'Publish /llms.txt at the domain root: a short markdown index of your most important pages.');
 
 addCheck('access', 'payloadWeight', 'Payload weight', htmlKB < 1024 ? 3 : (htmlKB < 2048 ? 1 : 0), 3,
-  'HTML is ' + (htmlKB >= 1024 ? r2(htmlKB / 1024) + ' MB' : htmlKB + ' KB') + '. ' + (htmlKB < 1024 ? 'Under the 1 MB crawl-budget target.' : 'Over 1 MB \\u2014 AI crawlers truncate or skip heavy pages.'),
+  'HTML is ' + (htmlKB >= 1024 ? r2(htmlKB / 1024) + ' MB' : htmlKB + ' KB') + (fetchMode === 'direct' ? '' : ' (rendered DOM size \\u2014 origin blocked direct fetching)') + '. ' + (htmlKB < 1024 ? 'Under the 1 MB crawl-budget target.' : 'Over 1 MB \\u2014 AI crawlers truncate or skip heavy pages.'),
   'Cut HTML under 1 MB: defer non-critical scripts, remove inline SVG bloat, lazy-load embeds.');
 
-var ssrOk = htmlWords >= 250 && (totalWords === 0 || htmlWords >= totalWords * 0.5);
-addCheck('access', 'serverRenderedText', 'Server-rendered article text', ssrOk ? 3 : (htmlWords >= 100 ? 1 : 0), 3,
-  htmlWords + ' words visible in raw HTML vs ' + totalWords + ' words extracted. ' + (ssrOk ? 'Content is server-rendered \\u2014 crawlable without JavaScript.' : 'Most content appears only after JavaScript runs \\u2014 many AI crawlers never see it.'),
-  'Server-render (SSR/SSG) the article body \\u2014 most AI crawlers do not execute JavaScript.');
+if (fetchMode === 'direct') {
+  var ssrOk = htmlWords >= 250 && (totalWords === 0 || htmlWords >= totalWords * 0.5);
+  addCheck('access', 'serverRenderedText', 'Server-rendered article text', ssrOk ? 3 : (htmlWords >= 100 ? 1 : 0), 3,
+    htmlWords + ' words visible in raw HTML vs ' + totalWords + ' words extracted. ' + (ssrOk ? 'Content is server-rendered \\u2014 crawlable without JavaScript.' : 'Most content appears only after JavaScript runs \\u2014 many AI crawlers never see it.'),
+    'Server-render (SSR/SSG) the article body \\u2014 most AI crawlers do not execute JavaScript.');
+} else {
+  addCheck('access', 'serverRenderedText', 'Server-rendered article text', 2, 3,
+    'Origin blocked direct fetching (HTTP ' + pageStatus + '), so content was measured on a browser-rendered copy \\u2014 raw server-side rendering could not be verified. Note: a hard bot wall can also block AI crawlers themselves.',
+    'Allow reputable crawlers through the bot protection (Cloudflare: verified-bots allowlist) and server-render the article body.');
+}
 
 var hygienePts = (titleTag.length >= 15 && titleTag.length <= 70 ? 0.5 : 0) + (metaDesc ? 0.5 : 0) + (hasCanonical ? 0.5 : 0) + (langAttr ? 0.5 : 0);
 addCheck('access', 'metaHygiene', 'Meta hygiene', Math.round(hygienePts), 2,
@@ -1007,11 +1080,11 @@ return [{ json: {
   issuesCount: issuesCount,
   pointsAvailable: pointsAvailable,
   fixAllPrompt: fixAllPrompt,
-  meta: { wordCount: totalWords, articleSource: articleSource, htmlKB: htmlKB, pageStatus: pageStatus, headings: { h1: effH1, h2: effH2, h3: effH3 }, schemaTypes: typeList, blockedBots: blockedBots },
+  meta: { wordCount: totalWords, articleSource: articleSource, pageFetch: fetchMode, htmlKB: htmlKB, pageStatus: pageStatus, headings: { h1: effH1, h2: effH2, h3: effH3 }, schemaTypes: typeList, blockedBots: blockedBots },
   categories: categories
 } }];`
     },
-    position: [1800, 520]
+    position: [2260, 520]
   },
   output: [{ ok: true, totalScore: 83, grade: 'A', verdict: 'Strong AI visibility', categories: [] }]
 });
@@ -1025,7 +1098,7 @@ const apiRespond = node({
       respondWith: 'firstIncomingItem',
       options: { responseHeaders: { entries: [{ name: 'Access-Control-Allow-Origin', value: '*' }] } }
     },
-    position: [2060, 520]
+    position: [2480, 520]
   }
 });
 
@@ -1038,7 +1111,11 @@ export default workflow('TmUOmIhnBh17MiCh', 'GEO Checker — AI Visibility Score
   .add(apiTrigger)
   .to(normalizeUrl)
   .to(fetchPage)
-  .to(fetchArticle)
+  .to(assessFetch)
+  .to(originBlocked
+    .onTrue(fetchPageJina.to(fetchArticle))
+    .onFalse(fetchArticle))
+  .add(fetchArticle)
   .to(fetchLlms)
   .to(fetchRobots)
   .to(scoreEngine)
