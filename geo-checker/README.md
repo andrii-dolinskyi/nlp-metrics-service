@@ -27,7 +27,7 @@ https://n8n-test.snoika.com/workflow/TmUOmIhnBh17MiCh
 5. `Score Engine` — single Code node, all deterministic (no LLM calls)
 6. `Send JSON Result`
 
-## Scoring: 6 categories, 100 points
+## Scoring: 7 categories, 100 points
 
 | Category | Pts | Checks |
 |---|---|---|

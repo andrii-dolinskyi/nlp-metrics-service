@@ -1,205 +1,4 @@
-import { workflow, node, trigger, sticky, expr } from '@n8n/workflow-sdk';
-
-const uiTrigger = trigger({
-  type: 'n8n-nodes-base.webhook',
-  version: 2.1,
-  config: {
-    name: 'Checker UI Request',
-    parameters: { httpMethod: 'GET', path: 'ai-visibility', responseMode: 'responseNode' },
-    position: [240, 180]
-  },
-  output: [{ query: {}, headers: {} }]
-});
-
-const serveUi = node({
-  type: 'n8n-nodes-base.respondToWebhook',
-  version: 1.5,
-  config: {
-    name: 'Serve Checker UI',
-    parameters: {
-      respondWith: 'text',
-      responseBody: `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Snoika AI Visibility Score</title>
-<style>
-:root{--bg:#0b0f1a;--card:#131a2b;--card2:#0f1524;--line:#232d45;--txt:#e8ecf5;--mut:#8b96ad;--acc:#6d8dff;--acc2:#9f6dff;--ok:#22c55e;--warn:#f59e0b;--bad:#ef4444}
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,Roboto,sans-serif;line-height:1.5}
-.wrap{max-width:880px;margin:0 auto;padding:40px 20px 80px}
-.badge{display:inline-block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--acc);border:1px solid var(--line);border-radius:99px;padding:4px 12px;margin-bottom:16px}
-h1{font-size:34px;font-weight:800;background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:10px}
-.tag{color:var(--mut);max-width:640px;margin-bottom:28px}
-.frm{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-.frm input{flex:1;min-width:260px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;color:var(--txt);font-size:15px;outline:none}
-.frm input:focus{border-color:var(--acc)}
-.frm button{background:linear-gradient(90deg,var(--acc),var(--acc2));border:0;border-radius:12px;padding:14px 22px;color:#fff;font-size:15px;font-weight:700;cursor:pointer}
-.frm button:disabled{opacity:.5;cursor:wait}
-.hint{font-size:12px;color:var(--mut);margin-bottom:30px}
-#status{display:none;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;color:var(--mut);margin-bottom:20px}
-.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--acc);border-top-color:transparent;border-radius:50%;margin-right:10px;vertical-align:-2px;animation:sp 0.8s linear infinite}
-@keyframes sp{to{transform:rotate(360deg)}}
-#error{display:none;background:#2a1420;border:1px solid #5b2333;border-radius:14px;padding:16px;color:#ff9db0;margin-bottom:20px}
-#result{display:none}
-.scorecard{display:flex;gap:28px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px;margin-bottom:16px}
-.ring{position:relative;width:150px;height:150px;flex:0 0 auto}
-.ring svg{transform:rotate(-90deg)}
-.ring .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.ring .num b{font-size:40px;font-weight:800}
-.ring .num span{font-size:12px;color:var(--mut)}
-.sc-info{flex:1;min-width:220px}
-.gradechip{display:inline-block;font-weight:800;font-size:14px;border-radius:8px;padding:4px 12px;margin-bottom:8px}
-.verdict{font-size:20px;font-weight:700;margin-bottom:8px}
-.chips{display:flex;gap:8px;flex-wrap:wrap}
-.chip{font-size:12px;color:var(--mut);background:var(--card2);border:1px solid var(--line);border-radius:99px;padding:4px 10px}
-.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin-bottom:16px}
-.toolbar .iss{font-size:14px;color:var(--mut)}
-.toolbar .iss b{color:var(--warn)}
-.cpy{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);padding:9px 14px;font-size:13px;cursor:pointer}
-.cpy:hover{border-color:var(--acc)}
-.cat{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden}
-.cat-h{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;cursor:pointer;user-select:none}
-.cat-h h3{font-size:16px}
-.cat-h .pts{font-size:14px;color:var(--mut)}
-.cat-h .pts b{color:var(--txt)}
-.bar{height:5px;background:var(--card2)}
-.bar i{display:block;height:100%;border-radius:0 3px 3px 0}
-.cat-b{display:none;border-top:1px solid var(--line)}
-.cat.open .cat-b{display:block}
-.chk{display:flex;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line)}
-.chk:last-child{border-bottom:0}
-.dot{width:10px;height:10px;border-radius:50%;margin-top:6px;flex:0 0 auto}
-.chk .bd{flex:1}
-.chk .lb{font-weight:600;font-size:14px;margin-bottom:2px}
-.chk .cm{font-size:13px;color:var(--mut)}
-.chk .pt{font-size:13px;color:var(--mut);white-space:nowrap;font-variant-numeric:tabular-nums}
-.fixbtn{margin-top:8px;display:inline-block;background:transparent;border:1px dashed var(--line);color:var(--acc);border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer}
-.sev{font-size:11px;font-weight:700;border-radius:6px;padding:2px 8px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
-.sev.clean{background:#0e2b1c;color:var(--ok)}
-.sev.notable{background:#2e2410;color:var(--warn)}
-.sev.heavy{background:#2e1216;color:var(--bad)}
-.diag{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;padding:14px 18px}
-.dcard{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:12px}
-.dcard .dv{font-size:18px;font-weight:800}
-.dcard .dl{font-size:12px;color:var(--acc);margin-bottom:2px}
-.dcard .dc{font-size:12px;color:var(--mut)}
-.subhead{padding:14px 18px 4px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
-.cta{background:linear-gradient(135deg,#182042,#1c1436);border:1px solid #2c3a68;border-radius:16px;padding:24px;margin-top:24px}
-.cta h3{margin-bottom:6px}
-.cta p{color:var(--mut);font-size:14px;margin-bottom:14px}
-.cta a{display:inline-block;background:linear-gradient(90deg,var(--acc),var(--acc2));color:#fff;text-decoration:none;font-weight:700;border-radius:10px;padding:11px 20px;font-size:14px}
-.foot{margin-top:36px;font-size:12px;color:var(--mut);text-align:center}
-</style>
-</head>
-<body>
-<div class="wrap">
-  <div class="badge">Free tool by Snoika</div>
-  <h1>AI Visibility Score</h1>
-  <p class="tag">Paste any URL and get a 40-signal audit of how likely the page is to be cited by ChatGPT, Perplexity, Google AI Overviews and Claude &mdash; including an AI-writing fingerprint scan no other checker runs.</p>
-  <form class="frm" id="frm">
-    <input id="url" type="text" placeholder="https://yoursite.com/blog/your-article" autocomplete="off">
-    <button id="go" type="submit">Score my page</button>
-  </form>
-  <div class="hint">Runs ~40 deterministic checks. No signup. Usually finishes in under 10 seconds.</div>
-  <div id="status"><span class="spin"></span><span id="stext">Fetching page&hellip;</span></div>
-  <div id="error"></div>
-  <div id="result"></div>
-  <div class="foot">Built by <a href="https://snoika.com" style="color:var(--acc)">Snoika</a> &mdash; AI marketing that gets you cited.</div>
-</div>
-<script>
-var API = '/webhook/ai-visibility-check';
-var STEPS = ['Fetching page HTML\u2026','Extracting the article\u2026','Reading structured data\u2026','Checking AI crawler access\u2026','Scanning for AI-writing patterns\u2026','Scoring 40+ signals\u2026'];
-var stepTimer = null;
-function h(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function el(id){return document.getElementById(id);}
-function statusColor(st){return st==='pass'?'var(--ok)':(st==='warn'?'var(--warn)':'var(--bad)');}
-function gradeColor(g){if(g==='A+'||g==='A')return['#0e2b1c','var(--ok)'];if(g==='B')return['#12283a','#38bdf8'];if(g==='C')return['#2e2410','var(--warn)'];return['#2e1216','var(--bad)'];}
-function ringColor(s){return s>=80?'#22c55e':(s>=70?'#38bdf8':(s>=55?'#f59e0b':'#ef4444'));}
-function copyTxt(btn,txt){
-  var done=function(){var o=btn.textContent;btn.textContent='Copied \u2713';setTimeout(function(){btn.textContent=o;},1600);};
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done,function(){fallbackCopy(txt);done();});}
-  else{fallbackCopy(txt);done();}
-}
-function fallbackCopy(txt){var t=document.createElement('textarea');t.value=txt;document.body.appendChild(t);t.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(t);}
-function renderCheck(c){
-  var fix='';
-  if(c.fixPrompt&&c.status!=='pass'){fix='<button class="fixbtn" data-fix="'+h(c.fixPrompt)+'">Copy fix prompt</button>';}
-  return '<div class="chk"><span class="dot" style="background:'+statusColor(c.status)+'"></span><div class="bd"><div class="lb">'+h(c.label)+'</div><div class="cm">'+h(c.comment)+'</div>'+fix+'</div><span class="pt">'+c.points+'/'+c.max+'</span></div>';
-}
-function renderPattern(p){
-  var cls=p.status==='clean'?'clean':(p.status==='notable'?'notable':'heavy');
-  return '<div class="chk"><span class="dot" style="background:'+(cls==='clean'?'var(--ok)':(cls==='notable'?'var(--warn)':'var(--bad)'))+'"></span><div class="bd"><div class="lb">'+h(p.label)+'</div><div class="cm">'+h(p.comment)+'</div></div><span class="sev '+cls+'">'+cls+'</span></div>';
-}
-function renderDiag(d){
-  return '<div class="dcard"><div class="dl">'+h(d.label)+'</div><div class="dv">'+h(d.value)+'</div><div class="dc">'+h(d.comment)+'</div></div>';
-}
-function render(r){
-  var gc=gradeColor(r.grade);
-  var circ=2*Math.PI*62;
-  var off=circ*(1-r.totalScore/100);
-  var html='';
-  html+='<div class="scorecard"><div class="ring"><svg width="150" height="150"><circle cx="75" cy="75" r="62" fill="none" stroke="var(--card2)" stroke-width="12"></circle><circle cx="75" cy="75" r="62" fill="none" stroke="'+ringColor(r.totalScore)+'" stroke-width="12" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'"></circle></svg><div class="num"><b>'+r.totalScore+'</b><span>/ 100</span></div></div>';
-  html+='<div class="sc-info"><span class="gradechip" style="background:'+gc[0]+';color:'+gc[1]+'">Grade '+h(r.grade)+'</span><div class="verdict">'+h(r.verdict)+'</div><div class="chips"><span class="chip">'+r.meta.wordCount+' words analyzed</span><span class="chip">Article via '+h(r.meta.articleSource)+'</span><span class="chip">Page fetch: '+h(r.meta.pageFetch||'direct')+'</span><span class="chip">HTML '+r.meta.htmlKB+' KB</span><span class="chip">HTTP '+r.meta.pageStatus+'</span></div></div></div>';
-  html+='<div class="toolbar"><span class="iss"><b>'+r.issuesCount+' issues</b> &bull; +'+r.pointsAvailable+' pts available</span><button class="cpy" id="fixall">Copy Fix-All Prompt</button></div>';
-  for(var i=0;i<r.categories.length;i++){
-    var cat=r.categories[i];
-    var pct=cat.max>0?Math.round(cat.score/cat.max*100):0;
-    var barc=pct>=80?'var(--ok)':(pct>=50?'var(--warn)':'var(--bad)');
-    html+='<div class="cat'+(i<2?' open':'')+'"><div class="cat-h"><h3>'+h(cat.name)+'</h3><span class="pts"><b>'+cat.score+'</b> / '+cat.max+'</span></div><div class="bar"><i style="width:'+pct+'%;background:'+barc+'"></i></div><div class="cat-b">';
-    if(cat.id==='voice'){
-      html+='<div class="subhead">AI-writing fingerprints (16 detectors)</div>';
-      for(var p=0;p<cat.patterns.length;p++){html+=renderPattern(cat.patterns[p]);}
-      html+='<div class="subhead">Writing diagnostics</div><div class="diag">';
-      for(var d=0;d<cat.diagnostics.length;d++){html+=renderDiag(cat.diagnostics[d]);}
-      html+='</div>';
-      if(cat.fixPrompt){html+='<div style="padding:0 18px 16px"><button class="fixbtn" data-fix="'+h(cat.fixPrompt)+'">Copy humanize prompt</button></div>';}
-    } else {
-      for(var c=0;c<cat.checks.length;c++){html+=renderCheck(cat.checks[c]);}
-    }
-    html+='</div></div>';
-  }
-  html+='<div class="cta"><h3>Too many AI fingerprints on your content?</h3><p>This scan is exactly how AI engines and readers spot machine-written pages. Snoika produces and rehabilitates content that reads human and gets cited by ChatGPT, Perplexity and Google AI Overviews.</p><a href="https://snoika.com" target="_blank" rel="noopener">Talk to Snoika &rarr;</a></div>';
-  el('result').innerHTML=html;
-  el('result').style.display='block';
-  var heads=el('result').querySelectorAll('.cat-h');
-  for(var k=0;k<heads.length;k++){heads[k].addEventListener('click',function(){this.parentNode.classList.toggle('open');});}
-  var fixes=el('result').querySelectorAll('[data-fix]');
-  for(var f=0;f<fixes.length;f++){fixes[f].addEventListener('click',function(){copyTxt(this,this.getAttribute('data-fix'));});}
-  var fa=el('fixall');
-  if(fa){fa.addEventListener('click',function(){copyTxt(this,r.fixAllPrompt||'');});}
-}
-el('frm').addEventListener('submit',function(ev){
-  ev.preventDefault();
-  var v=el('url').value.trim();
-  if(!v){return;}
-  el('error').style.display='none';
-  el('result').style.display='none';
-  el('go').disabled=true;
-  el('status').style.display='block';
-  var si=0;el('stext').textContent=STEPS[0];
-  stepTimer=setInterval(function(){si=(si+1)%STEPS.length;el('stext').textContent=STEPS[si];},1600);
-  fetch(API+'?url='+encodeURIComponent(v),{method:'POST'})
-    .then(function(res){return res.json();})
-    .then(function(data){
-      clearInterval(stepTimer);el('status').style.display='none';el('go').disabled=false;
-      if(!data||data.ok===false){el('error').textContent=(data&&data.error)?data.error:'Something went wrong. Try again.';el('error').style.display='block';return;}
-      render(data);
-    })
-    .catch(function(){
-      clearInterval(stepTimer);el('status').style.display='none';el('go').disabled=false;
-      el('error').textContent='Could not reach the scoring service. Try again in a moment.';el('error').style.display='block';
-    });
-});
-</script>
-</body>
-</html>`,
-      options: { responseHeaders: { entries: [{ name: 'Content-Type', value: 'text/html; charset=utf-8' }] } }
-    },
-    position: [540, 180]
-  }
-});
+import { workflow, node, trigger, merge, sticky, expr, newCredential } from '@n8n/workflow-sdk';
 
 const apiTrigger = trigger({
   type: 'n8n-nodes-base.webhook',
@@ -207,7 +6,7 @@ const apiTrigger = trigger({
   config: {
     name: 'Score API Request',
     parameters: { httpMethod: 'POST', path: 'ai-visibility-check', responseMode: 'responseNode' },
-    position: [240, 520]
+    position: [-160, 336]
   },
   output: [{ query: { url: 'https://example.com/blog/post' }, body: {}, headers: {} }]
 });
@@ -217,10 +16,7 @@ const normalizeUrl = node({
   version: 2,
   config: {
     name: 'Normalize URL',
-    parameters: {
-      mode: 'runOnceForAllItems',
-      language: 'javaScript',
-      jsCode: `var inp = $input.first().json;
+    parameters: { mode: 'runOnceForAllItems', language: 'javaScript', jsCode: `var inp = $input.first().json;
 var q = inp.query || {};
 var b = inp.body || {};
 var raw = String(q.url || b.url || '').trim();
@@ -234,9 +30,8 @@ var privateHost = host === 'localhost' || host.slice(-6) === '.local' || host.sl
 if (privateHost) { return [{ json: { error: 'Private and internal addresses are not allowed.' } }]; }
 if (!/^[a-z0-9.-]+$/.test(host) || host.indexOf('.') === -1) { return [{ json: { error: 'That does not look like a valid URL.' } }]; }
 var origin = m[1].toLowerCase() + '://' + hostPort;
-return [{ json: { url: raw, origin: origin, host: host } }];`
-    },
-    position: [500, 520]
+return [{ json: { url: raw, origin: origin, host: host } }];` },
+    position: [64, 336]
   },
   output: [{ url: 'https://example.com/blog/post', origin: 'https://example.com', host: 'example.com' }]
 });
@@ -262,9 +57,43 @@ const fetchPage = node({
       }
     },
     onError: 'continueRegularOutput',
-    position: [760, 520]
+    position: [736, -32]
   },
   output: [{ body: '<html>...</html>', headers: { 'content-type': 'text/html' }, statusCode: 200 }]
+});
+
+const assessFetch = node({
+  type: 'n8n-nodes-base.code',
+  version: 2,
+  config: {
+    name: 'Assess Page Fetch',
+    parameters: { mode: 'runOnceForAllItems', language: 'javaScript', jsCode: `var j = $input.first().json;
+var body = typeof j.body === 'string' ? j.body : '';
+var sc = j.statusCode || 0;
+var challenge = /_cf_chl|cf-browser-verification|challenge-platform|<title>[^<]*(just a moment|attention required|access denied|verifying you are human)[^<]*<\\/title>/i.test(body.slice(0, 6000));
+var blocked = !body || sc >= 400 || body.length < 1500 || challenge;
+return [{ json: { blocked: blocked, statusCode: sc } }];` },
+    position: [976, -32]
+  },
+  output: [{ blocked: false, statusCode: 200 }]
+});
+
+const extractTavily = node({
+  type: '@tavily/n8n-nodes-tavily.tavily',
+  version: 1,
+  config: {
+    name: 'Extract',
+    parameters: {
+      resource: 'extract',
+      urls: [expr("{{ $('Normalize URL').first().json.url }}")],
+      options: { include_images: true, extract_depth: 'advanced', format: 'markdown', include_favicon: true }
+    },
+    credentials: { tavilyApi: newCredential('Tavily API') },
+    onError: 'continueRegularOutput',
+    alwaysOutputData: true,
+    position: [816, 176]
+  },
+  output: [{ results: [{ url: 'https://example.com', raw_content: 'markdown...', images: [], favicon: 'https://example.com/favicon.ico' }] }]
 });
 
 const fetchArticle = node({
@@ -283,9 +112,9 @@ const fetchArticle = node({
       }
     },
     onError: 'continueRegularOutput',
-    position: [1600, 520]
+    position: [800, 400]
   },
-  output: [{ data: '# Article title\n\nMarkdown content...', statusCode: 200, headers: {} }]
+  output: [{ data: '# Article title', statusCode: 200, headers: {} }]
 });
 
 const fetchLlms = node({
@@ -303,7 +132,7 @@ const fetchLlms = node({
       }
     },
     onError: 'continueRegularOutput',
-    position: [1820, 520]
+    position: [736, 592]
   },
   output: [{ body: '# llms.txt', statusCode: 200, headers: {} }]
 });
@@ -323,67 +152,18 @@ const fetchRobots = node({
       }
     },
     onError: 'continueRegularOutput',
-    position: [2040, 520]
+    position: [672, 784]
   },
-  output: [{ body: 'User-agent: *\nAllow: /', statusCode: 200, headers: {} }]
+  output: [{ body: 'User-agent: *', statusCode: 200, headers: {} }]
 });
 
-const assessFetch = node({
-  type: 'n8n-nodes-base.code',
-  version: 2,
+const waitAll = merge({
+  version: 3.2,
   config: {
-    name: 'Assess Page Fetch',
-    parameters: {
-      mode: 'runOnceForAllItems',
-      language: 'javaScript',
-      jsCode: `var j = $input.first().json;
-var body = typeof j.body === 'string' ? j.body : '';
-var sc = j.statusCode || 0;
-var challenge = /_cf_chl|cf-browser-verification|challenge-platform|<title>[^<]*(just a moment|attention required|access denied|verifying you are human)[^<]*<\\/title>/i.test(body.slice(0, 6000));
-var blocked = !body || sc >= 400 || body.length < 1500 || challenge;
-return [{ json: { blocked: blocked, statusCode: sc } }];`
-    },
-    position: [980, 520]
-  },
-  output: [{ blocked: false, statusCode: 200 }]
-});
-
-const originBlocked = node({
-  type: 'n8n-nodes-base.if',
-  version: 2.3,
-  config: {
-    name: 'Origin Blocked?',
-    parameters: {
-      conditions: {
-        options: { caseSensitive: true, typeValidation: 'loose' },
-        combinator: 'and',
-        conditions: [{ id: 'blocked-check', leftValue: expr('{{ $json.blocked }}'), rightValue: true, operator: { type: 'boolean', operation: 'true' } }]
-      },
-      looseTypeValidation: true
-    },
-    position: [1180, 520]
+    name: 'Wait For All Sources',
+    parameters: { mode: 'append', numberInputs: 5 },
+    position: [1600, 368]
   }
-});
-
-const fetchPageJina = node({
-  type: 'n8n-nodes-base.httpRequest',
-  version: 4.4,
-  config: {
-    name: 'Fetch Page via Jina',
-    parameters: {
-      method: 'GET',
-      url: expr("https://r.jina.ai/{{ $('Normalize URL').first().json.url }}"),
-      sendHeaders: true,
-      headerParameters: { parameters: [{ name: 'X-Return-Format', value: 'html' }] },
-      options: {
-        timeout: 15000,
-        response: { response: { fullResponse: true, neverError: true, responseFormat: 'text', outputPropertyName: 'body' } }
-      }
-    },
-    onError: 'continueRegularOutput',
-    position: [1380, 660]
-  },
-  output: [{ body: '<html>rendered DOM...</html>', statusCode: 200, headers: {} }]
 });
 
 const scoreEngine = node({
@@ -391,11 +171,8 @@ const scoreEngine = node({
   version: 2,
   config: {
     name: 'Score Engine',
-    parameters: {
-      mode: 'runOnceForAllItems',
-      language: 'javaScript',
-      jsCode: `var nu = $('Normalize URL').first().json;
-if (nu.error) { return [{ json: { ok: false, error: nu.error } }]; }
+    parameters: { mode: 'runOnceForAllItems', language: 'javaScript', jsCode: `var nu = $('Normalize URL').first().json;
+if (nu.error) { return [{ json: { page: {}, payload: { error: nu.error } } }]; }
 
 function grab(name) { try { return $(name).first().json || {}; } catch (e) { return {}; } }
 var pageRes = grab('Fetch Page HTML');
@@ -409,17 +186,20 @@ var jinaStatus = jinaRes.statusCode || 0;
 var jinaRaw = (typeof jinaRes.data === 'string') ? jinaRes.data : (typeof jinaRes.body === 'string' ? jinaRes.body : '');
 if (jinaStatus && jinaStatus !== 200) { jinaRaw = ''; }
 
-var proxyRes = grab('Fetch Page via Jina');
-var proxyHtml = (proxyRes.statusCode === 200 && typeof proxyRes.body === 'string') ? proxyRes.body : '';
-function looksBlocked(h) { return !h || h.length < 1500 || /_cf_chl|cf-browser-verification|challenge-platform|<title>[^<]*(just a moment|attention required|access denied|verifying you are human)[^<]*<\\/title>/i.test(h.slice(0, 6000)); }
-var fetchMode = 'direct';
-if ((looksBlocked(html) || pageStatus >= 400) && proxyHtml.length > 1500) {
-  html = proxyHtml;
-  fetchMode = 'rendered (Jina proxy)';
-}
+var tavRes = grab('Extract');
+var tavItem = tavRes.results && tavRes.results.length ? tavRes.results[0] : tavRes;
+var tavContent = (typeof tavItem.raw_content === 'string') ? tavItem.raw_content : ((typeof tavItem.rawContent === 'string') ? tavItem.rawContent : ((typeof tavItem.content === 'string') ? tavItem.content : ''));
+var tavImagesRaw = Array.isArray(tavItem.images) ? tavItem.images : [];
+var tavImgCount = tavImagesRaw.length;
+var tavFavicon = (typeof tavItem.favicon === 'string' && tavItem.favicon) ? tavItem.favicon : '';
 
-if ((!html || html.length < 300) && jinaRaw.length < 300) {
-  return [{ json: { ok: false, error: 'Could not fetch the page (HTTP ' + (pageStatus || 'no response') + '). The site blocks automated access (Cloudflare or similar) and the rendered-proxy fallback also failed.' } }];
+function looksBlocked(h) { return !h || h.length < 1500 || /_cf_chl|cf-browser-verification|challenge-platform|<title>[^<]*(just a moment|attention required|access denied|verifying you are human)[^<]*<\\/title>/i.test(h.slice(0, 6000)); }
+var htmlUsable = !looksBlocked(html) && pageStatus > 0 && pageStatus < 400;
+var fetchMode = htmlUsable ? 'direct' : 'blocked (bot wall)';
+if (!htmlUsable) { html = ''; }
+
+if (!html && jinaRaw.length < 300 && tavContent.length < 300) {
+  return [{ json: { page: { url: nu.url, httpStatus: pageStatus }, payload: { error: 'Could not fetch the page (HTTP ' + (pageStatus || 'no response') + '). The site blocks automated access and no extractor could read it.' } } }];
 }
 
 var BT = String.fromCharCode(96);
@@ -521,6 +301,10 @@ var article = jinaRaw;
 var mci = article.indexOf('Markdown Content:');
 if (mci > -1 && mci < 500) { article = article.slice(mci + 17); }
 var articleSource = 'Jina Reader';
+if (article.replace(/\\s+/g, ' ').trim().length < 200 && tavContent.replace(/\\s+/g, ' ').trim().length >= 200) {
+  article = tavContent;
+  articleSource = 'Tavily Extract';
+}
 if (article.replace(/\\s+/g, ' ').trim().length < 200) {
   articleSource = 'HTML fallback';
   var scope = htmlNoScript;
@@ -558,7 +342,7 @@ var totalWords = wordsArray.length;
 var per1kDiv = Math.max(totalWords, 1) / 1000;
 
 if (totalWords < 80) {
-  return [{ json: { ok: false, error: 'Only ' + totalWords + ' words of article text could be extracted \\u2014 not enough to score. The page may be behind JavaScript or a paywall.' } }];
+  return [{ json: { page: { url: nu.url, httpStatus: pageStatus }, payload: { error: 'Only ' + totalWords + ' words of article text could be extracted \\u2014 not enough to score. The page may be behind JavaScript or a paywall.' } } }];
 }
 
 var mdSections = [];
@@ -656,13 +440,15 @@ if (robotsFound) { AI_BOTS.forEach(function (bpair) { if (botBlocked(bpair[1])) 
 var llmsOk = llmsRes.statusCode === 200 && typeof llmsRes.body === 'string' && llmsRes.body.trim().length > 20 && llmsRes.body.trim().charAt(0) !== '<';
 
 var categories = [
-  { id: 'answer', name: 'Answer Architecture', max: 25, score: 0, checks: [] },
+  { id: 'answer', name: 'Answer Architecture', max: 22, score: 0, checks: [] },
   { id: 'machine', name: 'Machine-Readable Signals', max: 15, score: 0, checks: [] },
-  { id: 'evidence', name: 'Evidence & Trust', max: 20, score: 0, checks: [] },
+  { id: 'evidence', name: 'Evidence & Trust', max: 18, score: 0, checks: [] },
   { id: 'access', name: 'AI Crawler Access', max: 15, score: 0, checks: [] },
-  { id: 'recency', name: 'Recency Signals', max: 10, score: 0, checks: [] },
-  { id: 'voice', name: 'Human Voice', max: 15, score: 0, checks: [], patterns: [], diagnostics: [] }
+  { id: 'recency', name: 'Recency Signals', max: 8, score: 0, checks: [] },
+  { id: 'voice', name: 'Human Voice', max: 12, score: 0, checks: [], patterns: [] },
+  { id: 'linguistic', name: 'Linguistic Signature', max: 10, score: 0, checks: [], metrics: [] }
 ];
+var verifyNote = htmlUsable ? '' : ' (could not fully verify \\u2014 the origin blocks automated fetching, which also hinders AI crawlers)';
 function cat(id) { for (var i = 0; i < categories.length; i++) { if (categories[i].id === id) { return categories[i]; } } }
 function addCheck(catId, id, label, points, max, comment, fixPrompt) {
   points = Math.max(0, Math.min(max, Math.round(points)));
@@ -675,13 +461,13 @@ function addCheck(catId, id, label, points, max, comment, fixPrompt) {
 var skeletonPts = 0;
 var skeletonNotes = [];
 if (effH1 === 1) { skeletonPts += 2; } else { skeletonNotes.push(effH1 === 0 ? 'no H1 found' : effH1 + ' H1 tags (should be exactly 1)'); }
-if (effH2 >= 3) { skeletonPts += 2; } else { skeletonNotes.push('only ' + effH2 + ' H2 sections (aim for 3+)'); }
+if (effH2 >= 3) { skeletonPts += 1; } else { skeletonNotes.push('only ' + effH2 + ' H2 sections (aim for 3+)'); }
 var skips = 0;
 var prevLevel = 0;
 headings.forEach(function (hh) { if (prevLevel > 0 && hh.level > prevLevel + 1) { skips++; } prevLevel = hh.level; });
 if (headings.length === 0 || skips === 0) { skeletonPts += 1; } else { skeletonNotes.push(skips + ' heading level skips'); }
-addCheck('answer', 'headingSkeleton', 'Heading skeleton (H1\\u2192H2\\u2192H3)', skeletonPts, 5,
-  skeletonPts === 5 ? 'Found ' + effH1 + ' H1, ' + effH2 + ' H2, ' + effH3 + ' H3. Clean outline \\u2014 retrieval systems chunk this page correctly.' : 'Found ' + effH1 + ' H1, ' + effH2 + ' H2, ' + effH3 + ' H3. Problems: ' + skeletonNotes.join('; ') + '.',
+addCheck('answer', 'headingSkeleton', 'Heading skeleton (H1\\u2192H2\\u2192H3)', skeletonPts, 4,
+  skeletonPts === 4 ? 'Found ' + effH1 + ' H1, ' + effH2 + ' H2, ' + effH3 + ' H3. Clean outline \\u2014 retrieval systems chunk this page correctly.' : 'Found ' + effH1 + ' H1, ' + effH2 + ' H2, ' + effH3 + ' H3. Problems: ' + skeletonNotes.join('; ') + '.',
   'Restructure headings: exactly one H1, at least 3 H2 sections, H3 only nested under H2, no level skips.');
 
 var qHeads = subHeadTexts.filter(function (t) { return /\\?\\s*$/.test(t) || /^(how|what|why|when|where|which|who|can|should|is|are|do|does|will)\\b/i.test(t); }).length;
@@ -711,25 +497,25 @@ var directSecs = mdSections.filter(function (s) {
   return !/^(in today|when it comes|before we|let's|as we|in this section|now that)/i.test(s.firstPara);
 }).length;
 var directShare = mdSections.length ? directSecs / mdSections.length : 0;
-addCheck('answer', 'answerFirstOpeners', 'Answer-first section openers', directShare >= 0.7 ? 5 : (directShare >= 0.4 ? 3 : (directSecs > 0 ? 1 : 0)), 5,
+addCheck('answer', 'answerFirstOpeners', 'Answer-first section openers', directShare >= 0.7 ? 4 : (directShare >= 0.4 ? 2 : (directSecs > 0 ? 1 : 0)), 4,
   mdSections.length ? directSecs + ' of ' + mdSections.length + ' sections open with a compact direct answer (\\u226465 words). ' + (directShare >= 0.7 ? 'Engines can quote your openers as-is.' : 'AI engines prefer sections that answer first, then elaborate.') : 'No sections detected to evaluate.',
   'Open every H2 section with a 1\\u20132 sentence direct answer (under 50 words) before any buildup.');
 
 var faqHeading = subHeadTexts.some(function (t) { return /faq|frequently asked|common questions|q\\s*&\\s*a/i.test(t); });
-addCheck('answer', 'qaCoverage', 'Q&A coverage (FAQ block)', hasType('FAQPage') ? 4 : (faqHeading ? 2 : 0), 4,
+addCheck('answer', 'qaCoverage', 'Q&A coverage (FAQ block)', hasType('FAQPage') ? 3 : (faqHeading ? 1 : 0), 3,
   hasType('FAQPage') ? 'FAQPage schema detected \\u2014 pages with FAQ markup get cited roughly 2.7\\u00D7 more often.' : (faqHeading ? 'FAQ section found in headings, but no FAQPage schema to make it machine-readable.' : 'No FAQ section or FAQPage schema found.'),
   'Add an FAQ section with 5+ real user questions and mark it up with FAQPage JSON-LD.');
 
 addCheck('machine', 'structuredCore', 'Structured data present', ldBlocks > 0 && typeList.length > 0 ? 3 : (ldBlocks > 0 ? 1 : 0), 3,
-  ldBlocks > 0 ? ldBlocks + ' JSON-LD block(s): ' + (typeList.slice(0, 6).join(', ') || 'unparseable') + '.' : 'No JSON-LD structured data \\u2014 the page is invisible to entity-based retrieval.',
+  ldBlocks > 0 ? ldBlocks + ' JSON-LD block(s): ' + (typeList.slice(0, 6).join(', ') || 'unparseable') + '.' : 'No JSON-LD structured data' + verifyNote + ' \\u2014 the page is invisible to entity-based retrieval.',
   'Add JSON-LD structured data: at minimum Article + Organization with sameAs links.');
 
-var artPts = (articleNode ? 2 : 0) + (dateModified ? 1 : 0) + ((ldAuthorName || (articleNode && articleNode.author)) ? 1 : 0);
-addCheck('machine', 'articleIdentity', 'Article schema with date & author', artPts, 4,
+var artPts = (articleNode ? 1 : 0) + (dateModified ? 1 : 0) + ((ldAuthorName || (articleNode && articleNode.author)) ? 1 : 0);
+addCheck('machine', 'articleIdentity', 'Article schema with date & author', artPts, 3,
   articleNode ? 'Article schema \\u2713' + (dateModified ? ' \\u00B7 dateModified \\u2713' : ' \\u00B7 dateModified missing') + (ldAuthorName ? ' \\u00B7 author: ' + ldAuthorName : ' \\u00B7 author missing') : 'No Article/BlogPosting schema found.',
   'Add Article JSON-LD with headline, author (Person), datePublished and dateModified.');
 
-addCheck('machine', 'qaSchema', 'Q&A / HowTo schema', hasType('FAQPage') ? 3 : ((hasType('HowTo') || hasType('QAPage')) ? 2 : 0), 3,
+addCheck('machine', 'qaSchema', 'Q&A / HowTo schema', hasType('FAQPage') ? 2 : ((hasType('HowTo') || hasType('QAPage')) ? 1 : 0), 2,
   hasType('FAQPage') ? 'FAQPage schema \\u2713' : (hasType('HowTo') ? 'HowTo schema \\u2713 (add FAQPage for full points)' : (hasType('QAPage') ? 'QAPage schema \\u2713' : 'No FAQPage, QAPage or HowTo schema.')),
   'Add FAQPage (or HowTo) JSON-LD that mirrors visible Q&A content on the page.');
 
@@ -743,26 +529,49 @@ addCheck('machine', 'wayfindingSchema', 'Wayfinding schema (Breadcrumb / ItemLis
   (hasType('BreadcrumbList') ? 'BreadcrumbList \\u2713 ' : 'BreadcrumbList missing ') + '\\u00B7 ' + (hasType('ItemList') ? 'ItemList \\u2713' : 'ItemList missing'),
   'Add BreadcrumbList JSON-LD; for listicles also add ItemList naming each item.');
 
-addCheck('evidence', 'numbersDensity', 'Hard numbers density', statPer200 >= 1 ? 5 : (statPer200 >= 0.5 ? 3 : (statCount > 0 ? 1 : 0)), 5,
+var imgTags = htmlNoScript.match(/<img\\b[^>]*>/gi) || [];
+var imgTotal = imgTags.length;
+var imgWithAlt = imgTags.filter(function (t) { return /alt=["'][^"']+["']/i.test(t); }).length;
+var imagesFound = Math.max(imgTotal, tavImgCount);
+var altPct = imgTotal > 0 ? Math.round(imgWithAlt / imgTotal * 100) : 0;
+var altPts, altComment;
+if (imgTotal === 0 && tavImgCount === 0) {
+  altPts = 0;
+  altComment = 'No images detected on the page \\u2014 nothing for multimodal AI retrieval to index.';
+} else if (imgTotal === 0 && tavImgCount > 0) {
+  altPts = 1;
+  altComment = tavImgCount + ' image(s) found via extraction, but alt text could not be verified' + verifyNote + '.';
+} else {
+  altPts = altPct >= 80 ? 2 : (altPct >= 50 ? 1 : 0);
+  altComment = imgWithAlt + ' of ' + imgTotal + ' images carry descriptive alt text (' + altPct + '%). ' + (altPct >= 80 ? 'Machines can read your visuals.' : 'Alt text is how AI engines understand images \\u2014 target 80%+ coverage.');
+}
+addCheck('machine', 'imageAltCoverage', 'Image alt-text coverage', altPts, 2, altComment,
+  'Add descriptive alt text (8\\u201315 words, factual) to every content image.');
+
+addCheck('evidence', 'numbersDensity', 'Hard numbers density', statPer200 >= 1 ? 4 : (statPer200 >= 0.5 ? 2 : (statCount > 0 ? 1 : 0)), 4,
   statCount + ' statistics in ' + totalWords + ' words (' + statPer200 + ' per 200 words). ' + (statPer200 >= 1 ? 'Princeton GEO research: statistics lift AI visibility ~41%.' : 'Target \\u22651 stat per 200 words \\u2014 numbers are what AI answers quote.'),
   'Weave one concrete statistic (with source) into every 150\\u2013200 words of copy.');
 
-addCheck('evidence', 'primarySources', 'Primary-source citations', authCount >= 3 ? 5 : (authCount === 2 ? 3 : (authCount === 1 ? 2 : 0)), 5,
+addCheck('evidence', 'primarySources', 'Primary-source citations', authCount >= 3 ? 4 : (authCount === 2 ? 2 : (authCount === 1 ? 1 : 0)), 4,
   authCount + ' authoritative outbound domains of ' + extLinks + ' external links' + (authCount ? ' (' + Object.keys(authHosts).slice(0, 3).join(', ') + ')' : '') + '. ' + (authCount >= 3 ? 'Strong trust graph.' : 'Linking .gov/.edu/journals/major press lifts visibility 30\\u201340%.'),
   'Cite at least 3 primary sources: .gov, .edu, peer-reviewed journals, Wikipedia or major publications.');
 
-addCheck('evidence', 'expertVoices', 'Expert voices & quotes', quoteSignals >= 2 ? 3 : (quoteSignals === 1 ? 1 : 0), 3,
+addCheck('evidence', 'expertVoices', 'Expert voices & quotes', quoteSignals >= 2 ? 2 : (quoteSignals === 1 ? 1 : 0), 2,
   quoteSignals >= 2 ? quoteSignals + ' attributed quotes/expert references found. Quotation adds ~28% visibility (Princeton GEO).' : (quoteSignals === 1 ? 'Only 1 attributed quote found \\u2014 add one or two more named experts.' : 'No expert quotes or named attributions detected.'),
   'Add 2\\u20133 quotes from named experts with title and affiliation, in quotation marks with attribution.');
 
-var authorPts = (bylineHtml ? 2 : 0) + (ldAuthorName ? 2 : 0);
-addCheck('evidence', 'namedAuthor', 'Named author & byline', authorPts, 4,
-  authorPts === 4 ? 'Visible byline \\u2713 and author schema (' + ldAuthorName + ') \\u2713.' : (bylineHtml ? 'Visible byline found, but no author in schema.' : (ldAuthorName ? 'Author in schema (' + ldAuthorName + '), but no visible byline markup.' : 'No byline or author schema \\u2014 anonymous content earns less trust.')),
+var authorPts = (bylineHtml ? 2 : 0) + (ldAuthorName ? 1 : 0);
+addCheck('evidence', 'namedAuthor', 'Named author & byline', authorPts, 3,
+  authorPts === 3 ? 'Visible byline \\u2713 and author schema (' + ldAuthorName + ') \\u2713.' : (bylineHtml ? 'Visible byline found, but no author in schema.' : (ldAuthorName ? 'Author in schema (' + ldAuthorName + '), but no visible byline markup.' : 'No byline or author schema \\u2014 anonymous content earns less trust.')),
   'Add a visible author byline with credentials, matched by Person author markup in Article schema.');
 
 addCheck('evidence', 'topicDepth', 'Topic depth (word count)', totalWords >= 2000 ? 3 : (totalWords >= 1200 ? 2 : (totalWords >= 600 ? 1 : 0)), 3,
   totalWords + ' words. ' + (totalWords >= 2000 ? 'Strong topical depth.' : (totalWords >= 1200 ? 'Decent depth \\u2014 2,000+ words correlates with more citations.' : 'Thin coverage \\u2014 AI engines prefer comprehensive pages.')),
   'Expand the article to 1,500\\u20132,000+ words of substantive, non-padded coverage.');
+
+addCheck('evidence', 'visualAssets', 'Visual assets present', imagesFound >= 3 ? 2 : (imagesFound >= 1 ? 1 : 0), 2,
+  imagesFound > 0 ? imagesFound + ' image(s) on the page. ' + (imagesFound >= 3 ? 'Visuals get surfaced in AI multimodal answers and Google AI Overviews.' : 'Add 1\\u20132 more original visuals (charts, screenshots) \\u2014 they earn extra citation surfaces.') : 'No images found \\u2014 text-only pages miss multimodal AI answer slots entirely.',
+  'Add 3+ original, content-bearing images (charts, product shots, diagrams) with captions.');
 
 var botPts;
 var botComment;
@@ -786,18 +595,18 @@ addCheck('access', 'llmsManifest', 'llms.txt manifest', llmsOk ? 2 : 0, 2,
   llmsOk ? 'llms.txt found at the domain root.' : 'No llms.txt \\u2014 an emerging standard that hands AI crawlers a curated content map.',
   'Publish /llms.txt at the domain root: a short markdown index of your most important pages.');
 
-addCheck('access', 'payloadWeight', 'Payload weight', htmlKB < 1024 ? 3 : (htmlKB < 2048 ? 1 : 0), 3,
-  'HTML is ' + (htmlKB >= 1024 ? r2(htmlKB / 1024) + ' MB' : htmlKB + ' KB') + (fetchMode === 'direct' ? '' : ' (rendered DOM size \\u2014 origin blocked direct fetching)') + '. ' + (htmlKB < 1024 ? 'Under the 1 MB crawl-budget target.' : 'Over 1 MB \\u2014 AI crawlers truncate or skip heavy pages.'),
+addCheck('access', 'payloadWeight', 'Payload weight', htmlUsable ? (htmlKB < 1024 ? 2 : (htmlKB < 2048 ? 1 : 0)) : 1, 2,
+  htmlUsable ? ('HTML is ' + (htmlKB >= 1024 ? r2(htmlKB / 1024) + ' MB' : htmlKB + ' KB') + '. ' + (htmlKB < 1024 ? 'Under the 1 MB crawl-budget target.' : 'Over 1 MB \\u2014 AI crawlers truncate or skip heavy pages.')) : ('Page weight could not be measured' + verifyNote + '.'),
   'Cut HTML under 1 MB: defer non-critical scripts, remove inline SVG bloat, lazy-load embeds.');
 
-if (fetchMode === 'direct') {
+if (htmlUsable) {
   var ssrOk = htmlWords >= 250 && (totalWords === 0 || htmlWords >= totalWords * 0.5);
   addCheck('access', 'serverRenderedText', 'Server-rendered article text', ssrOk ? 3 : (htmlWords >= 100 ? 1 : 0), 3,
     htmlWords + ' words visible in raw HTML vs ' + totalWords + ' words extracted. ' + (ssrOk ? 'Content is server-rendered \\u2014 crawlable without JavaScript.' : 'Most content appears only after JavaScript runs \\u2014 many AI crawlers never see it.'),
     'Server-render (SSR/SSG) the article body \\u2014 most AI crawlers do not execute JavaScript.');
 } else {
-  addCheck('access', 'serverRenderedText', 'Server-rendered article text', 2, 3,
-    'Origin blocked direct fetching (HTTP ' + pageStatus + '), so content was measured on a browser-rendered copy \\u2014 raw server-side rendering could not be verified. Note: a hard bot wall can also block AI crawlers themselves.',
+  addCheck('access', 'serverRenderedText', 'Server-rendered article text', 1, 3,
+    'Origin blocked direct fetching (HTTP ' + pageStatus + ') \\u2014 server-side rendering could not be verified, and a hard bot wall can also block AI crawlers themselves.',
     'Allow reputable crawlers through the bot protection (Cloudflare: verified-bots allowlist) and server-render the article body.');
 }
 
@@ -806,11 +615,16 @@ addCheck('access', 'metaHygiene', 'Meta hygiene', Math.round(hygienePts), 2,
   'Title ' + (titleTag ? titleTag.length + ' chars' : 'missing') + ' \\u00B7 description ' + (metaDesc ? '\\u2713' : '\\u2717') + ' \\u00B7 canonical ' + (hasCanonical ? '\\u2713' : '\\u2717') + ' \\u00B7 lang ' + (langAttr ? '"' + langAttr + '"' : '\\u2717'),
   'Fix the basics: 15\\u201370 char title, meta description, canonical link, html lang attribute.');
 
-addCheck('recency', 'freshModified', 'Fresh dateModified', monthsAgo === -1 ? 0 : (monthsAgo <= 3 ? 4 : (monthsAgo <= 12 ? 3 : (monthsAgo <= 24 ? 1 : 0))), 4,
+var hasFavicon = !!tavFavicon || /<link[^>]*rel=["'][^"']*icon[^"']*["'][^>]*>/i.test(html);
+addCheck('access', 'brandFavicon', 'Favicon (brand identity)', hasFavicon ? 1 : 0, 1,
+  hasFavicon ? 'Favicon found' + (tavFavicon ? ' (' + tavFavicon.slice(0, 60) + ')' : '') + ' \\u2014 AI interfaces show it next to citations.' : 'No favicon detected \\u2014 cited links without one look less trustworthy in AI answer interfaces.',
+  'Add a favicon (and apple-touch-icon) at the domain root \\u2014 AI answer UIs display it beside your citation.');
+
+addCheck('recency', 'freshModified', 'Fresh dateModified', monthsAgo === -1 ? 0 : (monthsAgo <= 3 ? 3 : (monthsAgo <= 12 ? 2 : (monthsAgo <= 24 ? 1 : 0))), 3,
   monthsAgo === -1 ? 'No dateModified in schema or meta tags \\u2014 engines cannot verify freshness.' : 'Updated ' + monthsAgo + ' month(s) ago per structured data. ' + (monthsAgo <= 12 ? 'Within the 12-month citation sweet spot.' : 'Stale \\u2014 most cited pages are updated within 12 months.'),
   'Refresh the content and update dateModified in Article schema (and article:modified_time meta).');
 
-addCheck('recency', 'visibleTimestamp', 'Visible "last updated" stamp', tsMatch ? 3 : 0, 3,
+addCheck('recency', 'visibleTimestamp', 'Visible "last updated" stamp', tsMatch ? 2 : 0, 2,
   tsMatch ? 'Found: "' + tsMatch[0].trim().slice(0, 60) + '"' : 'No visible update timestamp \\u2014 both readers and engines look for one near the top.',
   'Display a visible "Last updated: [Month Year]" line near the top of the article.');
 
@@ -1022,7 +836,7 @@ addPattern('repeatedArguments', 'Repeated arguments', repTriKeys.length, repTriR
 ], { top: topTri ? trigrams[topTri] : 0, tri: topTri });
 
 var voiceIdx = idxDen > 0 ? idxNum / idxDen : 0;
-var voiceScore = Math.round(15 * (1 - voiceIdx));
+var voiceScore = Math.round(12 * (1 - voiceIdx));
 var heavyPatterns = patterns.filter(function (p) { return p.status === 'heavy'; });
 var notablePatterns = patterns.filter(function (p) { return p.status === 'notable'; });
 var vc = cat('voice');
@@ -1035,19 +849,42 @@ if (heavyPatterns.length > 0 || notablePatterns.length > 2) {
   vc.fixPrompt = 'Rewrite the article to remove AI-writing patterns while preserving all facts and structure. Specifically fix: ' + heavyPatterns.concat(notablePatterns).map(function (p) { return p.label.toLowerCase() + ' (' + p.count + ' found)'; }).join(', ') + '. Vary sentence length (target std deviation above 6), avoid "not just X, it\\u2019s Y" framings, replace vague attributions with named sources, and cut filler signposts.';
 }
 
-function dg(label, value, comment) { vc.diagnostics.push({ label: label, value: value, comment: comment }); }
-dg('Sentence burstiness', r1(burstiness), burstiness < 4 ? 'Very uniform rhythm \\u2014 AI-typical. Human writing lands \\u03C3 6\\u20139.' : (burstiness < 6 ? 'Moderate variation \\u2014 slightly mechanical. Humans average \\u03C3 6\\u20139.' : 'Naturally varied sentence lengths \\u2014 human-typical.'));
-dg('Avg sentence length', r1(avgSentLen) + ' words', avgSentLen > 25 ? 'Long \\u2014 hard to extract into answers. Aim for 15\\u201320.' : (avgSentLen < 10 ? 'Choppy \\u2014 may read as thin.' : 'In the 10\\u201325 word extraction sweet spot.'));
-dg('Opener variety', Math.round(openerVariety * 100) + '%', openerVariety < 0.4 ? 'Sentences keep starting the same way \\u2014 an AI monotone marker.' : (openerVariety < 0.6 ? 'Fair variety; ' + aiOpenerPct + '% start with generic openers (the/this/it\\u2026).' : 'Strong variety in sentence starts.'));
-dg('Generic openers', aiOpenerPct + '%', aiOpenerPct > 60 ? 'Over 60% of sentences start with the/this/it/in\\u2026 \\u2014 AI-typical.' : (aiOpenerPct > 45 ? 'Somewhat generic sentence starts.' : 'Healthy mix of sentence starts.'));
-dg('Lexical diversity (TTR)', r2(ttr), ttr < 0.3 ? 'Low \\u2014 vocabulary loops on itself.' : (ttr < 0.45 ? 'Mid-range diversity, typical for long-form.' : 'Rich vocabulary for this length.'));
-dg('One-use words (hapax)', Math.round(hapaxRatio * 100) + '%', hapaxRatio < 0.15 ? 'Few single-use words \\u2014 repetitive lexicon.' : (hapaxRatio < 0.3 ? 'Normal share of one-off words.' : 'High share of unique words \\u2014 human-typical breadth.'));
-dg('Avg paragraph length', Math.round(avgParaLen) + ' words', avgParaLen > 120 ? 'Dense paragraphs \\u2014 split for scannability.' : (avgParaLen < 25 ? 'Fragmented \\u2014 consider merging some.' : 'Comfortable paragraph sizing.'));
-dg('Clause mix', singleClausePct + '% simple / ' + complexPct + '% complex', singleClausePct > 75 ? 'Mostly single-clause sentences \\u2014 staccato, AI-listicle feel.' : (complexPct > 75 ? 'Almost everything is multi-clause \\u2014 dense to parse.' : 'Balanced simple/complex mix \\u2014 human-typical.'));
-dg('Tense consistency', tensePct + '%', tensePct < 60 ? 'Tense drifts between sentences \\u2014 tighten to one dominant tense.' : 'Dominant tense held \\u2014 consistent narration.');
-dg('Contrast connectives', connContrast + ' \\u00B7 causal: ' + connCause, connContrast + connCause === 0 ? 'No however/because-type connectives \\u2014 argumentation may feel flat.' : (connContrast / Math.max(totalWords, 1) * 1000 > 6 ? 'Heavy "however/although" load \\u2014 an AI balancing tic.' : 'Normal connective usage.'));
-dg('Nominalization', Math.round(nomRatio * 1000) / 10 + '%', nomRatio > 0.12 ? 'Abstract noun-heavy ("-tion/-ment") \\u2014 verbs are stronger.' : 'Concrete verb-led style.');
-dg('Repeated phrases', repeatedBigrams + ' bigrams / ' + repTriKeys.length + ' trigrams', repTriKeys.length > totalWords / 250 ? 'Noticeable phrase recycling' + (topTri ? ' (worst: "' + topTri + '")' : '') + '.' : 'Low phrase recycling.');
+var lc = cat('linguistic');
+var lingNum = 0, lingDen = 0;
+function lm2(id, label, value, sev, weight, comment) {
+  lingNum += weight * sev;
+  lingDen += weight * 2;
+  lc.metrics.push({ id: id, label: label, value: String(value), status: sev === 0 ? 'good' : (sev === 1 ? 'fair' : 'poor'), comment: comment });
+}
+lm2('burstiness', 'Sentence burstiness', r1(burstiness), burstiness < 4 ? 2 : (burstiness < 6 ? 1 : 0), 1.5,
+  burstiness < 4 ? 'Very uniform rhythm (\\u03C3 ' + r1(burstiness) + ') \\u2014 AI-typical. Human writing lands \\u03C3 6\\u20139.' : (burstiness < 6 ? 'Moderate variation (\\u03C3 ' + r1(burstiness) + ') \\u2014 slightly mechanical. Humans average \\u03C3 6\\u20139.' : 'Naturally varied sentence lengths (\\u03C3 ' + r1(burstiness) + ') \\u2014 human-typical.'));
+lm2('avgSentence', 'Avg sentence length', r1(avgSentLen) + ' words', (avgSentLen >= 10 && avgSentLen <= 25) ? 0 : ((avgSentLen >= 8 && avgSentLen <= 30) ? 1 : 2), 1,
+  avgSentLen > 25 ? 'Long (' + r1(avgSentLen) + ' words) \\u2014 hard to extract into answers. Aim for 15\\u201320.' : (avgSentLen < 10 ? 'Choppy (' + r1(avgSentLen) + ' words) \\u2014 may read as thin.' : r1(avgSentLen) + ' words \\u2014 in the 10\\u201325 word extraction sweet spot.'));
+lm2('openerVariety', 'Opener variety', Math.round(openerVariety * 100) + '%', openerVariety < 0.4 ? 2 : (openerVariety < 0.6 ? 1 : 0), 1,
+  openerVariety < 0.4 ? 'Only ' + Math.round(openerVariety * 100) + '% unique sentence starts \\u2014 an AI monotone marker.' : (openerVariety < 0.6 ? Math.round(openerVariety * 100) + '% unique starts \\u2014 fair variety; ' + aiOpenerPct + '% open with generic words (the/this/it\\u2026).' : Math.round(openerVariety * 100) + '% unique starts \\u2014 strong variety.'));
+lm2('genericOpeners', 'Generic openers', aiOpenerPct + '%', aiOpenerPct > 60 ? 2 : (aiOpenerPct > 45 ? 1 : 0), 1,
+  aiOpenerPct > 60 ? aiOpenerPct + '% of sentences start with the/this/it/in\\u2026 \\u2014 AI-typical monotony.' : (aiOpenerPct > 45 ? aiOpenerPct + '% generic sentence starts \\u2014 mix in names, numbers and verbs.' : aiOpenerPct + '% \\u2014 healthy mix of sentence starts.'));
+lm2('ttr', 'Lexical diversity (TTR)', r2(ttr), ttr < 0.25 ? 2 : (ttr < 0.32 ? 1 : 0), 1,
+  ttr < 0.25 ? 'TTR ' + r2(ttr) + ' \\u2014 low; the vocabulary loops on itself.' : (ttr < 0.32 ? 'TTR ' + r2(ttr) + ' \\u2014 slightly repetitive lexicon for this length.' : 'TTR ' + r2(ttr) + ' \\u2014 healthy vocabulary range for long-form.'));
+lm2('hapax', 'One-use words (hapax)', Math.round(hapaxRatio * 100) + '%', hapaxRatio < 0.12 ? 2 : (hapaxRatio < 0.15 ? 1 : 0), 0.5,
+  hapaxRatio < 0.12 ? Math.round(hapaxRatio * 100) + '% single-use words \\u2014 repetitive lexicon.' : (hapaxRatio < 0.15 ? Math.round(hapaxRatio * 100) + '% single-use words \\u2014 borderline.' : Math.round(hapaxRatio * 100) + '% single-use words \\u2014 human-typical breadth.'));
+lm2('paragraphs', 'Avg paragraph length', Math.round(avgParaLen) + ' words', avgParaLen > 150 ? 2 : ((avgParaLen > 120 || avgParaLen < 25) ? 1 : 0), 0.5,
+  avgParaLen > 120 ? Math.round(avgParaLen) + ' words \\u2014 dense paragraphs; split for scannability.' : (avgParaLen < 25 ? Math.round(avgParaLen) + ' words \\u2014 fragmented; consider merging some.' : Math.round(avgParaLen) + ' words \\u2014 comfortable paragraph sizing.'));
+lm2('clauseMix', 'Clause mix', singleClausePct + '% simple / ' + complexPct + '% complex', (singleClausePct > 85 || complexPct > 85) ? 2 : ((singleClausePct > 75 || complexPct > 75) ? 1 : 0), 1,
+  singleClausePct > 75 ? singleClausePct + '% single-clause sentences \\u2014 staccato, AI-listicle feel.' : (complexPct > 75 ? complexPct + '% multi-clause sentences \\u2014 dense to parse and extract.' : 'Balanced simple/complex mix \\u2014 human-typical.'));
+lm2('tense', 'Tense consistency', tensePct + '%', tensePct < 50 ? 2 : (tensePct < 60 ? 1 : 0), 1,
+  tensePct < 60 ? 'Dominant tense holds only ' + tensePct + '% \\u2014 narration drifts between tenses.' : tensePct + '% \\u2014 dominant tense held; consistent narration.');
+var contrastRate = connContrast / per1kDiv;
+lm2('connectives', 'Connective balance', connContrast + ' contrast \\u00B7 ' + connCause + ' causal', contrastRate > 10 ? 2 : ((contrastRate > 6 || connContrast + connCause === 0) ? 1 : 0), 0.5,
+  connContrast + connCause === 0 ? 'No however/because-type connectives \\u2014 argumentation may feel flat.' : (contrastRate > 6 ? 'Heavy "however/although" load (' + r1(contrastRate) + '/1k words) \\u2014 an AI balancing tic.' : 'Normal connective usage.'));
+lm2('nominalization', 'Nominalization', Math.round(nomRatio * 1000) / 10 + '%', nomRatio > 0.16 ? 2 : (nomRatio > 0.12 ? 1 : 0), 0.5,
+  nomRatio > 0.12 ? Math.round(nomRatio * 1000) / 10 + '% abstract "-tion/-ment" nouns \\u2014 verbs are stronger and easier to quote.' : Math.round(nomRatio * 1000) / 10 + '% \\u2014 concrete, verb-led style.');
+var repTriPer1k = repTriKeys.length / per1kDiv;
+lm2('phraseRecycling', 'Phrase recycling', repeatedBigrams + ' bigrams / ' + repTriKeys.length + ' trigrams', repTriPer1k > 10 ? 2 : (repTriPer1k > 4 ? 1 : 0), 1,
+  repTriPer1k > 4 ? 'Noticeable phrase recycling' + (topTri ? ' (worst: "' + topTri + '")' : '') + ' \\u2014 consolidate repeated wording.' : 'Low phrase recycling \\u2014 each phrase earns its place.');
+var lingIdx = lingDen > 0 ? lingNum / lingDen : 0;
+lc.score = Math.round(10 * (1 - lingIdx));
+lc.summary = lc.score >= 8 ? 'Linguistic profile reads human-typical across ' + lc.metrics.length + ' measures.' : (lc.score >= 5 ? 'Some mechanical patterns in the linguistic profile \\u2014 see the flagged measures.' : 'The linguistic profile is strongly machine-typical \\u2014 rhythm, variety and lexicon need human editing.');
 
 var totalScore = 0;
 categories.forEach(function (c) { totalScore += c.score; });
@@ -1070,53 +907,73 @@ var pointsAvailable = 100 - totalScore;
 var fixAllPrompt = 'You are an expert GEO/AEO editor. Improve the page at ' + nu.url + ' for AI search visibility (ChatGPT, Perplexity, Google AI Overviews). Keep the core message, brand voice and facts. Apply every fix below:\\n' + failing.map(function (f, i) { return (i + 1) + '. ' + f; }).join('\\n');
 
 return [{ json: {
-  ok: true,
-  tool: 'Snoika AI Visibility Score',
-  url: nu.url,
-  analyzedAt: now.toISOString(),
-  totalScore: totalScore,
-  grade: grade,
-  verdict: verdict,
-  issuesCount: issuesCount,
-  pointsAvailable: pointsAvailable,
-  fixAllPrompt: fixAllPrompt,
-  meta: { wordCount: totalWords, articleSource: articleSource, pageFetch: fetchMode, htmlKB: htmlKB, pageStatus: pageStatus, headings: { h1: effH1, h2: effH2, h3: effH3 }, schemaTypes: typeList, blockedBots: blockedBots },
-  categories: categories
-} }];`
-    },
-    position: [2260, 520]
+  page: {
+    url: nu.url,
+    host: nu.host,
+    title: titleTag,
+    analyzedAt: now.toISOString(),
+    httpStatus: pageStatus,
+    fetchMode: fetchMode,
+    articleSource: articleSource,
+    htmlKB: htmlKB,
+    wordCount: totalWords,
+    headings: { h1: effH1, h2: effH2, h3: effH3 },
+    imagesFound: imagesFound,
+    favicon: tavFavicon || (hasFavicon ? 'present' : ''),
+    schemaTypes: typeList,
+    blockedBots: blockedBots
   },
-  output: [{ ok: true, totalScore: 83, grade: 'A', verdict: 'Strong AI visibility', categories: [] }]
+  payload: {
+    totalScore: totalScore,
+    grade: grade,
+    verdict: verdict,
+    issuesCount: issuesCount,
+    pointsAvailable: pointsAvailable,
+    fixAllPrompt: fixAllPrompt,
+    categories: categories
+  }
+} }];` },
+    executeOnce: true,
+    position: [2016, 368]
+  },
+  output: [{ page: { url: 'https://example.com' }, payload: { totalScore: 83, grade: 'A', categories: [] } }]
 });
 
-const apiRespond = node({
+const respondReport = node({
   type: 'n8n-nodes-base.respondToWebhook',
   version: 1.5,
   config: {
-    name: 'Send JSON Result',
+    name: 'Respond Report',
     parameters: {
-      respondWith: 'firstIncomingItem',
+      respondWith: 'json',
+      responseBody: expr("{{ $('Score Engine').first().json }}"),
       options: { responseHeaders: { entries: [{ name: 'Access-Control-Allow-Origin', value: '*' }] } }
     },
-    position: [2480, 520]
+    position: [2256, 368]
   }
 });
 
-const notes = sticky('## AI Visibility Score (GEO/AEO checker)\n\n**UI page:** GET /webhook/ai-visibility\n**API:** POST /webhook/ai-visibility-check?url=...\n\nArticle text is extracted via Jina Reader (r.jina.ai, keyless). To raise Jina rate limits, add your Jina API key as a Header Auth credential (Authorization: Bearer ...) on the "Fetch Article Markdown" node.\n\nScoring: 6 categories / 100 pts — Answer Architecture 25, Machine-Readable Signals 15, Evidence & Trust 20, AI Crawler Access 15, Recency 10, Human Voice 15 (16 AI-writing detectors + 12 diagnostics).', [], { color: 4 });
+const notes = sticky('## AI Visibility Score API\n\nPOST /webhook/ai-visibility-check?url=...\nResponse: { page, payload } \u2014 payload has 7 scored categories / 100 pts:\nAnswer 22 \u00B7 Machine-Readable 15 (incl. image alt) \u00B7 Evidence 18 (incl. visual assets) \u00B7 Access 15 (incl. favicon) \u00B7 Recency 8 \u00B7 Human Voice 12 \u00B7 Linguistic Signature 10.\n\nFan-out: direct HTML + Tavily Extract (images/favicon/content) + Jina markdown + llms.txt + robots.txt. The Merge node is the barrier that makes the engine wait for ALL five sources \u2014 do not remove it.', [], { color: 4 });
 
-export default workflow('TmUOmIhnBh17MiCh', 'GEO Checker — AI Visibility Score')
+export default workflow('TmUOmIhnBh17MiCh', 'GEO Checker \u2014 AI Visibility Score')
   .add(notes)
-  .add(uiTrigger)
-  .to(serveUi)
   .add(apiTrigger)
   .to(normalizeUrl)
   .to(fetchPage)
   .to(assessFetch)
-  .to(originBlocked
-    .onTrue(fetchPageJina.to(fetchArticle))
-    .onFalse(fetchArticle))
-  .add(fetchArticle)
+  .to(waitAll.input(0))
+  .add(normalizeUrl)
+  .to(extractTavily)
+  .to(waitAll.input(1))
+  .add(normalizeUrl)
+  .to(fetchArticle)
+  .to(waitAll.input(2))
+  .add(normalizeUrl)
   .to(fetchLlms)
+  .to(waitAll.input(3))
+  .add(normalizeUrl)
   .to(fetchRobots)
+  .to(waitAll.input(4))
+  .add(waitAll)
   .to(scoreEngine)
-  .to(apiRespond);
+  .to(respondReport);
