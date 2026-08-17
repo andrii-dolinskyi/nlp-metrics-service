@@ -419,7 +419,7 @@ var categories = [
 ];
 var verifyNote = htmlUsable ? '' : ' (could not fully verify \\u2014 the origin blocks automated fetching, which also hinders AI crawlers)';
 function cat(id) { for (var i = 0; i < categories.length; i++) { if (categories[i].id === id) { return categories[i]; } } }
-function addCheck(catId, id, label, points, max, comment, fixPrompt) {
+function addCheck(catId, id, label, points, max, comment) {
   points = Math.max(0, Math.min(max, Math.round(points)));
   var status = points >= max ? 'pass' : (points > 0 ? 'warn' : 'fail');
   var c = cat(catId);
@@ -436,28 +436,24 @@ var prevLevel = 0;
 headings.forEach(function (hh) { if (prevLevel > 0 && hh.level > prevLevel + 1) { skips++; } prevLevel = hh.level; });
 if (headings.length === 0 || skips === 0) { skeletonPts += 1; } else { skeletonNotes.push(skips + ' heading level skips'); }
 addCheck('answer', 'headingSkeleton', 'Heading skeleton (H1\\u2192H2\\u2192H3)', skeletonPts, 4,
-  skeletonPts === 4 ? 'Found ' + effH1 + ' H1, ' + effH2 + ' H2, ' + effH3 + ' H3. Clean outline \\u2014 retrieval systems chunk this page correctly.' : 'Found ' + effH1 + ' H1, ' + effH2 + ' H2, ' + effH3 + ' H3. Problems: ' + skeletonNotes.join('; ') + '.',
-  'Restructure headings: exactly one H1, at least 3 H2 sections, H3 only nested under H2, no level skips.');
+  skeletonPts === 4 ? 'Found ' + effH1 + ' H1, ' + effH2 + ' H2, ' + effH3 + ' H3. Clean outline \\u2014 retrieval systems chunk this page correctly.' : 'Found ' + effH1 + ' H1, ' + effH2 + ' H2, ' + effH3 + ' H3. Problems: ' + skeletonNotes.join('; ') + '.');
 
 var qHeads = subHeadTexts.filter(function (t) { return /\\?\\s*$/.test(t) || /^(how|what|why|when|where|which|who|can|should|is|are|do|does|will)\\b/i.test(t); }).length;
 var qPct = subHeadTexts.length ? Math.round(qHeads / subHeadTexts.length * 100) : 0;
 addCheck('answer', 'questionHeadings', 'Question-phrased subheadings', qPct >= 25 ? 3 : (qPct >= 10 ? 2 : (qHeads > 0 ? 1 : 0)), 3,
-  qHeads + ' of ' + subHeadTexts.length + ' subheadings (' + qPct + '%) are phrased as questions. ' + (qPct >= 25 ? 'Strong match with how people query AI assistants.' : 'AI answers map best to headings that mirror real questions \\u2014 target 25%+.'),
-  'Rephrase at least a quarter of H2/H3 headings as natural questions users would ask an AI assistant.');
+  qHeads + ' of ' + subHeadTexts.length + ' subheadings (' + qPct + '%) are phrased as questions. ' + (qPct >= 25 ? 'Strong match with how people query AI assistants.' : 'AI answers map best to headings that mirror real questions \\u2014 target 25%+.'));
 
 var listPts = (htmlTables > 0 || mdTableRows >= 3) ? 2 : 0;
 listPts += effLis >= 5 ? 2 : (effLis > 0 ? 1 : 0);
 addCheck('answer', 'liftableBlocks', 'Liftable blocks (tables & lists)', listPts, 4,
-  (htmlTables > 0 || mdTableRows >= 3 ? 'Table \\u2713' : 'No tables') + ' \\u00B7 ' + effLis + ' list items. ' + (listPts >= 4 ? 'AI engines quote tables and lists verbatim \\u2014 good.' : 'Tables and bullet lists are the most-extracted blocks in AI answers.'),
-  'Add at least one comparison table and one 5+ item bulleted list summarizing key facts.');
+  (htmlTables > 0 || mdTableRows >= 3 ? 'Table \\u2713' : 'No tables') + ' \\u00B7 ' + effLis + ' list items. ' + (listPts >= 4 ? 'AI engines quote tables and lists verbatim \\u2014 good.' : 'Tables and bullet lists are the most-extracted blocks in AI answers.'));
 
 var secWords = mdSections.map(function (s) { return s.words; }).filter(function (w) { return w > 0; });
 var avgSec = secWords.length ? Math.round(secWords.reduce(function (a, b) { return a + b; }, 0) / secWords.length) : 0;
 var secPts = 0;
 if (avgSec >= 75 && avgSec <= 300) { secPts = 4; } else if ((avgSec >= 40 && avgSec < 75) || (avgSec > 300 && avgSec <= 450)) { secPts = 2; } else if (avgSec > 0) { secPts = 1; }
 addCheck('answer', 'passageSizing', 'Passage sizing (75\\u2013300 words/section)', secPts, 4,
-  secWords.length ? 'Average ' + avgSec + ' words across ' + secWords.length + ' sections. ' + (secPts === 4 ? 'Ideal for passage-level retrieval.' : (avgSec < 75 ? 'Sections are thin \\u2014 too little context per chunk.' : 'Sections are walls of text \\u2014 they exceed typical retrieval chunks.')) : 'No H2 sections detected to measure.',
-  'Resize sections so each H2 block carries 75\\u2013300 words: split walls of text, merge stubs.');
+  secWords.length ? 'Average ' + avgSec + ' words across ' + secWords.length + ' sections. ' + (secPts === 4 ? 'Ideal for passage-level retrieval.' : (avgSec < 75 ? 'Sections are thin \\u2014 too little context per chunk.' : 'Sections are walls of text \\u2014 they exceed typical retrieval chunks.')) : 'No H2 sections detected to measure.');
 
 var directSecs = mdSections.filter(function (s) {
   if (!s.firstPara || s.firstPara.indexOf('![') === 0) { return false; }
@@ -467,36 +463,29 @@ var directSecs = mdSections.filter(function (s) {
 }).length;
 var directShare = mdSections.length ? directSecs / mdSections.length : 0;
 addCheck('answer', 'answerFirstOpeners', 'Answer-first section openers', directShare >= 0.7 ? 4 : (directShare >= 0.4 ? 2 : (directSecs > 0 ? 1 : 0)), 4,
-  mdSections.length ? directSecs + ' of ' + mdSections.length + ' sections open with a compact direct answer (\\u226465 words). ' + (directShare >= 0.7 ? 'Engines can quote your openers as-is.' : 'AI engines prefer sections that answer first, then elaborate.') : 'No sections detected to evaluate.',
-  'Open every H2 section with a 1\\u20132 sentence direct answer (under 50 words) before any buildup.');
+  mdSections.length ? directSecs + ' of ' + mdSections.length + ' sections open with a compact direct answer (\\u226465 words). ' + (directShare >= 0.7 ? 'Engines can quote your openers as-is.' : 'AI engines prefer sections that answer first, then elaborate.') : 'No sections detected to evaluate.');
 
 var faqHeading = subHeadTexts.some(function (t) { return /faq|frequently asked|common questions|q\\s*&\\s*a/i.test(t); });
 addCheck('answer', 'qaCoverage', 'Q&A coverage (FAQ block)', hasType('FAQPage') ? 3 : (faqHeading ? 1 : 0), 3,
-  hasType('FAQPage') ? 'FAQPage schema detected \\u2014 pages with FAQ markup get cited roughly 2.7\\u00D7 more often.' : (faqHeading ? 'FAQ section found in headings, but no FAQPage schema to make it machine-readable.' : 'No FAQ section or FAQPage schema found.'),
-  'Add an FAQ section with 5+ real user questions and mark it up with FAQPage JSON-LD.');
+  hasType('FAQPage') ? 'FAQPage schema detected \\u2014 pages with FAQ markup get cited roughly 2.7\\u00D7 more often.' : (faqHeading ? 'FAQ section found in headings, but no FAQPage schema to make it machine-readable.' : 'No FAQ section or FAQPage schema found.'));
 
 addCheck('machine', 'structuredCore', 'Structured data present', ldBlocks > 0 && typeList.length > 0 ? 3 : (ldBlocks > 0 ? 1 : 0), 3,
-  ldBlocks > 0 ? ldBlocks + ' JSON-LD block(s): ' + (typeList.slice(0, 6).join(', ') || 'unparseable') + '.' : 'No JSON-LD structured data' + verifyNote + ' \\u2014 the page is invisible to entity-based retrieval.',
-  'Add JSON-LD structured data: at minimum Article + Organization with sameAs links.');
+  ldBlocks > 0 ? ldBlocks + ' JSON-LD block(s): ' + (typeList.slice(0, 6).join(', ') || 'unparseable') + '.' : 'No JSON-LD structured data' + verifyNote + ' \\u2014 the page is invisible to entity-based retrieval.');
 
 var artPts = (articleNode ? 1 : 0) + (dateModified ? 1 : 0) + ((ldAuthorName || (articleNode && articleNode.author)) ? 1 : 0);
 addCheck('machine', 'articleIdentity', 'Article schema with date & author', artPts, 3,
-  articleNode ? 'Article schema \\u2713' + (dateModified ? ' \\u00B7 dateModified \\u2713' : ' \\u00B7 dateModified missing') + (ldAuthorName ? ' \\u00B7 author: ' + ldAuthorName : ' \\u00B7 author missing') : 'No Article/BlogPosting schema found.',
-  'Add Article JSON-LD with headline, author (Person), datePublished and dateModified.');
+  articleNode ? 'Article schema \\u2713' + (dateModified ? ' \\u00B7 dateModified \\u2713' : ' \\u00B7 dateModified missing') + (ldAuthorName ? ' \\u00B7 author: ' + ldAuthorName : ' \\u00B7 author missing') : 'No Article/BlogPosting schema found.' + verifyNote);
 
 addCheck('machine', 'qaSchema', 'Q&A / HowTo schema', hasType('FAQPage') ? 2 : ((hasType('HowTo') || hasType('QAPage')) ? 1 : 0), 2,
-  hasType('FAQPage') ? 'FAQPage schema \\u2713' : (hasType('HowTo') ? 'HowTo schema \\u2713 (add FAQPage for full points)' : (hasType('QAPage') ? 'QAPage schema \\u2713' : 'No FAQPage, QAPage or HowTo schema.')),
-  'Add FAQPage (or HowTo) JSON-LD that mirrors visible Q&A content on the page.');
+  hasType('FAQPage') ? 'FAQPage schema \\u2713' : (hasType('HowTo') ? 'HowTo schema \\u2713 (add FAQPage for full points)' : (hasType('QAPage') ? 'QAPage schema \\u2713' : 'No FAQPage, QAPage or HowTo schema.' + verifyNote)));
 
 var entPts = (hasType('Person') ? 1 : 0) + (hasType('Organization') ? 1 : 0);
 if (entPts === 2) { entPts = 3; }
 addCheck('machine', 'entityAnchors', 'Entity anchors (Person / Organization)', entPts, 3,
-  entPts >= 3 ? 'Person \\u2713 and Organization \\u2713 \\u2014 both entity types anchored.' : (hasType('Person') ? 'Person \\u2713, Organization missing.' : (hasType('Organization') ? 'Organization \\u2713, Person missing.' : 'No Person or Organization schema \\u2014 no entity for AI to attribute.')),
-  'Add Person schema for the author and Organization schema for the brand, both with sameAs profile links.');
+  entPts >= 3 ? 'Person \\u2713 and Organization \\u2713 \\u2014 both entity types anchored.' : (hasType('Person') ? 'Person \\u2713, Organization missing.' : (hasType('Organization') ? 'Organization \\u2713, Person missing.' : 'No Person or Organization schema' + verifyNote + ' \\u2014 no entity for AI to attribute.')));
 
 addCheck('machine', 'wayfindingSchema', 'Wayfinding schema (Breadcrumb / ItemList)', (hasType('BreadcrumbList') ? 1 : 0) + (hasType('ItemList') ? 1 : 0), 2,
-  (hasType('BreadcrumbList') ? 'BreadcrumbList \\u2713 ' : 'BreadcrumbList missing ') + '\\u00B7 ' + (hasType('ItemList') ? 'ItemList \\u2713' : 'ItemList missing'),
-  'Add BreadcrumbList JSON-LD; for listicles also add ItemList naming each item.');
+  (hasType('BreadcrumbList') ? 'BreadcrumbList \\u2713 ' : 'BreadcrumbList missing ') + '\\u00B7 ' + (hasType('ItemList') ? 'ItemList \\u2713' : 'ItemList missing') + verifyNote);
 
 var imgTags = htmlNoScript.match(/<img\\b[^>]*>/gi) || [];
 var imgTotal = imgTags.length;
@@ -514,33 +503,26 @@ if (imgTotal === 0 && tavImgCount === 0) {
   altPts = altPct >= 80 ? 2 : (altPct >= 50 ? 1 : 0);
   altComment = imgWithAlt + ' of ' + imgTotal + ' images carry descriptive alt text (' + altPct + '%). ' + (altPct >= 80 ? 'Machines can read your visuals.' : 'Alt text is how AI engines understand images \\u2014 target 80%+ coverage.');
 }
-addCheck('machine', 'imageAltCoverage', 'Image alt-text coverage', altPts, 2, altComment,
-  'Add descriptive alt text (8\\u201315 words, factual) to every content image.');
+addCheck('machine', 'imageAltCoverage', 'Image alt-text coverage', altPts, 2, altComment);
 
 addCheck('evidence', 'numbersDensity', 'Hard numbers density', statPer200 >= 1 ? 4 : (statPer200 >= 0.5 ? 2 : (statCount > 0 ? 1 : 0)), 4,
-  statCount + ' statistics in ' + totalWords + ' words (' + statPer200 + ' per 200 words). ' + (statPer200 >= 1 ? 'Princeton GEO research: statistics lift AI visibility ~41%.' : 'Target \\u22651 stat per 200 words \\u2014 numbers are what AI answers quote.'),
-  'Weave one concrete statistic (with source) into every 150\\u2013200 words of copy.');
+  statCount + ' statistics in ' + totalWords + ' words (' + statPer200 + ' per 200 words). ' + (statPer200 >= 1 ? 'Princeton GEO research: statistics lift AI visibility ~41%.' : 'Target \\u22651 stat per 200 words \\u2014 numbers are what AI answers quote.'));
 
 addCheck('evidence', 'primarySources', 'Primary-source citations', authCount >= 3 ? 4 : (authCount === 2 ? 2 : (authCount === 1 ? 1 : 0)), 4,
-  authCount + ' authoritative outbound domains of ' + extLinks + ' external links' + (authCount ? ' (' + Object.keys(authHosts).slice(0, 3).join(', ') + ')' : '') + '. ' + (authCount >= 3 ? 'Strong trust graph.' : 'Linking .gov/.edu/journals/major press lifts visibility 30\\u201340%.'),
-  'Cite at least 3 primary sources: .gov, .edu, peer-reviewed journals, Wikipedia or major publications.');
+  authCount + ' authoritative outbound domains of ' + extLinks + ' external links' + (authCount ? ' (' + Object.keys(authHosts).slice(0, 3).join(', ') + ')' : '') + '. ' + (authCount >= 3 ? 'Strong trust graph.' : 'Linking .gov/.edu/journals/major press lifts visibility 30\\u201340%.'));
 
 addCheck('evidence', 'expertVoices', 'Expert voices & quotes', quoteSignals >= 2 ? 2 : (quoteSignals === 1 ? 1 : 0), 2,
-  quoteSignals >= 2 ? quoteSignals + ' attributed quotes/expert references found. Quotation adds ~28% visibility (Princeton GEO).' : (quoteSignals === 1 ? 'Only 1 attributed quote found \\u2014 add one or two more named experts.' : 'No expert quotes or named attributions detected.'),
-  'Add 2\\u20133 quotes from named experts with title and affiliation, in quotation marks with attribution.');
+  quoteSignals >= 2 ? quoteSignals + ' attributed quotes/expert references found. Quotation adds ~28% visibility (Princeton GEO).' : (quoteSignals === 1 ? 'Only 1 attributed quote found \\u2014 add one or two more named experts.' : 'No expert quotes or named attributions detected.'));
 
 var authorPts = (bylineHtml ? 2 : 0) + (ldAuthorName ? 1 : 0);
 addCheck('evidence', 'namedAuthor', 'Named author & byline', authorPts, 3,
-  authorPts === 3 ? 'Visible byline \\u2713 and author schema (' + ldAuthorName + ') \\u2713.' : (bylineHtml ? 'Visible byline found, but no author in schema.' : (ldAuthorName ? 'Author in schema (' + ldAuthorName + '), but no visible byline markup.' : 'No byline or author schema \\u2014 anonymous content earns less trust.')),
-  'Add a visible author byline with credentials, matched by Person author markup in Article schema.');
+  authorPts === 3 ? 'Visible byline \\u2713 and author schema (' + ldAuthorName + ') \\u2713.' : (bylineHtml ? 'Visible byline found, but no author in schema.' : (ldAuthorName ? 'Author in schema (' + ldAuthorName + '), but no visible byline markup.' : 'No byline or author schema \\u2014 anonymous content earns less trust.')));
 
 addCheck('evidence', 'topicDepth', 'Topic depth (word count)', totalWords >= 2000 ? 3 : (totalWords >= 1200 ? 2 : (totalWords >= 600 ? 1 : 0)), 3,
-  totalWords + ' words. ' + (totalWords >= 2000 ? 'Strong topical depth.' : (totalWords >= 1200 ? 'Decent depth \\u2014 2,000+ words correlates with more citations.' : 'Thin coverage \\u2014 AI engines prefer comprehensive pages.')),
-  'Expand the article to 1,500\\u20132,000+ words of substantive, non-padded coverage.');
+  totalWords + ' words. ' + (totalWords >= 2000 ? 'Strong topical depth.' : (totalWords >= 1200 ? 'Decent depth \\u2014 2,000+ words correlates with more citations.' : 'Thin coverage \\u2014 AI engines prefer comprehensive pages.')));
 
 addCheck('evidence', 'visualAssets', 'Visual assets present', imagesFound >= 3 ? 2 : (imagesFound >= 1 ? 1 : 0), 2,
-  imagesFound > 0 ? imagesFound + ' image(s) on the page. ' + (imagesFound >= 3 ? 'Visuals get surfaced in AI multimodal answers and Google AI Overviews.' : 'Add 1\\u20132 more original visuals (charts, screenshots) \\u2014 they earn extra citation surfaces.') : 'No images found \\u2014 text-only pages miss multimodal AI answer slots entirely.',
-  'Add 3+ original, content-bearing images (charts, product shots, diagrams) with captions.');
+  imagesFound > 0 ? imagesFound + ' image(s) on the page. ' + (imagesFound >= 3 ? 'Visuals get surfaced in AI multimodal answers and Google AI Overviews.' : 'Add 1\\u20132 more original visuals (charts, screenshots) \\u2014 they earn extra citation surfaces.') : 'No images found \\u2014 text-only pages miss multimodal AI answer slots entirely.');
 
 var botPts;
 var botComment;
@@ -557,49 +539,39 @@ if (!robotsFound) {
   botPts = 0;
   botComment = blockedBots.length + ' AI crawlers blocked (' + blockedBots.join(', ') + ') \\u2014 this page is invisible to those engines regardless of content quality.';
 }
-addCheck('access', 'botDoorPolicy', 'AI crawler door policy (robots.txt)', botPts, 5, botComment,
-  'Update robots.txt to allow GPTBot, OAI-SearchBot, PerplexityBot, ClaudeBot, Google-Extended, CCBot and Bingbot.');
+addCheck('access', 'botDoorPolicy', 'AI crawler door policy (robots.txt)', botPts, 5, botComment);
 
 addCheck('access', 'llmsManifest', 'llms.txt manifest', llmsOk ? 2 : 0, 2,
-  llmsOk ? 'llms.txt found at the domain root.' : 'No llms.txt \\u2014 an emerging standard that hands AI crawlers a curated content map.',
-  'Publish /llms.txt at the domain root: a short markdown index of your most important pages.');
+  llmsOk ? 'llms.txt found at the domain root.' : 'No llms.txt \\u2014 an emerging standard that hands AI crawlers a curated content map.');
 
 addCheck('access', 'payloadWeight', 'Payload weight', htmlUsable ? (htmlKB < 1024 ? 2 : (htmlKB < 2048 ? 1 : 0)) : 1, 2,
-  htmlUsable ? ('HTML is ' + (htmlKB >= 1024 ? r2(htmlKB / 1024) + ' MB' : htmlKB + ' KB') + '. ' + (htmlKB < 1024 ? 'Under the 1 MB crawl-budget target.' : 'Over 1 MB \\u2014 AI crawlers truncate or skip heavy pages.')) : ('Page weight could not be measured' + verifyNote + '.'),
-  'Cut HTML under 1 MB: defer non-critical scripts, remove inline SVG bloat, lazy-load embeds.');
+  htmlUsable ? ('HTML is ' + (htmlKB >= 1024 ? r2(htmlKB / 1024) + ' MB' : htmlKB + ' KB') + '. ' + (htmlKB < 1024 ? 'Under the 1 MB crawl-budget target.' : 'Over 1 MB \\u2014 AI crawlers truncate or skip heavy pages.')) : ('Page weight could not be measured' + verifyNote + '.'));
 
 if (htmlUsable) {
   var ssrOk = htmlWords >= 250 && (totalWords === 0 || htmlWords >= totalWords * 0.5);
   addCheck('access', 'serverRenderedText', 'Server-rendered article text', ssrOk ? 3 : (htmlWords >= 100 ? 1 : 0), 3,
-    htmlWords + ' words visible in raw HTML vs ' + totalWords + ' words extracted. ' + (ssrOk ? 'Content is server-rendered \\u2014 crawlable without JavaScript.' : 'Most content appears only after JavaScript runs \\u2014 many AI crawlers never see it.'),
-    'Server-render (SSR/SSG) the article body \\u2014 most AI crawlers do not execute JavaScript.');
+    htmlWords + ' words visible in raw HTML vs ' + totalWords + ' words extracted. ' + (ssrOk ? 'Content is server-rendered \\u2014 crawlable without JavaScript.' : 'Most content appears only after JavaScript runs \\u2014 many AI crawlers never see it.'));
 } else {
   addCheck('access', 'serverRenderedText', 'Server-rendered article text', 1, 3,
-    'Origin blocked direct fetching (HTTP ' + pageStatus + ') \\u2014 server-side rendering could not be verified, and a hard bot wall can also block AI crawlers themselves.',
-    'Allow reputable crawlers through the bot protection (Cloudflare: verified-bots allowlist) and server-render the article body.');
+    'Origin blocked direct fetching (HTTP ' + pageStatus + ') \\u2014 server-side rendering could not be verified, and a hard bot wall can also block AI crawlers themselves.');
 }
 
 var hygienePts = (titleTag.length >= 15 && titleTag.length <= 70 ? 0.5 : 0) + (metaDesc ? 0.5 : 0) + (hasCanonical ? 0.5 : 0) + (langAttr ? 0.5 : 0);
 addCheck('access', 'metaHygiene', 'Meta hygiene', Math.round(hygienePts), 2,
-  'Title ' + (titleTag ? titleTag.length + ' chars' : 'missing') + ' \\u00B7 description ' + (metaDesc ? '\\u2713' : '\\u2717') + ' \\u00B7 canonical ' + (hasCanonical ? '\\u2713' : '\\u2717') + ' \\u00B7 lang ' + (langAttr ? '"' + langAttr + '"' : '\\u2717'),
-  'Fix the basics: 15\\u201370 char title, meta description, canonical link, html lang attribute.');
+  'Title ' + (titleTag ? titleTag.length + ' chars' : 'missing') + ' \\u00B7 description ' + (metaDesc ? '\\u2713' : '\\u2717') + ' \\u00B7 canonical ' + (hasCanonical ? '\\u2713' : '\\u2717') + ' \\u00B7 lang ' + (langAttr ? '"' + langAttr + '"' : '\\u2717') + verifyNote);
 
 var hasFavicon = !!tavFavicon || /<link[^>]*rel=["'][^"']*icon[^"']*["'][^>]*>/i.test(html);
 addCheck('access', 'brandFavicon', 'Favicon (brand identity)', hasFavicon ? 1 : 0, 1,
-  hasFavicon ? 'Favicon found' + (tavFavicon ? ' (' + tavFavicon.slice(0, 60) + ')' : '') + ' \\u2014 AI interfaces show it next to citations.' : 'No favicon detected \\u2014 cited links without one look less trustworthy in AI answer interfaces.',
-  'Add a favicon (and apple-touch-icon) at the domain root \\u2014 AI answer UIs display it beside your citation.');
+  hasFavicon ? 'Favicon found' + (tavFavicon ? ' (' + tavFavicon.slice(0, 60) + ')' : '') + ' \\u2014 AI interfaces show it next to citations.' : 'No favicon detected \\u2014 cited links without one look less trustworthy in AI answer interfaces.');
 
 addCheck('recency', 'freshModified', 'Fresh dateModified', monthsAgo === -1 ? 0 : (monthsAgo <= 3 ? 3 : (monthsAgo <= 12 ? 2 : (monthsAgo <= 24 ? 1 : 0))), 3,
-  monthsAgo === -1 ? 'No dateModified in schema or meta tags \\u2014 engines cannot verify freshness.' : 'Updated ' + monthsAgo + ' month(s) ago per structured data. ' + (monthsAgo <= 12 ? 'Within the 12-month citation sweet spot.' : 'Stale \\u2014 most cited pages are updated within 12 months.'),
-  'Refresh the content and update dateModified in Article schema (and article:modified_time meta).');
+  monthsAgo === -1 ? 'No dateModified in schema or meta tags' + verifyNote + ' \\u2014 engines cannot verify freshness.' : 'Updated ' + monthsAgo + ' month(s) ago per structured data. ' + (monthsAgo <= 12 ? 'Within the 12-month citation sweet spot.' : 'Stale \\u2014 most cited pages are updated within 12 months.'));
 
 addCheck('recency', 'visibleTimestamp', 'Visible "last updated" stamp', tsMatch ? 2 : 0, 2,
-  tsMatch ? 'Found: "' + tsMatch[0].trim().slice(0, 60) + '"' : 'No visible update timestamp \\u2014 both readers and engines look for one near the top.',
-  'Display a visible "Last updated: [Month Year]" line near the top of the article.');
+  tsMatch ? 'Found: "' + tsMatch[0].trim().slice(0, 60) + '"' : 'No visible update timestamp' + verifyNote + ' \\u2014 both readers and engines look for one near the top.');
 
 addCheck('recency', 'currentYearAnchor', 'Current-year anchor', mentionsCurYear ? 3 : (mentionsPrevYear ? 2 : 0), 3,
-  mentionsCurYear ? String(curYear) + ' referenced in the content \\u2014 signals up-to-date coverage.' : (mentionsPrevYear ? 'Only ' + (curYear - 1) + ' referenced \\u2014 bump key mentions to ' + curYear + '.' : 'No recent year referenced anywhere in the copy.'),
-  'Reference ' + curYear + ' naturally in the title, headings or body where the content is current.');
+  mentionsCurYear ? String(curYear) + ' referenced in the content \\u2014 signals up-to-date coverage.' : (mentionsPrevYear ? 'Only ' + (curYear - 1) + ' referenced \\u2014 bump key mentions to ' + curYear + '.' : 'No recent year referenced anywhere in the copy.'));
 
 var wordFreq = {};
 wordsArray.forEach(function (w) { wordFreq[w] = (wordFreq[w] || 0) + 1; });
@@ -769,7 +741,7 @@ addPattern('significanceInflation', 'Significance inflation', sigInf.n, sigInf.n
   '{n} inflation phrases ({top}) at {rate}/1k words \\u2014 "plays a vital role" is AI\\u2019s favorite empty claim. Replace each with evidence.'
 ], { top: topFound(sigInf.found, 2) });
 
-var hedges = pcList(['often', 'typically', 'generally', 'usually', 'potentially', 'arguably', 'tends to', 'tend to', 'can help', 'may help', 'might help', 'could help', 'in many cases', 'in some cases', 'to some extent', 'relatively', 'somewhat']);
+var hedges = pcList(['often', 'typically', 'generally', 'usually', 'potentially', 'arguably', 'tends to', 'tend to', 'can help', 'may help', 'might help', 'could help', 'in many cases', 'in some cases', 'to some extent', 'more or less', 'relatively', 'somewhat']);
 addPattern('hedging', 'Hedging', hedges.n, hedges.n / per1kDiv, 4, 9, 1, [
   '{n} hedges in {words} words \\u2014 the text commits to its claims.',
   '{n} hedges ({top}) at {rate}/1k words. Some caution is fine; this much reads as machine risk-aversion.',
@@ -908,7 +880,7 @@ const respondReport = node({
     parameters: {
       respondWith: 'json',
       responseBody: expr("{{ $('Score Engine').first().json }}"),
-      options: { responseHeaders: { entries: [{ name: 'Access-Control-Allow-Origin', value: '*' }] } }
+      options: {}
     },
     position: [2256, 368]
   }
