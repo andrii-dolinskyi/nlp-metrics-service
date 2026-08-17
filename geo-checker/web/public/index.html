@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Free AI visibility checker: see whether ChatGPT, Perplexity and Google AI would quote your page, and what to fix.">
+<title>Snoika AI Visibility Score</title>
+<style>
+  :root{
+    --bg:#0D0B1F; --bg2:#12102a; --card:#171430; --card2:#1d1940;
+    --line:#2a2550; --line2:#37306a;
+    --fg:#f1effa; --mut:#9b95bd; --faint:#6e6894;
+    --violet:#8c76ee; --glow:#7a4ff0; --cyan:#1aa8ff;
+    --ok:#3ecf7a; --ok-bg:#12321f; --warn:#f0b429; --warn-bg:#33290e; --bad:#f06a6a; --bad-bg:#361318;
+    --r-card:16px; --r-pill:999px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg); color:var(--fg);
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--cyan);text-decoration:none}
+  button{font:inherit;cursor:pointer}
+  .wrap{max-width:960px;margin:0 auto;padding:0 24px}
+
+  /* ── faux site nav ── */
+  .nav{border-bottom:1px solid var(--line);background:rgba(13,11,31,.85);backdrop-filter:blur(8px);position:sticky;top:0;z-index:50}
+  .nav-in{max-width:1160px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:28px}
+  .logo{font-weight:800;font-size:19px;letter-spacing:-.02em;color:var(--fg)}
+  .logo b{background:linear-gradient(92deg,var(--violet),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .nav-links{display:flex;gap:22px;font-size:13.5px;color:var(--mut)}
+  .nav-links span{cursor:pointer}
+  .nav-links span:hover{color:var(--fg)}
+  .nav-cta{margin-left:auto;display:flex;gap:10px;align-items:center}
+  .btn{border-radius:var(--r-pill);font-weight:600;font-size:14px;border:0;display:inline-flex;align-items:center;gap:8px;transition:filter .15s, transform .15s}
+  .btn:hover{filter:brightness(1.12)}
+  .btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+  .btn-primary{background:linear-gradient(92deg,var(--glow),var(--violet));color:#fff;padding:10px 20px;box-shadow:0 4px 24px rgba(122,79,240,.35)}
+  .btn-ghost{background:transparent;color:var(--fg);border:1px solid var(--line2);padding:9px 18px}
+  .btn-lg{padding:14px 28px;font-size:15px}
+
+  /* ── hero ── */
+  .hero{position:relative;padding:72px 0 44px;text-align:center;overflow:hidden}
+  .hero::before{content:"";position:absolute;inset:-40% -20% auto;height:130%;
+    background:radial-gradient(ellipse 55% 45% at 50% 0%,rgba(122,79,240,.28),transparent 65%),
+               radial-gradient(ellipse 30% 30% at 72% 12%,rgba(26,168,255,.12),transparent 70%);
+    pointer-events:none}
+  .hero>*{position:relative}
+  .eyebrow{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--cyan);border:1px solid var(--line2);border-radius:var(--r-pill);padding:6px 16px;margin-bottom:22px;background:rgba(26,168,255,.06)}
+  h1{font-size:clamp(34px,6vw,54px);font-weight:800;letter-spacing:-.03em;line-height:1.08;text-wrap:balance}
+  h1 .grad{background:linear-gradient(92deg,var(--violet) 20%,var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{max-width:620px;margin:18px auto 0;color:var(--mut);font-size:17px;text-wrap:balance}
+  .urlbar{display:flex;gap:10px;max-width:640px;margin:32px auto 10px;flex-wrap:wrap}
+  .urlbar input{flex:1;min-width:240px;background:var(--card);border:1px solid var(--line2);border-radius:var(--r-pill);
+    padding:15px 22px;color:var(--fg);font-size:15px;outline:none}
+  .urlbar input:focus{border-color:var(--violet);box-shadow:0 0 0 3px rgba(140,118,238,.18)}
+  .trust{font-size:12.5px;color:var(--faint)}
+  .trust b{color:var(--mut);font-weight:600}
+
+  /* ── demo switch ── */
+  .demo{max-width:960px;margin:36px auto 0;padding:0 24px;display:flex;justify-content:center}
+  .demo-in{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px dashed var(--line2);border-radius:var(--r-pill);padding:6px 8px 6px 18px;font-size:12.5px;color:var(--faint)}
+  .demo-in b{color:var(--mut);letter-spacing:.08em;text-transform:uppercase;font-size:11px}
+  .seg{display:flex;background:var(--card);border-radius:var(--r-pill);padding:3px;gap:2px}
+  .seg button{border:0;background:transparent;color:var(--mut);border-radius:var(--r-pill);padding:6px 14px;font-size:12.5px;font-weight:600}
+  .seg button.on{background:linear-gradient(92deg,var(--glow),var(--violet));color:#fff}
+
+  /* ── result ── */
+  .result{padding:28px 0 8px}
+  .scorecard{display:flex;gap:34px;align-items:center;flex-wrap:wrap;background:linear-gradient(180deg,var(--card2),var(--card));
+    border:1px solid var(--line2);border-radius:20px;padding:30px 34px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+  .ring{position:relative;width:158px;height:158px;flex:0 0 auto}
+  .ring svg{transform:rotate(-90deg);display:block}
+  .ring circle{transition:stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1)}
+  .ring .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .ring .num b{font-size:44px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+  .ring .num span{font-size:12px;color:var(--mut)}
+  .sc-info{flex:1;min-width:250px}
+  .gradechip{display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:13px;border-radius:var(--r-pill);padding:5px 14px;margin-bottom:10px}
+  .verdict{font-size:22px;font-weight:700;letter-spacing:-.01em;margin-bottom:6px;text-wrap:balance}
+  .scanned{font-size:13px;color:var(--faint);margin-bottom:14px;word-break:break-all}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{font-size:12px;color:var(--mut);background:var(--bg2);border:1px solid var(--line);border-radius:var(--r-pill);padding:4px 12px;font-variant-numeric:tabular-nums}
+
+  .toolbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+    background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);padding:14px 20px;margin:14px 0 18px}
+  .iss{font-size:14px;color:var(--mut)}
+  .iss b{color:var(--warn)}
+  .iss .pts{color:var(--fg);font-weight:600}
+
+  /* ── categories ── */
+  .cat{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);margin-bottom:12px;overflow:hidden;transition:border-color .2s}
+  .cat.open{border-color:var(--line2)}
+  .cat-h{display:flex;align-items:center;gap:14px;padding:17px 20px;cursor:pointer;user-select:none;background:transparent;border:0;width:100%;text-align:left;color:var(--fg)}
+  .cat-h:focus-visible{outline:2px solid var(--cyan);outline-offset:-2px}
+  .cat-h h3{font-size:15.5px;font-weight:700;letter-spacing:-.01em}
+  .cat-h .sub{font-size:12px;color:var(--faint);font-weight:400;margin-top:1px}
+  .cat-h .pts{margin-left:auto;font-size:14px;color:var(--mut);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .cat-h .pts b{color:var(--fg);font-size:16px}
+  .chev{width:22px;height:22px;flex:0 0 auto;border-radius:50%;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;
+    color:var(--mut);font-size:11px;transition:transform .25s}
+  .cat.open .chev{transform:rotate(180deg);color:var(--violet);border-color:var(--violet)}
+  .bar{height:4px;background:var(--bg2)}
+  .bar i{display:block;height:100%;border-radius:0 2px 2px 0;transition:width .6s ease}
+  .cat-b{display:none;border-top:1px solid var(--line)}
+  .cat.open .cat-b{display:block}
+  .chk{display:flex;gap:14px;padding:15px 20px;border-bottom:1px solid var(--line)}
+  .chk:last-child{border-bottom:0}
+  .dot{width:10px;height:10px;border-radius:50%;margin-top:7px;flex:0 0 auto}
+  .chk .bd{flex:1;min-width:0}
+  .chk .lb{font-weight:600;font-size:14px}
+  .chk .cm{font-size:13px;color:var(--mut);margin-top:2px}
+  .chk .pt{font-size:13px;color:var(--mut);white-space:nowrap;font-variant-numeric:tabular-nums;padding-top:2px}
+  .fixbtn{margin-top:9px;background:transparent;border:1px dashed var(--line2);color:var(--violet);border-radius:var(--r-pill);padding:5px 13px;font-size:12px;font-weight:600}
+  .fixbtn:hover{border-color:var(--violet)}
+  .sev{font-size:10.5px;font-weight:700;border-radius:6px;padding:3px 9px;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;align-self:flex-start;margin-top:2px}
+  .sev.clean{background:var(--ok-bg);color:var(--ok)}
+  .sev.notable{background:var(--warn-bg);color:var(--warn)}
+  .sev.heavy{background:var(--bad-bg);color:var(--bad)}
+  .subhead{padding:16px 20px 6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);font-weight:700}
+  .diag{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;padding:12px 20px 18px}
+  .dcard{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+  .dcard .dl{font-size:11px;color:var(--violet);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+  .dcard .dv{font-size:19px;font-weight:800;margin:2px 0;font-variant-numeric:tabular-nums}
+  .dcard .dc{font-size:12px;color:var(--mut)}
+
+  /* ── voice callout inside category ── */
+  .voice-note{margin:6px 20px 18px;padding:14px 18px;border-radius:12px;background:rgba(122,79,240,.08);border:1px solid rgba(140,118,238,.3);font-size:13.5px;color:var(--mut)}
+  .voice-note b{color:var(--fg)}
+  .voice-note a{font-weight:600}
+
+  /* ── snoika CTA band ── */
+  .cta-band{margin:30px 0 8px;border-radius:20px;padding:34px 36px;position:relative;overflow:hidden;
+    background:linear-gradient(120deg,#1c1145 0%,#171430 55%,#0f2038 100%);border:1px solid var(--line2)}
+  .cta-band::after{content:"";position:absolute;inset:auto -10% -70% auto;width:60%;height:160%;
+    background:radial-gradient(ellipse at center,rgba(26,168,255,.14),transparent 65%);pointer-events:none}
+  .cta-band>*{position:relative}
+  .cta-tag{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;display:inline-block}
+  .cta-tag.low{color:var(--bad)}
+  .cta-tag.high{color:var(--ok)}
+  .cta-band h2{font-size:clamp(21px,3vw,27px);font-weight:800;letter-spacing:-.02em;max-width:560px;text-wrap:balance}
+  .cta-band p{color:var(--mut);max-width:600px;margin:12px 0 22px;font-size:15px}
+  .cta-band p b{color:var(--fg)}
+  .cta-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .cta-note{font-size:12px;color:var(--faint)}
+
+  /* ── explainer sections ── */
+  section.explain{padding:56px 0 8px}
+  .sec-eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin-bottom:10px}
+  section.explain h2{font-size:clamp(22px,3.4vw,30px);font-weight:800;letter-spacing:-.02em;text-wrap:balance;max-width:640px}
+  section.explain>.wrap>p.lead{color:var(--mut);max-width:640px;margin-top:12px;font-size:15.5px}
+  .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-top:28px}
+  .col{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);padding:22px}
+  .col .ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;
+    background:rgba(140,118,238,.12);border:1px solid rgba(140,118,238,.3);color:var(--violet);font-size:17px;font-weight:800}
+  .col h3{font-size:15.5px;font-weight:700;margin-bottom:6px}
+  .col p{font-size:13.5px;color:var(--mut)}
+  .col p b{color:var(--fg)}
+
+  .weights{margin-top:28px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden}
+  .wrow{display:flex;align-items:center;gap:16px;padding:13px 20px;border-bottom:1px solid var(--line);font-size:13.5px}
+  .wrow:last-child{border-bottom:0}
+  .wrow .wname{width:220px;font-weight:600}
+  .wrow .wbar{flex:1;height:8px;background:var(--bg2);border-radius:4px;overflow:hidden}
+  .wrow .wbar i{display:block;height:100%;background:linear-gradient(90deg,var(--glow),var(--violet))}
+  .wrow .wpts{width:56px;text-align:right;color:var(--mut);font-variant-numeric:tabular-nums}
+
+  .faq{margin-top:26px;display:grid;gap:10px}
+  .faq details{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0 20px}
+  .faq summary{cursor:pointer;font-weight:600;font-size:14.5px;padding:16px 0;list-style:none;display:flex;justify-content:space-between;align-items:center}
+  .faq summary::after{content:"+";color:var(--violet);font-size:18px;font-weight:400}
+  .faq details[open] summary::after{content:"–"}
+  .faq details p{color:var(--mut);font-size:13.5px;padding:0 0 16px;max-width:680px}
+
+  .footer{margin-top:70px;border-top:1px solid var(--line);padding:34px 0 46px;text-align:center;color:var(--faint);font-size:13px}
+  .footer .logo{font-size:16px;display:block;margin-bottom:8px}
+  .footer a{color:var(--mut)}
+
+  .toast{position:fixed;bottom:26px;left:50%;transform:translate(-50%,80px);background:var(--card2);border:1px solid var(--violet);
+    color:var(--fg);padding:10px 22px;border-radius:var(--r-pill);font-size:13.5px;transition:transform .3s;z-index:99;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+  .toast.show{transform:translate(-50%,0)}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+  @media (max-width:720px){.nav-links{display:none}.scorecard{padding:24px}.cta-band{padding:26px 24px}.wrow .wname{width:140px}}
+</style>
+</head>
+<body>
+
+
+<nav class="nav"><div class="nav-in">
+  <span class="logo">snoika<b>.</b></span>
+  <div class="nav-links"><span>Product</span><span>Solutions</span><span>Customers</span><span>Pricing</span><span>Resources</span></div>
+  <div class="nav-cta"><a class="btn btn-ghost" href="https://snoika.com">Book a Call</a><a class="btn btn-primary" href="https://snoika.com">Start free trial</a></div>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <span class="eyebrow">Free tool</span>
+  <h1>Will AI engines<br><span class="grad">recommend your page?</span></h1>
+  <p>People now ask ChatGPT, Perplexity and Google AI instead of searching. These AI tools answer by quoting pages they trust. Paste your link below and we will check, in plain language, whether your page is one they would quote &mdash; and what to change if not.</p>
+  <form class="urlbar" id="scanForm">
+    <input type="text" id="urlInput" placeholder="https://yoursite.com/blog/your-article" autocomplete="off" aria-label="Page URL">
+    <button class="btn btn-primary btn-lg" type="submit" id="scanBtn">Check my page</button>
+  </form>
+  <div id="tsWidget"></div>
+  <div class="trust"><b>Free</b> &middot; no signup &middot; results in seconds &middot; <button class="sample-link" type="button" onclick="showSample()">see a sample report first</button></div>
+</div></header>
+
+
+
+<main class="result"><div class="wrap">
+  <div id="status"><span class="spin"></span><span id="statusText">Reading your page&hellip;</span></div>
+  <div id="error"></div>
+  <div id="result"></div>
+</div></main>
+
+<section class="explain"><div class="wrap">
+  <div class="sec-eyebrow">What we check</div>
+  <h2>Three simple questions decide if AI quotes your page</h2>
+  <p class="lead">Think of AI tools as very picky editors. Before they quote a page in an answer, they check three things. Our scanner checks the same three &mdash; with 50+ individual signals.</p>
+  <div class="cols">
+    <div class="col"><div class="ic">1</div><h3>Can AI even open your page?</h3>
+      <p>Every AI tool sends a robot to read your site. If your site tells those robots to go away (a file called <b>robots.txt</b> controls this), your page is invisible to AI &mdash; no matter how good the content is. We check the door policy for 11 different AI robots.</p></div>
+    <div class="col"><div class="ic">2</div><h3>Is it easy to quote?</h3>
+      <p>AI answers are short. They lift <b>small, self-contained pieces</b>: a direct answer under a heading, a table row, a statistic with a source, an FAQ entry. Pages built from long unstructured text rarely get picked. We measure how liftable your page is.</p></div>
+    <div class="col"><div class="ic">3</div><h3>Does it sound human?</h3>
+      <p>AI tools increasingly avoid quoting text that looks machine-written. We scan for <b>16 known AI-writing patterns</b> (like "not just X, it's Y" sentences and em-dash overload) plus 12 deeper style measurements. Human-sounding pages win.</p></div>
+  </div>
+  <div class="weights">
+    <div class="wrow"><span class="wname">Answer Architecture</span><span class="wbar"><i style="width:100%"></i></span><span class="wpts">22 pts</span></div>
+    <div class="wrow"><span class="wname">Evidence &amp; Trust</span><span class="wbar"><i style="width:82%"></i></span><span class="wpts">18 pts</span></div>
+    <div class="wrow"><span class="wname">Machine-Readable Signals</span><span class="wbar"><i style="width:68%"></i></span><span class="wpts">15 pts</span></div>
+    <div class="wrow"><span class="wname">AI Crawler Access</span><span class="wbar"><i style="width:68%"></i></span><span class="wpts">15 pts</span></div>
+    <div class="wrow"><span class="wname">Human Voice</span><span class="wbar"><i style="width:55%"></i></span><span class="wpts">12 pts</span></div>
+    <div class="wrow"><span class="wname">Linguistic Signature</span><span class="wbar"><i style="width:45%"></i></span><span class="wpts">10 pts</span></div>
+    <div class="wrow"><span class="wname">Recency Signals</span><span class="wbar"><i style="width:36%"></i></span><span class="wpts">8 pts</span></div>
+  </div>
+
+  <div class="sec-eyebrow" style="margin-top:56px">How to read your score</div>
+  <h2>What the number means</h2>
+  <div class="legend">
+    <div class="lg"><b style="color:#3ecf7a">80&ndash;100 &middot; A</b><span>Built to be quoted. AI tools can read, trust and lift this page. Protect it &mdash; scores decay as content ages.</span></div>
+    <div class="lg"><b style="color:#38bdf8">70&ndash;79 &middot; B</b><span>Good foundation. A handful of fixes &mdash; usually schema, sources or an FAQ &mdash; move you into the top band.</span></div>
+    <div class="lg"><b style="color:#f0b429">55&ndash;69 &middot; C</b><span>Mixed. AI tools will sometimes use the page, but competitors with cleaner signals get picked first.</span></div>
+    <div class="lg"><b style="color:#f06a6a">Below 55 &middot; D&ndash;F</b><span>Mostly invisible to AI search. The good news: every failed check tells you exactly what is missing.</span></div>
+  </div>
+</div></section>
+
+<section class="explain"><div class="wrap">
+  <div class="sec-eyebrow">FAQ</div>
+  <h2>Common questions</h2>
+  <div class="faq">
+    <details><summary>What is "AI visibility"?</summary>
+      <p>When someone asks ChatGPT, Perplexity or Google AI a question, the answer often quotes a few web pages as sources. AI visibility means your pages are the ones being quoted. It is the new version of "ranking on Google" &mdash; except instead of ten blue links, there is usually one answer with two or three sources.</p></details>
+    <details><summary>Is this the same as SEO?</summary>
+      <p>It overlaps, but it is not the same. Classic SEO gets you into a list of links. AI tools pull out small passages and prefer direct answers, verified facts with named sources, machine-readable structure, and human-sounding writing. A page can rank #1 on Google and still never be quoted by ChatGPT. This practice is often called GEO (Generative Engine Optimization) or AEO (Answer Engine Optimization).</p></details>
+    <details><summary>How is the score calculated?</summary>
+      <p>100 points across seven categories &mdash; page structure, proof and sources, machine-readable data, AI robot access, freshness, and two writing-quality categories. Every check is deterministic: the same page always gets the same score. No AI guessing is involved in the scoring itself.</p></details>
+    <details><summary>What is a good score?</summary>
+      <p>80+ means the page is genuinely well prepared for AI search &mdash; few pages on the internet get there. 70&ndash;79 is solid. Below 55, AI tools are mostly skipping the page. Most business pages we scan land between 40 and 65, so even a few fixes can put you ahead of competitors.</p></details>
+    <details><summary>Why does "sounding human" matter to an AI?</summary>
+      <p>Two reasons. AI search tools are trained to prefer original, trustworthy content &mdash; and machine-written text signals neither. And human readers bounce off robotic text too, which feeds back into every ranking system. Our scanner detects the same patterns readers subconsciously notice: repetitive rhythm, filler phrases, hype words, "not just X, it's Y" constructions.</p></details>
+    <details><summary>My score is low. What now?</summary>
+      <p>Open each category and read the failed checks &mdash; each one says in plain language what is missing and what good looks like. You can hand that list to your content team. Or skip the manual work: Snoika produces and fixes content that passes these signals automatically, and keeps it passing as your pages age.</p></details>
+    <details><summary>My site blocks AI robots. Is that bad?</summary>
+      <p>It is a choice, but know what it costs: if GPTBot or PerplexityBot is blocked in your robots.txt, your content cannot appear in those tools' answers at all. Many sites blocked AI crawlers in 2023&ndash;24 by default and never revisited the decision &mdash; while their competitors became the sources AI recommends.</p></details>
+    <details><summary>Do you store my page or data?</summary>
+      <p>We read the public page you submit, score it, and keep the result briefly cached so repeat checks are instant. We do not store your content, and there is no signup.</p></details>
+  </div>
+</div></section>
+
+<footer class="footer"><div class="wrap">
+  <span class="logo">snoika<b>.</b></span>
+  Be visible inside AI Search Engines. · <a href="https://snoika.com">snoika.com</a><br>
+  <span style="font-size:12px">Free tool · scores are deterministic and based on published GEO research (Princeton GEO, Ahrefs, Semrush studies)</span>
+</div></footer>
+
+<div class="toast" id="toast">Copied ✓</div>
+
+<script>
+var API = '/api/ai-visibility';
+var BOOK_URL = 'https://snoika.com';   /* site devs: replace with the real booking link */
+var TRIAL_URL = 'https://snoika.com';  /* site devs: replace with the real signup link */
+var OK="#3ecf7a", WARN="#f0b429", BAD="#f06a6a";
+var SAMPLE = {"page": {"url": "https://snoika.com/blog/ai-seo-tools-ranking-visibility", "host": "snoika.com", "title": "12 AI SEO tools to improve rankings in 2026", "analyzedAt": "2026-08-17T09:08:10.741Z", "httpStatus": 200, "fetchMode": "direct", "htmlKB": 346, "wordCount": 2687, "headings": {"h1": 1, "h2": 7, "h3": 20}, "imagesFound": 16, "favicon": "https://snoika.com/favicon.ico", "schemaTypes": ["Article", "Webpage", "Person", "Organization", "Imageobject", "Website", "Breadcrumblist", "Listitem", "Itemlist", "Faqpage", "Question", "Answer", "Contactpoint", "Postaladdress"], "blockedBots": []}, "payload": {"totalScore": 83, "grade": "A", "verdict": "Strong AI visibility", "issuesCount": 6, "pointsAvailable": 17, "categories": [{"id": "answer", "name": "Answer Architecture", "max": 22, "score": 17, "checks": [{"id": "headingSkeleton", "label": "Heading skeleton (H1→H2→H3)", "points": 4, "max": 4, "status": "pass", "comment": "Found 1 H1, 7 H2, 20 H3. Clean outline — retrieval systems chunk this page correctly."}, {"id": "questionHeadings", "label": "Question-phrased subheadings", "points": 3, "max": 3, "status": "pass", "comment": "7 of 27 subheadings (26%) are phrased as questions. Strong match with how people query AI assistants."}, {"id": "liftableBlocks", "label": "Liftable blocks (tables & lists)", "points": 1, "max": 4, "status": "warn", "comment": "No tables · 4 list items. Tables and bullet lists are the most-extracted blocks in AI answers."}, {"id": "passageSizing", "label": "Passage sizing (75–300 words/section)", "points": 2, "max": 4, "status": "warn", "comment": "Average 381 words across 7 sections. Sections are walls of text — they exceed typical retrieval chunks."}, {"id": "answerFirstOpeners", "label": "Answer-first section openers", "points": 4, "max": 4, "status": "pass", "comment": "6 of 7 sections open with a compact direct answer (≤65 words). Engines can quote your openers as-is."}, {"id": "qaCoverage", "label": "Q&A coverage (FAQ block)", "points": 3, "max": 3, "status": "pass", "comment": "FAQPage schema detected — pages with FAQ markup get cited roughly 2.7× more often."}]}, {"id": "machine", "name": "Machine-Readable Signals", "max": 15, "score": 15, "checks": [{"id": "structuredCore", "label": "Structured data present", "points": 3, "max": 3, "status": "pass", "comment": "7 JSON-LD block(s): Article, Webpage, Person, Organization, Imageobject, Website."}, {"id": "articleIdentity", "label": "Article schema with date & author", "points": 3, "max": 3, "status": "pass", "comment": "Article schema ✓ · dateModified ✓ · author: Jevgenia Pogadajeva, MBA, MSc"}, {"id": "qaSchema", "label": "Q&A / HowTo schema", "points": 2, "max": 2, "status": "pass", "comment": "FAQPage schema ✓"}, {"id": "entityAnchors", "label": "Entity anchors (Person / Organization)", "points": 3, "max": 3, "status": "pass", "comment": "Person ✓ and Organization ✓ — both entity types anchored."}, {"id": "wayfindingSchema", "label": "Wayfinding schema (Breadcrumb / ItemList)", "points": 2, "max": 2, "status": "pass", "comment": "BreadcrumbList ✓ · ItemList ✓"}, {"id": "imageAltCoverage", "label": "Image alt-text coverage", "points": 2, "max": 2, "status": "pass", "comment": "16 of 16 images carry descriptive alt text (100%). Machines can read your visuals."}]}, {"id": "evidence", "name": "Evidence & Trust", "max": 18, "score": 10, "checks": [{"id": "numbersDensity", "label": "Hard numbers density", "points": 4, "max": 4, "status": "pass", "comment": "34 statistics in 2687 words (2.53 per 200 words). Princeton GEO research: statistics lift AI visibility ~41%."}, {"id": "primarySources", "label": "Primary-source citations", "points": 0, "max": 4, "status": "fail", "comment": "0 authoritative outbound domains of 31 external links. Linking .gov/.edu/journals/major press lifts visibility 30–40%."}, {"id": "expertVoices", "label": "Expert voices & quotes", "points": 0, "max": 2, "status": "fail", "comment": "No expert quotes or named attributions detected."}, {"id": "namedAuthor", "label": "Named author & byline", "points": 1, "max": 3, "status": "warn", "comment": "Author in schema (Jevgenia Pogadajeva, MBA, MSc), but no visible byline markup."}, {"id": "topicDepth", "label": "Topic depth (word count)", "points": 3, "max": 3, "status": "pass", "comment": "2687 words. Strong topical depth."}, {"id": "visualAssets", "label": "Visual assets present", "points": 2, "max": 2, "status": "pass", "comment": "16 image(s) on the page. Visuals get surfaced in AI multimodal answers and Google AI Overviews."}]}, {"id": "access", "name": "AI Crawler Access", "max": 15, "score": 13, "checks": [{"id": "botDoorPolicy", "label": "AI crawler door policy (robots.txt)", "points": 5, "max": 5, "status": "pass", "comment": "robots.txt allows all 11 AI crawlers checked (GPTBot, PerplexityBot, ClaudeBot, Google-Extended, CCBot…)."}, {"id": "llmsManifest", "label": "llms.txt manifest", "points": 0, "max": 2, "status": "fail", "comment": "No llms.txt — an emerging standard that hands AI crawlers a curated content map."}, {"id": "payloadWeight", "label": "Payload weight", "points": 2, "max": 2, "status": "pass", "comment": "HTML is 346 KB. Under the 1 MB crawl-budget target."}, {"id": "serverRenderedText", "label": "Server-rendered article text", "points": 3, "max": 3, "status": "pass", "comment": "3420 words visible in raw HTML vs 2687 words extracted. Content is server-rendered — crawlable without JavaScript."}, {"id": "metaHygiene", "label": "Meta hygiene", "points": 2, "max": 2, "status": "pass", "comment": "Title 43 chars · description ✓ · canonical ✓ · lang \"en\""}, {"id": "brandFavicon", "label": "Favicon (brand identity)", "points": 1, "max": 1, "status": "pass", "comment": "Favicon found (https://snoika.com/favicon.ico) — AI interfaces show it next to citations."}]}, {"id": "recency", "name": "Recency Signals", "max": 8, "score": 8, "checks": [{"id": "freshModified", "label": "Fresh dateModified", "points": 3, "max": 3, "status": "pass", "comment": "Updated 0 month(s) ago per structured data. Within the 12-month citation sweet spot."}, {"id": "visibleTimestamp", "label": "Visible \"last updated\" stamp", "points": 2, "max": 2, "status": "pass", "comment": "Found: \"as of February 2026\""}, {"id": "currentYearAnchor", "label": "Current-year anchor", "points": 3, "max": 3, "status": "pass", "comment": "2026 referenced in the content — signals up-to-date coverage."}]}, {"id": "voice", "name": "Human Voice", "max": 12, "score": 11, "checks": [], "patterns": [{"id": "negativeParallelisms", "label": "Negative parallelisms", "count": 0, "per1k": 0, "status": "clean", "comment": "No \"not just X — it’s Y\" constructions. Reads like a person wrote it."}, {"id": "tailingNegations", "label": "Tailing negations", "count": 0, "per1k": 0, "status": "clean", "comment": "No trailing \", not X\" corrections — sentences commit to their point."}, {"id": "aiVocabulary", "label": "AI-flag vocabulary", "count": 0, "per1k": 0, "status": "clean", "comment": "0 AI-flag words in 2687 words — vocabulary looks human."}, {"id": "threeRule", "label": "Rule-of-three triads", "count": 2, "per1k": 0.7, "status": "clean", "comment": "2 \"X, Y, and Z\" triads (0.7/1k words) — normal range."}, {"id": "signpostingFiller", "label": "Signposting filler", "count": 1, "per1k": 0.4, "status": "clean", "comment": "No filler signposts (\"it’s important to note\", \"in conclusion\"…). Every sentence earns its place."}, {"id": "vagueAttributions", "label": "Vague attributions", "count": 0, "per1k": 0, "status": "clean", "comment": "No unsourced \"experts say / studies show\" claims."}, {"id": "addressPerspectiveLock", "label": "Second-person lock", "count": 77, "per1k": 28.7, "status": "notable", "comment": "\"You/your\" appears 77 times (28.7/1k words) — leaning on direct address. Mix in named examples and first-person experience."}, {"id": "copulaSubstitutes", "label": "Copula substitutes", "count": 0, "per1k": 0, "status": "clean", "comment": "Plain \"is/are\" doing its job — no dressed-up copulas."}, {"id": "intensifiers", "label": "Empty intensifiers", "count": 0, "per1k": 0, "status": "clean", "comment": "0 intensifiers in 2687 words — restrained, credible tone."}, {"id": "ingPileups", "label": "Participial pile-ups", "count": 3, "per1k": 2, "status": "clean", "comment": "3 sentences open with an \"-ing\" phrase (2% of sentences) — healthy variety."}, {"id": "significanceInflation", "label": "Significance inflation", "count": 0, "per1k": 0, "status": "clean", "comment": "No unearned importance claims — significance is shown, not asserted."}, {"id": "hedging", "label": "Hedging", "count": 3, "per1k": 1.1, "status": "clean", "comment": "3 hedges in 2687 words — the text commits to its claims."}, {"id": "semicolons", "label": "Semicolon rate", "count": 3, "per1k": 1.1, "status": "clean", "comment": "3 semicolons (1.1/1k words) — normal for web copy."}, {"id": "emDashes", "label": "Em-dash rate", "count": 0, "per1k": 0, "status": "clean", "comment": "0 em/en dashes (0/1k words) — within human range."}, {"id": "salesyLanguage", "label": "Salesy language", "count": 0, "per1k": 0, "status": "clean", "comment": "No hype vocabulary — the copy sells with substance."}, {"id": "repeatedArguments", "label": "Repeated arguments", "count": 25, "per1k": 9.3, "status": "notable", "comment": "25 three-word phrases repeat (10× for the worst). Repetition signals template writing — consolidate duplicate points."}], "summary": "Human-sounding: 14 of 16 detectors clean. AI engines and readers both reward this."}, {"id": "linguistic", "name": "Linguistic Signature", "max": 10, "score": 9, "checks": [], "metrics": [{"id": "burstiness", "label": "Sentence burstiness", "value": "18.8", "status": "good", "comment": "Naturally varied sentence lengths (σ 18.8) — human-typical."}, {"id": "avgSentence", "label": "Avg sentence length", "value": "19.8 words", "status": "good", "comment": "19.8 words — in the 10–25 word extraction sweet spot."}, {"id": "openerVariety", "label": "Opener variety", "value": "49%", "status": "fair", "comment": "49% unique starts — fair variety; 29% open with generic words (the/this/it…)."}, {"id": "genericOpeners", "label": "Generic openers", "value": "29%", "status": "good", "comment": "29% — healthy mix of sentence starts."}, {"id": "ttr", "label": "Lexical diversity (TTR)", "value": "0.31", "status": "fair", "comment": "TTR 0.31 — slightly repetitive lexicon for this length."}, {"id": "hapax", "label": "One-use words (hapax)", "value": "16%", "status": "good", "comment": "16% single-use words — human-typical breadth."}, {"id": "paragraphs", "label": "Avg paragraph length", "value": "27 words", "status": "good", "comment": "27 words — comfortable paragraph sizing."}, {"id": "clauseMix", "label": "Clause mix", "value": "43% simple / 57% complex", "status": "good", "comment": "Balanced simple/complex mix — human-typical."}, {"id": "tense", "label": "Tense consistency", "value": "90%", "status": "good", "comment": "90% — dominant tense held; consistent narration."}, {"id": "connectives", "label": "Connective balance", "value": "1 contrast · 9 causal", "status": "good", "comment": "Normal connective usage."}, {"id": "nominalization", "label": "Nominalization", "value": "3.4%", "status": "good", "comment": "3.4% — concrete, verb-led style."}, {"id": "phraseRecycling", "label": "Phrase recycling", "value": "85 bigrams / 25 trigrams", "status": "fair", "comment": "Noticeable phrase recycling (worst: \"ai seo tools\") — consolidate repeated wording."}], "summary": "Linguistic profile reads human-typical across 12 measures."}]}};
+var turnstileToken = null;
+function h(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function dec(s){return String(s==null?"":s).replace(/&#x27;|&#0?39;/g,"'").replace(/&amp;/g,"&");}
+function el(id){return document.getElementById(id);}
+function sc(st){return st==="pass"?OK:(st==="warn"?WARN:BAD);}
+function svc(st){return (st==="clean"||st==="good")?OK:((st==="notable"||st==="fair")?WARN:BAD);}
+function gradeColor(g){if(g==="A+"||g==="A")return["#12321f",OK];if(g==="B")return["#12283a","#38bdf8"];if(g==="C")return["#2e2410",WARN];return["#361318",BAD];}
+function ringColor(s){return s>=80?OK:(s>=70?"#38bdf8":(s>=55?WARN:BAD));}
+var CAT_SUBS = {
+  answer: "Is the page structured the way AI answers are assembled?",
+  machine: "Can machines parse who wrote what — and see your images?",
+  evidence: "Does the page prove its claims?",
+  access: "Can the AI robots even get in?",
+  recency: "Does the page look alive and current?",
+  voice: "16 AI-writing detectors · does it read machine-made?",
+  linguistic: "12 style measurements · what the numbers say about the writing"
+};
+function renderCheck(c){
+  return '<div class="chk"><span class="dot" style="background:'+sc(c.status)+'"></span><div class="bd"><div class="lb">'+h(c.label)+'</div><div class="cm">'+h(c.comment)+'</div></div><span class="pt">'+c.points+'/'+c.max+'</span></div>';
+}
+function renderPattern(p){
+  return '<div class="chk"><span class="dot" style="background:'+svc(p.status)+'"></span><div class="bd"><div class="lb">'+h(p.label)+'</div><div class="cm">'+h(p.comment)+'</div></div><span class="sev '+p.status+'">'+p.status+'</span></div>';
+}
+function renderMetric(m){
+  return '<div class="chk"><span class="dot" style="background:'+svc(m.status)+'"></span><div class="bd"><div class="lb">'+h(m.label)+'</div><div class="cm">'+h(m.comment)+'</div></div><span class="mval">'+h(m.value)+'</span><span class="sev '+m.status+'">'+m.status+'</span></div>';
+}
+function buildCta(page, pl){
+  var low = pl.totalScore < 70;
+  var blocked = page.blockedBots ? page.blockedBots.length : 0;
+  var blockLine = blocked > 3 ? ' And '+blocked+' AI robots are blocked outright — those tools never even see the content.' : '';
+  if(low){
+    return {tag:(blocked>3?'Critical: '+blocked+' AI robots blocked':'Score under 70 — AI tools are skipping this page'),cls:'low',
+      h:pl.issuesCount+' issues stand between this page and being quoted. Or skip the checklist entirely.',
+      p:'This is exactly the work Snoika does for you: we produce and fix content so it passes <b>every signal on this page</b> — structure, proof, machine-readable data, images machines can read, and writing that sounds human — then keep it fresh so the score does not decay.'+blockLine+' Most clients see AI citations within the first weeks.',
+      primary:'Book a Call',primaryUrl:BOOK_URL,secondary:'Start free trial',secondaryUrl:TRIAL_URL,
+      note:'Bring this report to the call — we will walk your score category by category.'};
+  }
+  return {tag:'Strong score — protect it',cls:'high',
+    h:'This page is quotable today. The question is whether the next 50 will be.',
+    p:'Scores decay: freshness lapses, competitors add better proof, AI tools raise the bar on machine-sounding writing. Snoika keeps <b>every article</b> at this level automatically — written, structured, sourced and humanized to pass all 50+ signals.',
+    primary:'Start free trial',primaryUrl:TRIAL_URL,secondary:'Book a Call',secondaryUrl:BOOK_URL,
+    note:'See how Snoika-produced pages score before you commit.'};
+}
+function render(data){
+  var page = data.page, pl = data.payload;
+  var circ = 2*Math.PI*62;
+  var off = circ*(1-pl.totalScore/100);
+  var gc = gradeColor(pl.grade);
+  var chips = [page.wordCount+' words analyzed', page.imagesFound+' images', (page.favicon?'Favicon ✓':'No favicon'), page.htmlKB+' KB HTML', 'HTTP '+page.httpStatus];
+  if(page.fetchMode && page.fetchMode !== 'direct'){ chips.push(page.fetchMode); }
+  var out = '';
+  out += '<div class="scorecard"><div class="ring"><svg width="150" height="150"><circle cx="75" cy="75" r="62" fill="none" stroke="var(--card2)" stroke-width="12"></circle><circle cx="75" cy="75" r="62" fill="none" stroke="'+ringColor(pl.totalScore)+'" stroke-width="12" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'"></circle></svg><div class="num"><b>'+pl.totalScore+'</b><span>/ 100</span></div></div>';
+  out += '<div class="sc-info"><span class="gradechip" style="background:'+gc[0]+';color:'+gc[1]+'">Grade '+h(pl.grade)+'</span><div class="verdict">'+h(pl.verdict)+'</div><div class="scanned">'+h(dec(page.title))+' — '+h(page.url)+'</div><div class="chips">';
+  chips.forEach(function(c){ out += '<span class="chip">'+h(c)+'</span>'; });
+  if(page.blockedBots && page.blockedBots.length){ out += '<span class="chip" style="color:'+BAD+';border-color:'+BAD+'">'+page.blockedBots.length+' AI robots blocked</span>'; }
+  out += '</div></div></div>';
+  out += '<div class="toolbar"><span class="iss"><b>'+pl.issuesCount+' issues found</b> &bull; <span class="pts">+'+pl.pointsAvailable+' points</span> recoverable — every check below explains exactly what is missing</span><button class="btn btn-ghost" id="ctaJump">How Snoika fixes this ↓</button></div>';
+  pl.categories.forEach(function(cat, idx){
+    var pct = cat.max > 0 ? Math.round(cat.score/cat.max*100) : 0;
+    var barc = pct>=80?OK:(pct>=50?WARN:BAD);
+    out += '<div class="cat'+(idx===0?' open':'')+'"><button class="cat-h" type="button"><div><h3>'+h(cat.name)+'</h3><div class="sub">'+(CAT_SUBS[cat.id]||'')+'</div></div><span class="pts"><b>'+cat.score+'</b> / '+cat.max+'</span><span class="chev">▾</span></button><div class="bar"><i style="width:'+pct+'%;background:'+barc+'"></i></div><div class="cat-b">';
+    if(cat.patterns && cat.patterns.length){
+      if(cat.summary){ out += '<div class="subhead">'+h(cat.summary)+'</div>'; }
+      cat.patterns.forEach(function(pp){ out += renderPattern(pp); });
+      out += '<div class="voice-note">This scan is exactly how AI tools — and your readers — spot machine-written pages. <b>Making content sound human without losing the facts is Snoika’s specialty.</b> <a href="https://snoika.com">See how we do it →</a></div>';
+    } else if(cat.metrics && cat.metrics.length){
+      if(cat.summary){ out += '<div class="subhead">'+h(cat.summary)+'</div>'; }
+      cat.metrics.forEach(function(mm){ out += renderMetric(mm); });
+    } else {
+      (cat.checks||[]).forEach(function(cc){ out += renderCheck(cc); });
+    }
+    out += '</div></div>';
+  });
+  var C = buildCta(page, pl);
+  out += '<div class="cta-band" id="ctaBand"><span class="cta-tag '+C.cls+'">'+h(C.tag)+'</span><h2>'+h(C.h)+'</h2><p>'+C.p+'</p><div class="cta-row"><a class="btn btn-primary btn-lg" href="'+C.primaryUrl+'">'+h(C.primary)+'</a><a class="btn btn-ghost btn-lg" href="'+C.secondaryUrl+'">'+h(C.secondary)+'</a><span class="cta-note">'+h(C.note)+'</span></div></div>';
+  el('result').innerHTML = out;
+  var heads = el('result').querySelectorAll('.cat-h');
+  for(var k=0;k<heads.length;k++){ heads[k].addEventListener('click', function(){ this.parentNode.classList.toggle('open'); }); }
+  var jump = el('ctaJump');
+  if(jump){ jump.addEventListener('click', function(){ el('ctaBand').scrollIntoView({behavior:'smooth'}); }); }
+  el('result').scrollIntoView({behavior:'smooth', block:'start'});
+}
+var STEPS = ['Reading your page…','Checking AI robot access…','Reading structured data…','Scanning for AI-writing patterns…','Scoring 50+ signals…'];
+var stepTimer = null;
+function setLoading(on){
+  el('scanBtn').disabled = on;
+  el('status').style.display = on ? 'block' : 'none';
+  if(stepTimer){ clearInterval(stepTimer); stepTimer = null; }
+  if(on){
+    var i = 0; el('statusText').textContent = STEPS[0];
+    stepTimer = setInterval(function(){ i = (i+1)%STEPS.length; el('statusText').textContent = STEPS[i]; }, 1800);
+  }
+}
+function showError(msg){ el('error').textContent = msg; el('error').style.display = 'block'; }
+function showSample(){
+  el('error').style.display = 'none';
+  el('urlInput').value = SAMPLE.page.url;
+  render(SAMPLE);
+}
+el('scanForm').addEventListener('submit', function(ev){
+  ev.preventDefault();
+  var url = el('urlInput').value.trim();
+  if(!url) return;
+  el('error').style.display = 'none';
+  el('result').innerHTML = '';
+  setLoading(true);
+  var body = { url: url };
+  if(turnstileToken) body.turnstileToken = turnstileToken;
+  fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      setLoading(false);
+      if(!data || !data.payload || data.payload.error){
+        showError((data && data.payload && data.payload.error) || 'Something went wrong. Please try again.');
+        if(window.turnstile){ try{ window.turnstile.reset(); }catch(e){} }
+        return;
+      }
+      render(data);
+      if(window.turnstile){ try{ window.turnstile.reset(); }catch(e){} }
+    })
+    .catch(function(){
+      setLoading(false);
+      showError('Could not reach the scanner. Please try again in a minute.');
+    });
+});
+fetch('/api/config').then(function(r){ return r.json(); }).then(function(cfg){
+  if(!cfg.turnstileSiteKey) return;
+  var s = document.createElement('script');
+  s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=__tsReady';
+  s.async = true;
+  window.__tsReady = function(){
+    window.turnstile.render('#tsWidget', { sitekey: cfg.turnstileSiteKey, theme: 'dark',
+      callback: function(t){ turnstileToken = t; },
+      'expired-callback': function(){ turnstileToken = null; } });
+  };
+  document.head.appendChild(s);
+}).catch(function(){});
+
+</script>
+
+</body>
+</html>
