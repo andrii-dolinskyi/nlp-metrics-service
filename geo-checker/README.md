@@ -25,18 +25,19 @@ https://n8n-test.snoika.com/workflow/TmUOmIhnBh17MiCh
    rate limits.
 4. `Fetch llms.txt` / `Fetch robots.txt` — domain-level AI-crawler signals
 5. `Score Engine` — single Code node, all deterministic (no LLM calls)
-6. `Send JSON Result`
+6. `Wait For All Sources` (Merge barrier) → `Score Engine` → `Respond Report` — response shape is `{ page, payload }`
 
 ## Scoring: 7 categories, 100 points
 
 | Category | Pts | Checks |
 |---|---|---|
-| Answer Architecture | 25 | heading skeleton, question-phrased subheadings, liftable blocks (tables/lists), passage sizing 75–300w, answer-first openers, FAQ coverage |
-| Machine-Readable Signals | 15 | JSON-LD present, Article schema w/ date+author, FAQ/HowTo schema, Person/Organization entities, Breadcrumb/ItemList |
-| Evidence & Trust | 20 | stats density (≥1/200w), primary-source citations, expert quotes, named author/byline, topic depth |
-| AI Crawler Access | 15 | robots.txt policy for 11 AI bots, llms.txt, payload <1 MB, server-rendered text, meta hygiene |
-| Recency Signals | 10 | dateModified freshness, visible "last updated" stamp, current-year anchor |
-| Human Voice | 15 | 16 AI-writing detectors + 12 writing diagnostics (below) |
+| Answer Architecture | 22 | heading skeleton, question-phrased subheadings, liftable blocks (tables/lists), passage sizing 75–300w, answer-first openers, FAQ coverage |
+| Machine-Readable Signals | 15 | JSON-LD present, Article schema w/ date+author, FAQ/HowTo schema, Person/Organization entities, Breadcrumb/ItemList, image alt-text coverage |
+| Evidence & Trust | 18 | stats density (≥1/200w), primary-source citations, expert quotes, named author/byline, topic depth, visual assets present |
+| AI Crawler Access | 15 | robots.txt policy for 11 AI bots, llms.txt, payload <1 MB, server-rendered text, meta hygiene, favicon |
+| Recency Signals | 8 | dateModified freshness, visible "last updated" stamp, current-year anchor |
+| Human Voice | 12 | 16 AI-writing detectors + 12 writing diagnostics (below) |
+| Linguistic Signature | 10 | 12 stylometric metrics (burstiness, sentence length, opener variety, TTR, hapax, clause mix, tense consistency, nominalization, phrase recycling…) each with good/fair/poor tiers |
 
 ## Human Voice — 16 AI-writing detectors
 
