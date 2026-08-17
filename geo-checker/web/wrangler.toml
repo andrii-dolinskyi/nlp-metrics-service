@@ -19,16 +19,12 @@ run_worker_first = ["/api/*"]
 N8N_WEBHOOK_URL = "https://n8n-test.snoika.com/webhook/ai-visibility-check"
 ALLOWED_ORIGIN = "https://snoika.com"
 TURNSTILE_SITE_KEY = ""
-RATE_PER_HOUR = "6"
-RATE_PER_DAY = "20"
+RATE_PER_HOUR = "30"
+RATE_PER_DAY = "100"
 CACHE_TTL_HOURS = "24"
 
-# Recommended: persistent rate limits + cache across Worker instances.
-# Create once with:  npx wrangler kv namespace create TOOLS_KV
-# then paste the printed id below and uncomment. Without it, an in-memory
-# fallback is used (works, but resets whenever Cloudflare recycles the
-# instance, so limits are softer).
-#
-# [[kv_namespaces]]
-# binding = "TOOLS_KV"
-# id = "PASTE_ID_HERE"
+# Persistent rate limits + result cache across Worker instances
+# (created with: npx wrangler kv namespace create TOOLS_KV)
+[[kv_namespaces]]
+binding = "TOOLS_KV"
+id = "e0aa64df45094a51b6181726c7437719"
