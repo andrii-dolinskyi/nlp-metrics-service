@@ -18,14 +18,12 @@ https://n8n-test.snoika.com/workflow/TmUOmIhnBh17MiCh
 
 1. `Normalize URL` — validation + SSRF guard (private hosts rejected)
 2. `Fetch Page HTML` — raw HTML with browser UA (schema/technical checks)
-3. `Fetch Article Markdown` — Jina Reader (`r.jina.ai`) extracts the article
-   body as markdown so linguistic analysis runs on article text only, never on
-   raw HTML. Falls back to HTML text extraction if Jina fails. Keyless by
-   default; add a Jina API key (Authorization: Bearer) on the node for higher
-   rate limits.
+3. `Extract` — content extraction node returning article markdown, images and
+   favicon; also the article-text source for linguistic analysis (HTML text is
+   the fallback)
 4. `Fetch llms.txt` / `Fetch robots.txt` — domain-level AI-crawler signals
-5. `Score Engine` — single Code node, all deterministic (no LLM calls)
-6. `Wait For All Sources` (Merge barrier) → `Score Engine` → `Respond Report` — response shape is `{ page, payload }`
+5. `Wait For All Sources` (Merge barrier, 4 inputs) → `Score Engine` →
+   `Respond Report` — response shape is `{ page, payload }`, no fix prompts
 
 ## Scoring: 7 categories, 100 points
 

@@ -96,27 +96,6 @@ const extractTavily = node({
   output: [{ results: [{ url: 'https://example.com', raw_content: 'markdown...', images: [], favicon: 'https://example.com/favicon.ico' }] }]
 });
 
-const fetchArticle = node({
-  type: 'n8n-nodes-base.httpRequest',
-  version: 4.4,
-  config: {
-    name: 'Fetch Article Markdown',
-    parameters: {
-      method: 'GET',
-      url: expr("https://r.jina.ai/{{ $('Normalize URL').first().json.url }}"),
-      sendHeaders: true,
-      headerParameters: { parameters: [{ name: 'X-Return-Format', value: 'markdown' }] },
-      options: {
-        timeout: 10000,
-        response: { response: { fullResponse: true, neverError: true, responseFormat: 'text', outputPropertyName: 'data' } }
-      }
-    },
-    onError: 'continueRegularOutput',
-    position: [800, 400]
-  },
-  output: [{ data: '# Article title', statusCode: 200, headers: {} }]
-});
-
 const fetchLlms = node({
   type: 'n8n-nodes-base.httpRequest',
   version: 4.4,
@@ -161,7 +140,7 @@ const waitAll = merge({
   version: 3.2,
   config: {
     name: 'Wait For All Sources',
-    parameters: { mode: 'append', numberInputs: 5 },
+    parameters: { mode: 'append', numberInputs: 4 },
     position: [1600, 368]
   }
 });
@@ -176,15 +155,11 @@ if (nu.error) { return [{ json: { page: {}, payload: { error: nu.error } } }]; }
 
 function grab(name) { try { return $(name).first().json || {}; } catch (e) { return {}; } }
 var pageRes = grab('Fetch Page HTML');
-var jinaRes = grab('Fetch Article Markdown');
 var llmsRes = grab('Fetch llms.txt');
 var robotsRes = grab('Fetch robots.txt');
 
 var html = (typeof pageRes.body === 'string') ? pageRes.body : '';
 var pageStatus = pageRes.statusCode || 0;
-var jinaStatus = jinaRes.statusCode || 0;
-var jinaRaw = (typeof jinaRes.data === 'string') ? jinaRes.data : (typeof jinaRes.body === 'string' ? jinaRes.body : '');
-if (jinaStatus && jinaStatus !== 200) { jinaRaw = ''; }
 
 var tavRes = grab('Extract');
 var tavItem = tavRes.results && tavRes.results.length ? tavRes.results[0] : tavRes;
@@ -198,7 +173,7 @@ var htmlUsable = !looksBlocked(html) && pageStatus > 0 && pageStatus < 400;
 var fetchMode = htmlUsable ? 'direct' : 'blocked (bot wall)';
 if (!htmlUsable) { html = ''; }
 
-if (!html && jinaRaw.length < 300 && tavContent.length < 300) {
+if (!html && tavContent.length < 300) {
   return [{ json: { page: { url: nu.url, httpStatus: pageStatus }, payload: { error: 'Could not fetch the page (HTTP ' + (pageStatus || 'no response') + '). The site blocks automated access and no extractor could read it.' } } }];
 }
 
@@ -297,14 +272,8 @@ var authCount = Object.keys(authHosts).length;
 
 var bylineHtml = /rel=["']author["']/i.test(html) || /class=["'][^"']*\\b(author|byline)\\b[^"']*["']/i.test(html) || !!metaContent('name', 'author');
 
-var article = jinaRaw;
-var mci = article.indexOf('Markdown Content:');
-if (mci > -1 && mci < 500) { article = article.slice(mci + 17); }
-var articleSource = 'Jina Reader';
-if (article.replace(/\\s+/g, ' ').trim().length < 200 && tavContent.replace(/\\s+/g, ' ').trim().length >= 200) {
-  article = tavContent;
-  articleSource = 'Tavily Extract';
-}
+var article = tavContent;
+var articleSource = 'extracted';
 if (article.replace(/\\s+/g, ' ').trim().length < 200) {
   articleSource = 'HTML fallback';
   var scope = htmlNoScript;
@@ -367,7 +336,7 @@ var mdListItems = (article.match(/^\\s*([-*+]|\\d+\\.)\\s+\\S/gm) || []).length;
 var mdTableRows = (article.match(/^\\s*\\|.*\\|\\s*$/gm) || []).length;
 var htmlTables = cnt(/<table\\b/gi, html);
 var htmlLis = cnt(/<li\\b/gi, html);
-var effLis = (articleSource === 'Jina Reader') ? mdListItems : Math.max(htmlLis, mdListItems);
+var effLis = (articleSource === 'HTML fallback') ? Math.max(htmlLis, mdListItems) : mdListItems;
 
 var statCount = cnt(/\\d+(?:\\.\\d+)?\\s?%/g, textForPatterns)
   + cnt(/[$\\u20AC\\u00A3\\u00A5]\\s?\\d[\\d,]*(?:\\.\\d+)?/g, textForPatterns)
@@ -455,7 +424,7 @@ function addCheck(catId, id, label, points, max, comment, fixPrompt) {
   var status = points >= max ? 'pass' : (points > 0 ? 'warn' : 'fail');
   var c = cat(catId);
   c.score += points;
-  c.checks.push({ id: id, label: label, points: points, max: max, status: status, comment: comment, fixPrompt: status === 'pass' ? undefined : fixPrompt });
+  c.checks.push({ id: id, label: label, points: points, max: max, status: status, comment: comment });
 }
 
 var skeletonPts = 0;
@@ -540,7 +509,7 @@ if (imgTotal === 0 && tavImgCount === 0) {
   altComment = 'No images detected on the page \\u2014 nothing for multimodal AI retrieval to index.';
 } else if (imgTotal === 0 && tavImgCount > 0) {
   altPts = 1;
-  altComment = tavImgCount + ' image(s) found via extraction, but alt text could not be verified' + verifyNote + '.';
+  altComment = tavImgCount + ' image(s) detected, but alt text could not be verified' + verifyNote + '.';
 } else {
   altPts = altPct >= 80 ? 2 : (altPct >= 50 ? 1 : 0);
   altComment = imgWithAlt + ' of ' + imgTotal + ' images carry descriptive alt text (' + altPct + '%). ' + (altPct >= 80 ? 'Machines can read your visuals.' : 'Alt text is how AI engines understand images \\u2014 target 80%+ coverage.');
@@ -845,9 +814,6 @@ vc.patterns = patterns;
 vc.summary = heavyPatterns.length === 0 && notablePatterns.length <= 2
   ? 'Human-sounding: ' + patterns.filter(function (p) { return p.status === 'clean'; }).length + ' of 16 detectors clean. AI engines and readers both reward this.'
   : heavyPatterns.length + ' heavy and ' + notablePatterns.length + ' notable AI-writing fingerprints detected across 16 detectors.';
-if (heavyPatterns.length > 0 || notablePatterns.length > 2) {
-  vc.fixPrompt = 'Rewrite the article to remove AI-writing patterns while preserving all facts and structure. Specifically fix: ' + heavyPatterns.concat(notablePatterns).map(function (p) { return p.label.toLowerCase() + ' (' + p.count + ' found)'; }).join(', ') + '. Vary sentence length (target std deviation above 6), avoid "not just X, it\\u2019s Y" framings, replace vague attributions with named sources, and cut filler signposts.';
-}
 
 var lc = cat('linguistic');
 var lingNum = 0, lingDen = 0;
@@ -897,14 +863,11 @@ else if (totalScore >= 55) { grade = 'C'; verdict = 'Mixed signals \\u2014 AI en
 else if (totalScore >= 40) { grade = 'D'; verdict = 'Weak \\u2014 mostly invisible to AI search'; }
 else { grade = 'F'; verdict = 'Needs a rebuild to earn AI citations'; }
 
-var failing = [];
+var issuesCount = 0;
 categories.forEach(function (c) {
-  (c.checks || []).forEach(function (ch) { if (ch.status !== 'pass' && ch.fixPrompt) { failing.push(ch.fixPrompt); } });
+  (c.checks || []).forEach(function (ch) { if (ch.status !== 'pass') { issuesCount++; } });
 });
-if (vc.fixPrompt) { failing.push(vc.fixPrompt); }
-var issuesCount = failing.length;
 var pointsAvailable = 100 - totalScore;
-var fixAllPrompt = 'You are an expert GEO/AEO editor. Improve the page at ' + nu.url + ' for AI search visibility (ChatGPT, Perplexity, Google AI Overviews). Keep the core message, brand voice and facts. Apply every fix below:\\n' + failing.map(function (f, i) { return (i + 1) + '. ' + f; }).join('\\n');
 
 return [{ json: {
   page: {
@@ -914,7 +877,6 @@ return [{ json: {
     analyzedAt: now.toISOString(),
     httpStatus: pageStatus,
     fetchMode: fetchMode,
-    articleSource: articleSource,
     htmlKB: htmlKB,
     wordCount: totalWords,
     headings: { h1: effH1, h2: effH2, h3: effH3 },
@@ -929,7 +891,6 @@ return [{ json: {
     verdict: verdict,
     issuesCount: issuesCount,
     pointsAvailable: pointsAvailable,
-    fixAllPrompt: fixAllPrompt,
     categories: categories
   }
 } }];` },
@@ -953,7 +914,7 @@ const respondReport = node({
   }
 });
 
-const notes = sticky('## AI Visibility Score API\n\nPOST /webhook/ai-visibility-check?url=...\nResponse: { page, payload } \u2014 payload has 7 scored categories / 100 pts:\nAnswer 22 \u00B7 Machine-Readable 15 (incl. image alt) \u00B7 Evidence 18 (incl. visual assets) \u00B7 Access 15 (incl. favicon) \u00B7 Recency 8 \u00B7 Human Voice 12 \u00B7 Linguistic Signature 10.\n\nFan-out: direct HTML + Tavily Extract (images/favicon/content) + Jina markdown + llms.txt + robots.txt. The Merge node is the barrier that makes the engine wait for ALL five sources \u2014 do not remove it.', [], { color: 4 });
+const notes = sticky('## AI Visibility Score API\n\nPOST /webhook/ai-visibility-check?url=...\nResponse: { page, payload } \u2014 payload has 7 scored categories / 100 pts:\nAnswer 22 \u00B7 Machine-Readable 15 \u00B7 Evidence 18 \u00B7 Access 15 \u00B7 Recency 8 \u00B7 Human Voice 12 \u00B7 Linguistic Signature 10.\n\nFour parallel sources feed the Merge barrier (direct HTML, content extraction, llms.txt, robots.txt) \u2014 the Merge node makes the engine wait for ALL of them; do not remove it.', [], { color: 4 });
 
 export default workflow('TmUOmIhnBh17MiCh', 'GEO Checker \u2014 AI Visibility Score')
   .add(notes)
@@ -966,14 +927,11 @@ export default workflow('TmUOmIhnBh17MiCh', 'GEO Checker \u2014 AI Visibility Sc
   .to(extractTavily)
   .to(waitAll.input(1))
   .add(normalizeUrl)
-  .to(fetchArticle)
+  .to(fetchLlms)
   .to(waitAll.input(2))
   .add(normalizeUrl)
-  .to(fetchLlms)
-  .to(waitAll.input(3))
-  .add(normalizeUrl)
   .to(fetchRobots)
-  .to(waitAll.input(4))
+  .to(waitAll.input(3))
   .add(waitAll)
   .to(scoreEngine)
   .to(respondReport);
