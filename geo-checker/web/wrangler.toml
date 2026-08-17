@@ -1,0 +1,34 @@
+# Cloudflare Workers config for the Snoika tools API + page
+#
+# Deploy:   npx wrangler deploy          (first run opens browser login)
+# Secrets:  npx wrangler secret put N8N_WEBHOOK_SECRET
+#           npx wrangler secret put TURNSTILE_SECRET     (optional)
+# Logs:     npx wrangler tail
+
+name = "snoika-tools"
+main = "worker.js"
+compatibility_date = "2026-08-01"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = ["/api/*"]
+
+[vars]
+# Not secret (the secret header is), but you can move it to a secret too.
+N8N_WEBHOOK_URL = "https://n8n-test.snoika.com/webhook/ai-visibility-check"
+ALLOWED_ORIGIN = "https://snoika.com"
+TURNSTILE_SITE_KEY = ""
+RATE_PER_HOUR = "6"
+RATE_PER_DAY = "20"
+CACHE_TTL_HOURS = "24"
+
+# Recommended: persistent rate limits + cache across Worker instances.
+# Create once with:  npx wrangler kv namespace create TOOLS_KV
+# then paste the printed id below and uncomment. Without it, an in-memory
+# fallback is used (works, but resets whenever Cloudflare recycles the
+# instance, so limits are softer).
+#
+# [[kv_namespaces]]
+# binding = "TOOLS_KV"
+# id = "PASTE_ID_HERE"

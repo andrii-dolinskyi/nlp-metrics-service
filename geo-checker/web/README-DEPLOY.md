@@ -1,8 +1,11 @@
 # AI Visibility Score — deployment handoff
 
 Everything the site team needs to put the free checker on snoika.com.
-Two files matter: `server.js` (backend proxy) and `public/index.html`
-(the complete page). No build step, no framework.
+Three files matter: `worker.js` (backend proxy, Cloudflare Workers —
+the deploy target), `public/index.html` (the complete page), and
+`wrangler.toml` (Workers config). `server.js` is the same backend as a
+classic Express app, kept for local dev or a Render/VPS deploy if ever
+preferred. No build step, no framework.
 
 ## What the backend does (and why it exists)
 
@@ -22,16 +25,22 @@ secret header. The server also enforces:
 ```bash
 cd geo-checker/web
 npm install
+npx wrangler dev          # Workers runtime, http://localhost:8787
+# or the Express variant:
 N8N_WEBHOOK_URL=https://n8n-test.snoika.com/webhook/ai-visibility-check node server.js
 # open http://localhost:3000
 ```
 
-## Deploy checklist
+## Deploy checklist (Cloudflare Workers, free plan)
 
-1. Deploy this folder to any Node 18+ host (Render, Railway, Fly, a VPS,
-   or wrap `server.js` as a Next.js/Express route in the main site repo).
-2. Set env vars from `.env.example`. Generate the secret:
-   `openssl rand -hex 32`.
+1. `npx wrangler deploy` from `geo-checker/web` (first run: browser login).
+   Non-secret config lives in `wrangler.toml` `[vars]`; redeploy after edits.
+2. Set the secret: generate with `openssl rand -hex 32`, then
+   `npx wrangler secret put N8N_WEBHOOK_SECRET`.
+   Optional but recommended: create a KV namespace
+   (`npx wrangler kv namespace create TOOLS_KV`) and uncomment the
+   `[[kv_namespaces]]` block in `wrangler.toml` so rate limits and the
+   result cache persist across Worker instances.
 3. In the n8n editor, open the **Score API Request** webhook node →
    Authentication → **Header Auth** → create a credential with header name
    `X-Snoika-Key` and the same secret. From then on, requests without the
@@ -42,15 +51,16 @@ N8N_WEBHOOK_URL=https://n8n-test.snoika.com/webhook/ai-visibility-check node ser
 5. Firewall (recommended): restrict `n8n-test.snoika.com/webhook/*` to the
    backend's egress IPs, or put Cloudflare Access in front of it. Also plan
    to move the workflow off the `-test` subdomain for production.
-6. Optional: create a Turnstile widget (Cloudflare dashboard → Turnstile),
-   set `TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET`. The frontend picks the
+6. Optional: create a Turnstile widget (Cloudflare dashboard → Turnstile).
+   Put `TURNSTILE_SITE_KEY` in `wrangler.toml` `[vars]` and set the secret
+   with `npx wrangler secret put TURNSTILE_SECRET`. The frontend picks the
    site key up automatically from `/api/config`.
 7. Set a spend alert on the Tavily account as a last-resort backstop.
 
 ## Frontend integration notes
 
 - `public/index.html` is self-contained (all CSS/JS inline). To embed in the
-  main site, either serve it as-is on a route like `/free-tools/ai-visibility`
+  main site, either serve it as-is on the `/free-tools/geo-checker` route
   or copy the `<style>`, body sections and `<script>` into your page template.
 - Replace the two placeholder links at the top of the script:
   `BOOK_URL` and `TRIAL_URL` (currently `https://snoika.com`).
@@ -61,7 +71,9 @@ N8N_WEBHOOK_URL=https://n8n-test.snoika.com/webhook/ai-visibility-check node ser
 
 ## Scaling note
 
-Rate limiting and cache are in-memory: perfect for a single instance, reset on
-restart. If you ever run multiple instances behind a load balancer, move both
-to Redis (the functions `rateLimited`, `cacheGet`, `cacheSet` in `server.js`
-are the only three places to touch).
+On Workers, rate limiting and cache use the `TOOLS_KV` namespace when bound
+(persistent, shared) and fall back to per-instance memory otherwise. Free-plan
+KV allows 1,000 writes/day — each fresh scan costs 2 writes, so roughly 500
+new scans/day before limits soften; far above expected lead-magnet traffic.
+The Express variant (`server.js`) keeps both in process memory: fine for one
+instance, move to Redis if ever load-balanced.
