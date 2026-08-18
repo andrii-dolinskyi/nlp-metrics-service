@@ -197,6 +197,10 @@
 
   /* ── tile: form + result ── */
   .tile{background:var(--tile);border-radius:24px;padding:32px 32px 36px;margin:32px auto 0}
+  .out-tile{display:none;margin-top:24px}
+  .out-tile.show{display:block}
+  .lotbox{width:72px;height:60px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .lotbox svg{display:block;width:100%;height:100%}
   .field-label{display:block;font-size:13px;font-weight:700;margin-bottom:8px;text-align:left}
   .urlbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
   .urlbar input{flex:1;min-width:240px;background:#fff;border:1px solid var(--line2);border-radius:var(--r-pill);
@@ -356,9 +360,11 @@
       <div class="field-error" id="fieldError">Please enter a valid URL (for example, https://snoika.com/pricing)</div>
       <div id="tsWidget"></div>
     </form>
+  </div>
 
+  <div class="tile out-tile" id="outTile">
     <div class="loadcard" id="loadCard" aria-live="polite">
-      <span class="cup" aria-hidden="true">&#9749;</span>
+      <div class="lotbox" id="lotBox" aria-hidden="true"><span class="cup">&#9749;</span></div>
       <div class="loadbody">
         <div class="loadmsg" id="loadMsg">Reading your page&hellip;</div>
         <div class="loadtrack"><i></i></div>
@@ -617,21 +623,62 @@ function render(data){
 /* ── loading ── */
 var STEPS = ['Reading your page…','Checking AI robot access…','Reading structured data…','Scanning for AI-writing patterns…','Scoring 50+ signals…'];
 var stepTimer = null;
+function showOutTile(){ el('outTile').classList.add('show'); }
+
+/* Lottie loader with coffee-emoji fallback */
+var lotTried = false;
+function initLottie(){
+  if(lotTried) return; lotTried = true;
+  var s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie_light.min.js';
+  s.async = true;
+  s.onload = function(){
+    try{
+      var anim = window.lottie.loadAnimation({ container: el('lotBox'), renderer: 'svg', loop: true, autoplay: true, path: 'img/loader.json' });
+      anim.addEventListener('DOMLoaded', function(){ var c = el('lotBox').querySelector('.cup'); if(c) c.style.display = 'none'; });
+    }catch(e){}
+  };
+  document.head.appendChild(s);
+}
+
 function setLoading(on){
   el('scanBtn').disabled = on;
   el('loadCard').classList.toggle('show', on);
   if(stepTimer){ clearInterval(stepTimer); stepTimer = null; }
   if(on){
+    showOutTile(); initLottie();
     var i = 0; el('loadMsg').textContent = STEPS[0];
     stepTimer = setInterval(function(){ i = (i+1)%STEPS.length; el('loadMsg').textContent = STEPS[i]; }, 1600);
   }
 }
 
 /* ── errors & modal ── */
-function showError(msg){ el('error').textContent = msg; el('error').style.display = 'block'; }
+function showError(msg){ showOutTile(); el('error').textContent = msg; el('error').style.display = 'block'; }
 function hideError(){ el('error').style.display = 'none'; }
-function showFieldError(){ el('fieldError').style.display = 'block'; }
+var URL_FIELD_MSG = 'Please enter a valid URL (for example, https://snoika.com/pricing)';
+function showFieldError(msg){ el('fieldError').textContent = msg || URL_FIELD_MSG; el('fieldError').style.display = 'block'; }
 function hideFieldError(){ el('fieldError').style.display = 'none'; }
+
+/* platform detection: pages that cannot be meaningfully scored */
+var PLATFORM_MSG = {
+  video: 'Videos cannot be scored for GEO. Please paste a URL of a page with content.',
+  social: 'Social media pages cannot be scored for GEO. Please paste a URL of a page with content.',
+  search: 'Search engines cannot be scored for GEO. Please paste a URL of a page with content.',
+  marketplace: 'Marketplace listings cannot be scored for GEO. Please paste a URL of a page with content.'
+};
+function platformKind(host){
+  function hit(list){ for(var i=0;i<list.length;i++){ var d=list[i]; if(host===d || host.slice(-(d.length+1))==='.'+d) return true; } return false; }
+  if(host==='apps.apple.com' || host==='play.google.com' || /(^|\.)amazon\./.test(host) || hit(['ebay.com','etsy.com','aliexpress.com'])) return 'marketplace';
+  if(hit(['youtube.com','youtu.be','vimeo.com','twitch.tv','dailymotion.com','rumble.com'])) return 'video';
+  if(hit(['facebook.com','fb.com','instagram.com','twitter.com','x.com','tiktok.com','linkedin.com','threads.net','pinterest.com','reddit.com','quora.com','snapchat.com','vk.com','t.me','telegram.org','whatsapp.com','messenger.com','discord.com','discord.gg','bsky.app','mastodon.social'])) return 'social';
+  if(hit(['google.com','bing.com','duckduckgo.com','yandex.com','baidu.com'])) return 'search';
+  return null;
+}
+function urlHost(u){
+  var s = u.trim();
+  if(!/^https?:\/\//i.test(s)) s = 'https://' + s;
+  try{ return new URL(s).hostname.toLowerCase().replace(/^www\./,''); }catch(e){ return ''; }
+}
 function showModal(title){ el('modalTitle').textContent = title; el('modalBg').classList.add('show'); }
 function hideModal(){ el('modalBg').classList.remove('show'); }
 el('modalX').addEventListener('click', hideModal);
@@ -653,6 +700,8 @@ el('scanForm').addEventListener('submit', function(ev){
   if(!url) return;
   hideError(); hideFieldError();
   if(!isValidUrl(url)){ showFieldError(); return; }
+  var pk = platformKind(urlHost(url));
+  if(pk){ showFieldError(PLATFORM_MSG[pk]); return; }
   el('result').innerHTML = '';
   setLoading(true);
   quotaDec();
@@ -675,7 +724,8 @@ el('scanForm').addEventListener('submit', function(ev){
         return;
       }
       if(!data || !data.payload || data.payload.error){
-        showError(msg || 'Oops, seems like our robots did something wrong. Please try again.');
+        if(msg && msg.indexOf('cannot be scored for GEO') !== -1){ showFieldError(msg); }
+        else { showError(msg || 'Oops, seems like our robots did something wrong. Please try again.'); }
         resetTs();
         return;
       }

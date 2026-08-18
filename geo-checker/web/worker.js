@@ -53,6 +53,23 @@ function json(data, status, extraHeaders) {
   });
 }
 
+/* ── platform detection: pages that cannot be meaningfully scored ────────── */
+const PLATFORM_MSG = {
+  video: 'Videos cannot be scored for GEO. Please paste a URL of a page with content.',
+  social: 'Social media pages cannot be scored for GEO. Please paste a URL of a page with content.',
+  search: 'Search engines cannot be scored for GEO. Please paste a URL of a page with content.',
+  marketplace: 'Marketplace listings cannot be scored for GEO. Please paste a URL of a page with content.',
+};
+function platformKind(host) {
+  host = host.replace(/^www\./, '');
+  const hit = (list) => list.some((d) => host === d || host.endsWith('.' + d));
+  if (host === 'apps.apple.com' || host === 'play.google.com' || /(^|\.)amazon\./.test(host) || hit(['ebay.com', 'etsy.com', 'aliexpress.com'])) return 'marketplace';
+  if (hit(['youtube.com', 'youtu.be', 'vimeo.com', 'twitch.tv', 'dailymotion.com', 'rumble.com'])) return 'video';
+  if (hit(['facebook.com', 'fb.com', 'instagram.com', 'twitter.com', 'x.com', 'tiktok.com', 'linkedin.com', 'threads.net', 'pinterest.com', 'reddit.com', 'quora.com', 'snapchat.com', 'vk.com', 't.me', 'telegram.org', 'whatsapp.com', 'messenger.com', 'discord.com', 'discord.gg', 'bsky.app', 'mastodon.social'])) return 'social';
+  if (hit(['google.com', 'bing.com', 'duckduckgo.com', 'yandex.com', 'baidu.com'])) return 'search';
+  return null;
+}
+
 /* ── input validation (identical rules to server.js) ─────────────────────── */
 function validateUrl(raw) {
   raw = String(raw || '').trim();
@@ -69,6 +86,8 @@ function validateUrl(raw) {
     host === '0.0.0.0' || host.startsWith('[');
   if (isPrivate) return { error: 'Private and internal addresses are not allowed.' };
   if (!/^[a-z0-9.-]+$/.test(host) || !host.includes('.')) return { error: 'That does not look like a valid URL.' };
+  const pk = platformKind(host);
+  if (pk) return { error: PLATFORM_MSG[pk] };
   return { value: raw };
 }
 
