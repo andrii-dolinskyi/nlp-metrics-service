@@ -311,6 +311,15 @@ var wordsArray = corpus.split(' ').filter(function (w) { return /^[a-z]{2,}$/.te
 var totalWords = wordsArray.length;
 var per1kDiv = Math.max(totalWords, 1) / 1000;
 
+var EN_STOPS = { the: 1, and: 1, of: 1, to: 1, that: 1, for: 1, with: 1, are: 1, this: 1, from: 1, has: 1, have: 1, not: 1, you: 1, your: 1, will: 1, can: 1, what: 1 };
+var enStopHits = 0;
+wordsArray.forEach(function (w) { if (EN_STOPS[w]) { enStopHits++; } });
+var enStopRate = totalWords > 0 ? enStopHits / totalWords : 0;
+var isEnglish;
+if (enStopRate >= 0.05) { isEnglish = true; }
+else if (enStopRate < 0.02) { isEnglish = false; }
+else { var laLower = langAttr.toLowerCase(); isEnglish = !laLower || laLower.indexOf('en') === 0; }
+
 if (totalWords < 80) {
   return [{ json: { page: { url: nu.url, httpStatus: pageStatus }, payload: { error: 'Only ' + totalWords + ' words of article text could be extracted and it is not enough to score. The page may be behind JavaScript or a paywall. Try another page.' } } }];
 }
@@ -806,8 +815,15 @@ var lingIdx = lingDen > 0 ? lingNum / lingDen : 0;
 lc.score = Math.round(12 * (1 - lingIdx));
 lc.summary = lc.score >= 10 ? 'Linguistic profile reads human-typical across 10 measures.' : (lc.score >= 6 ? 'Some mechanical patterns in the linguistic profile.' : 'The linguistic profile is strongly machine-typical.');
 
+var LANG_NOTE = 'Not scored because this check currently works for English content only. This does not affect the overall score.';
+if (!isEnglish) {
+  vc.notScored = true; vc.score = 0; vc.patterns = []; vc.summary = LANG_NOTE;
+  lc.notScored = true; lc.score = 0; lc.metrics = []; lc.summary = LANG_NOTE;
+}
 var totalScore = 0;
-categories.forEach(function (c) { totalScore += c.score; });
+var availMax = 0;
+categories.forEach(function (c) { if (!c.notScored) { totalScore += c.score; availMax += c.max; } });
+totalScore = availMax > 0 ? Math.round(100 * totalScore / availMax) : 0;
 totalScore = Math.max(0, Math.min(100, totalScore));
 var grade, verdict;
 if (totalScore >= 90) { grade = 'A+'; verdict = 'Exceptional \\u2014 built to be cited by AI engines'; }

@@ -600,8 +600,12 @@ function render(data){
   (pl.categories||[]).forEach(function(cat, idx){
     var pct = cat.max > 0 ? Math.round(cat.score/cat.max*100) : 0;
     var barc = pct>=80?OK:(pct>=50?WARN:BAD);
-    out += '<div class="cat'+(idx===0?' open':'')+'"><button class="cat-h" type="button"><div><h3>'+h(cat.name)+'</h3><div class="sub">'+h(CAT_SUBS[cat.id]||'')+'</div></div><span class="pts"><b>'+cat.score+'</b> / '+cat.max+'</span><span class="chev">&#9662;</span></button><div class="bar"><i style="width:'+pct+'%;background:'+barc+'"></i></div><div class="cat-b">';
-    if(cat.patterns && cat.patterns.length){
+    var ptsHtml = cat.notScored ? '<b>&mdash;</b>' : '<b>'+cat.score+'</b> / '+cat.max;
+    if(cat.notScored){ pct = 0; barc = '#C9C6D6'; }
+    out += '<div class="cat'+(idx===0?' open':'')+'"><button class="cat-h" type="button"><div><h3>'+h(cat.name)+'</h3><div class="sub">'+h(CAT_SUBS[cat.id]||'')+'</div></div><span class="pts">'+ptsHtml+'</span><span class="chev">&#9662;</span></button><div class="bar"><i style="width:'+pct+'%;background:'+barc+'"></i></div><div class="cat-b">';
+    if(cat.notScored){
+      out += '<div class="catsum">'+h(cat.summary||'')+'</div>';
+    } else if(cat.patterns && cat.patterns.length){
       if(cat.summary){ out += '<div class="catsum">'+h(cat.summary)+'</div>'; }
       cat.patterns.forEach(function(pp){ out += renderPattern(pp); });
     } else if(cat.metrics && cat.metrics.length){
