@@ -359,9 +359,13 @@
       <div class="urlbar">
         <input type="text" id="urlInput" placeholder="https://snoika.com/blog/ai-seo-tools-ranking-visibility" autocomplete="off" aria-label="Page URL">
         <button class="btn btn-primary btn-lg" type="submit" id="scanBtn">Check my GEO score</button>
-        <span class="quota" id="quota"><span id="quotaNum">100</span>/100
-          <button class="qinfo" type="button" id="quotaInfo" aria-label="Usage limit information">?</button>
-          <span class="qtip" role="tooltip">You can run this tool only 100 times per day but only 30 times per hour. Use it wisely.</span>
+        <span class="quota" id="quotaH"><span id="quotaHNum">30</span>/30
+          <button class="qinfo" type="button" id="quotaHInfo" aria-label="Hourly limit information">?</button>
+          <span class="qtip" role="tooltip">Up to 30 checks per hour. Each check frees up again one hour after you run it.</span>
+        </span>
+        <span class="quota" id="quotaD"><span id="quotaDNum">100</span>/100
+          <button class="qinfo" type="button" id="quotaDInfo" aria-label="Daily limit information">?</button>
+          <span class="qtip" role="tooltip">Up to 100 checks per day. Each check frees up again 24 hours after you run it.</span>
         </span>
       </div>
       <div class="microcopy">For example: https://snoika.com/blog/ai-seo-tools-ranking-visibility</div>
@@ -533,33 +537,34 @@ var CAT_SUBS = {
   freshness: "Is the page current?"
 };
 
-/* ── daily counter (client-side, informational) ── */
-function quotaLoad(){
+/* ── click limits: sliding windows, 30/hour and 100/day, enforced client-side ── */
+var Q_KEY = 'geoScanTimes', Q_HOUR = 30, Q_DAY = 100;
+function qTimes(){
   try{
-    var today = new Date().toDateString();
-    var d = localStorage.getItem('geoQuotaDate');
-    var n = parseInt(localStorage.getItem('geoQuotaLeft'), 10);
-    if(d !== today || isNaN(n)){
-      n = 100;
-      localStorage.setItem('geoQuotaDate', today);
-      localStorage.setItem('geoQuotaLeft', '100');
-    }
-    return Math.max(0, Math.min(100, n));
-  }catch(e){ return 100; }
+    var now = Date.now();
+    var a = JSON.parse(localStorage.getItem(Q_KEY) || '[]');
+    if(!Array.isArray(a)) a = [];
+    return a.filter(function(t){ return typeof t === 'number' && now - t < 86400000; });
+  }catch(e){ return []; }
 }
-function quotaShow(){ el('quotaNum').textContent = quotaLoad(); }
-function quotaDec(){
-  try{
-    var n = Math.max(0, quotaLoad() - 1);
-    localStorage.setItem('geoQuotaLeft', String(n));
-  }catch(e){}
-  quotaShow();
+function qSave(a){ try{ localStorage.setItem(Q_KEY, JSON.stringify(a)); }catch(e){} }
+function qHourUsed(a){ var now = Date.now(); return a.filter(function(t){ return now - t < 3600000; }).length; }
+function quotaShow(){
+  var a = qTimes(); qSave(a);
+  el('quotaHNum').textContent = Math.max(0, Q_HOUR - qHourUsed(a));
+  el('quotaDNum').textContent = Math.max(0, Q_DAY - a.length);
 }
+function quotaCheck(){
+  var a = qTimes();
+  if(qHourUsed(a) >= Q_HOUR) return 'hour';
+  if(a.length >= Q_DAY) return 'day';
+  return null;
+}
+function quotaRecord(){ var a = qTimes(); a.push(Date.now()); qSave(a); quotaShow(); }
 quotaShow();
-el('quotaInfo').addEventListener('click', function(ev){
-  ev.preventDefault();
-  el('quota').classList.toggle('tip-open');
-});
+setInterval(quotaShow, 30000);
+el('quotaHInfo').addEventListener('click', function(ev){ ev.preventDefault(); el('quotaD').classList.remove('tip-open'); el('quotaH').classList.toggle('tip-open'); });
+el('quotaDInfo').addEventListener('click', function(ev){ ev.preventDefault(); el('quotaH').classList.remove('tip-open'); el('quotaD').classList.toggle('tip-open'); });
 document.addEventListener('click', function(ev){
   if(!el('quota').contains(ev.target)) el('quota').classList.remove('tip-open');
 });
@@ -716,9 +721,12 @@ el('scanForm').addEventListener('submit', function(ev){
   if(!isValidUrl(url)){ showFieldError(); return; }
   var pk = platformKind(urlHost(url));
   if(pk){ showFieldError(PLATFORM_MSG[pk]); return; }
+  var ql = quotaCheck();
+  if(ql === 'hour'){ showModal('Hourly limit reached'); return; }
+  if(ql === 'day'){ showModal('Daily limit reached'); return; }
+  quotaRecord();
   el('result').innerHTML = '';
   setLoading(true);
-  quotaDec();
   var body = { url: url };
   if(turnstileToken) body.turnstileToken = turnstileToken;
   fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
