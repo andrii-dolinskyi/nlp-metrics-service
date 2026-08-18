@@ -129,6 +129,14 @@
     },
     {
      "@type": "Question",
+     "name": "Does it work for pages in other languages?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Partly, and the report is honest about it. The technical categories, like structure, markup, crawler access and freshness, are scored for any language. The two writing categories, Human Voice and Linguistic Signature, currently work for English content only, so for non-English pages they are shown as not scored and the total score is calculated from the remaining checks. Pages in scripts without spaces between words, like Chinese or Japanese, usually cannot be scored yet."
+     }
+    },
+    {
+     "@type": "Question",
      "name": "Do you store my page or my results?",
      "acceptedAnswer": {
       "@type": "Answer",
@@ -479,6 +487,8 @@
         <p>llms.txt is an emerging standard: a plain-text file on your site that gives AI systems a curated map of your best content. Adoption is early and no major AI vendor has confirmed using it yet, so it carries only 2 points in our scoring. It is cheap to add and positions you well if adoption grows.</p></details>
       <details><summary>My site is behind bot protection. Can you still check it?</summary>
         <p>Often yes. The tool has a fallback for pages that block simple automated visits, and the report will tell you honestly when parts of the page could not be verified. If nothing can be read at all, you get a clear message instead of an inaccurate score. That result is itself useful because if we cannot read your page, many AI crawlers cannot either. And this can hurt your AI visibility.</p></details>
+      <details><summary>Does it work for pages in other languages?</summary>
+        <p>Partly, and the report is honest about it. The technical categories, like structure, markup, crawler access and freshness, are scored for any language. The two writing categories, Human Voice and Linguistic Signature, currently work for English content only, so for non-English pages they are shown as not scored and the total score is calculated from the remaining checks. Pages in scripts without spaces between words, like Chinese or Japanese, usually cannot be scored yet.</p></details>
       <details><summary>Do you store my page or my results?</summary>
         <p>We keep the scored report in a short-lived cache for up to 24 hours so repeat scans return instantly. We do not publish your results or share them with third parties.</p></details>
       <details><summary>How often should I re-check a page?</summary>
