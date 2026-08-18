@@ -71,23 +71,28 @@ needed — same behavior, same env vars.)
 Paste this prompt into Lovable (attach `public/index.html` as the reference):
 
 > Create a page at the slug `/free-tools/geo-checker`, matching the
-> attached `index.html` exactly: same layout, colors, copy, FAQ and footer.
-> Keep all text as written. The scan form must POST JSON `{ "url": "<input>" }`
-> to `https://snoika-tools.<your-account>.workers.dev/api/t/ai-visibility` and render the
+> attached `index.html` exactly: same layout (white background), colors,
+> copy and FAQ. Keep all text as written. The page has no header or footer
+> of its own — use the site's. The scan form must POST JSON
+> `{ "url": "<input>", "turnstileToken": "<token>" }`
+> to `https://snoika-tools.snoika.workers.dev/api/t/ai-visibility` and render the
 > response, which has the shape `{ page, payload }` (see attached
 > `sample-payload.json`). The rendering logic (score ring, category
 > accordions, three row types: checks with points, patterns with
-> clean/notable/heavy chips, metrics with value + good/fair/poor chips, and
-> the score-dependent CTA band) is fully implemented in the `<script>` at the
-> bottom of the reference file — port it as-is. Also copy the
+> clean/notable/heavy chips, metrics with a single status+value chip; the
+> loading card, the hourly/daily limit popups, the localStorage scan
+> counter, the Turnstile integration, and the score-dependent CTA band) is
+> fully implemented in the `<script>` of the reference file — port it
+> as-is. Upload the three attached images and serve them at `img/scoring.png`,
+> `img/research.png`, `img/femida.png` (or update the three src attributes),
+> keeping the alt texts from the reference. Also copy the
 > `<script type="application/ld+json">` block from the reference `<head>`
-> into the page head, update its `url` field to the final page URL, set the
-> page <title> and meta description from the reference, and remove the
-> demo top-nav and footer (the site already has its own).
+> into the page head and set the page <title> and meta description from the
+> reference.
 
 Also give Lovable/your site config:
 - **llms.txt**: add this line to snoika.com's `/llms.txt`:
-  `- [AI Visibility Score](https://snoika.com/free-tools/geo-checker): free checker that scores any page on 50+ signals for how likely ChatGPT, Perplexity and Google AI are to quote it`
+  `- [GEO Checker](https://snoika.com/free-tools/geo-checker): free checker that scores any page on 50+ signals for how likely ChatGPT, Perplexity and Google AI are to quote it`
 - **Sitemap**: make sure the slug is in the sitemap (Lovable usually handles this).
 - Set `ALLOWED_ORIGIN=https://snoika.com` on the API so the Lovable page may call it.
 - Replace `BOOK_URL` / `TRIAL_URL` placeholders with the real booking/signup links.
