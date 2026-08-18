@@ -18,7 +18,7 @@ run_worker_first = ["/api/*"]
 # Not secret (the secret header is), but you can move it to a secret too.
 N8N_WEBHOOK_URL = "https://n8n-test.snoika.com/webhook/ai-visibility-check"
 ALLOWED_ORIGIN = "https://snoika.com"
-TURNSTILE_SITE_KEY = ""
+TURNSTILE_SITE_KEY = "0x4AAAAAAEStuhMgTRdKWXs_"
 RATE_PER_HOUR = "30"
 RATE_PER_DAY = "100"
 CACHE_TTL_HOURS = "24"
