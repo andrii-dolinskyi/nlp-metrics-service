@@ -11,8 +11,8 @@ the request templates). The workflow itself lives in n8n.
 ClickUp offers no webhook events for chat channel messages (only task/list/folder/space/goal events), so the
 workflow polls the channel:
 
-1. **Poll Channel** (Schedule Trigger, every minute) -> **Fetch Messages** (`GET /api/v3/workspaces/{ws}/chat/channels/{ch}/messages?limit=50&content_format=text/md`).
-2. **Pick Request** drops bot messages (every bot message starts with the marker `🤖`) and anything older than 3 hours.
+1. **Poll Channel** (Schedule Trigger, every minute) -> **Fetch Messages** (`GET /api/v3/workspaces/{ws}/chat/channels/{ch}/messages?limit=100&content_format=text/md`, following `next_cursor` for up to 15 pages so a busy channel cannot push a request out of the window).
+2. **Pick Request** merges the pages, drops bot messages (every bot message starts with the marker `🤖`) and anything older than 3 hours, and sorts oldest first.
 3. **Not Processed?** filters out message ids already stored in the n8n data table `yt_script_requests`.
 4. **Take Oldest** handles one request per poll (the rest are picked up on the following runs).
 5. **Resolve Requester** (`GET /api/v2/team`) maps the message `user_id` to a username.
@@ -31,8 +31,9 @@ workflow polls the channel:
    **Thumbnail Edit Synthesis** (gpt-image-1 image edit, `input_fidelity=high`, quality medium); options 1 and 4 go through
    **Thumbnail Image Synthesis** (plain generation, quality medium). **Merge Thumbnails** joins both branches,
    **Cloudinary Upload** stores the originals in folder `youtube-thumbnails`, and **Thumbnail Record Builder** builds the
-   delivery URLs: photo-style 16:9 images are smart-cropped to 1280x720, illustrations are padded (`c_pad,b_auto`) so icons
-   and text are never cut, Shorts are padded to 1080x1920. A failed option is reported in the channel; the script is still
+   delivery URLs (1280x720, or 1080x1920 for Shorts): images without text (option 3) are smart-cropped (`c_fill,g_auto`),
+   the photo with a title banner (option 2) is padded with Cloudinary generative fill (`c_pad,b_gen_fill`) so the banner is
+   never cut, illustrations with a banner (options 1 and 4) are padded with the predominant colour (`c_pad,b_auto`). A failed option is reported in the channel; the script is still
    delivered. Sources: `nodes/thumbnails/`.
 10. **Compose Result** builds the channel message (script + YouTube metadata + sources), splits it into parts under
    ClickUp's 40,000 character limit, **Post Result** posts each part and adds the requester as a follower,
