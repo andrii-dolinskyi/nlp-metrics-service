@@ -26,8 +26,8 @@ workflow polls the channel:
    **Thumbnail Prompt Forge** adds the YouTube rules (one focal subject, high contrast, legible at 320 px, safe areas, exact
    text or no text) and falls back to generic concepts if the director fails. **Thumbnail Image Synthesis** renders them with
    gpt-image-1 (1536x1024, or 1024x1536 for Shorts, quality high). **Cloudinary Upload** stores the originals in folder
-   `youtube-thumbnails`; **Thumbnail Record Builder** builds delivery URLs cropped to 1280x720 (or 1080x1920 for Shorts)
-   with `c_fill,g_auto,q_auto:good,f_jpg`. A failed option is reported in the channel; the script is still delivered.
+   `youtube-thumbnails`; **Thumbnail Record Builder** builds delivery URLs: 16:9 videos are smart-cropped to 1280x720 (`c_fill,g_auto`), Shorts are padded to 1080x1920 (`c_pad,b_auto`) so text is never cut
+   with `q_auto:good,f_jpg`. A failed option is reported in the channel; the script is still delivered.
    Sources: `nodes/thumbnails/`.
 10. **Compose Result** builds the channel message (script + YouTube metadata + sources), splits it into parts under
    ClickUp's 40,000 character limit, **Post Result** posts each part and adds the requester as a follower,

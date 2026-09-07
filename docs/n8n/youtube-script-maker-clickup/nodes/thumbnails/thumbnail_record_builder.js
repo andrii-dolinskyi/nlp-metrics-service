@@ -2,7 +2,8 @@
 const items = $('Thumbnail Bytes Materializer').all().map(i => i.json);
 const uploads = $input.all().map(i => i.json || {});
 const isShorts = items.length ? Boolean(items[0].isShorts) : false;
-const TRANSFORM = isShorts ? 'c_fill,g_auto,w_1080,h_1920,q_auto:good,f_jpg' : 'c_fill,g_auto,w_1280,h_720,q_auto:good,f_jpg';
+// Landscape: smart crop 3:2 -> 16:9 (loses ~5% top and bottom). Portrait Shorts: pad 2:3 -> 9:16 with bars in the image's predominant colour so no text is ever cut.
+const TRANSFORM = isShorts ? 'c_pad,b_auto,w_1080,h_1920,q_auto:good,f_jpg' : 'c_fill,g_auto,w_1280,h_720,q_auto:good,f_jpg';
 
 const youtubeUrl = secureUrl => {
   const s = String(secureUrl || '');
