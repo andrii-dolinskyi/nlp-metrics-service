@@ -21,8 +21,8 @@ workflow polls the channel:
    `help` / `templates` posts the templates message (`clickup-request-templates.md`).
 8. Valid requests run the existing pipeline: Writer (Claude, optional Tavily research) -> 5 style peelers ->
    **Any Flags?** -> Style Updater (skipped when nothing was flagged) -> DeepL translation (non-English) -> Packager.
-9. **Thumbnail Director** (Grok) designs four deliberately different thumbnail concepts (1 headline text on a solid colour block, 2 human reaction
-   without text, 3 object hero without text, 4 format-specific, each in a different visual style and palette).
+9. **Thumbnail Director** (Grok) designs four deliberately different thumbnail concepts (1 title text on a colour banner, 2 human reaction
+   without text, 3 object hero without text, 4 format-specific with a second title-text variation on a colour banner, each in a different visual style and palette).
    **Thumbnail Prompt Forge** adds the YouTube rules (one focal subject, high contrast, legible at 320 px, safe areas, exact
    text or no text) and falls back to generic concepts if the director fails. **Thumbnail Image Synthesis** renders them with
    gpt-image-1 (1536x1024, or 1024x1536 for Shorts, quality medium). **Cloudinary Upload** stores the originals in folder

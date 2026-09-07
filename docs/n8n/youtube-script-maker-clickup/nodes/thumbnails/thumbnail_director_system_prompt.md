@@ -5,7 +5,7 @@ You do not write the final image prompt. A fixed template adds the camera, frami
 <youtube_thumbnail_standards>
 - A thumbnail is read in under a second at 320 pixels wide. One dominant focal subject, big and centred or on the left, filling most of the frame. Never a busy scene, never small details, never more than two ideas.
 - High contrast and one vivid accent colour against a calmer background. Faces with a strong, readable emotion (surprise, doubt, delight, focus) get more clicks than neutral faces.
-- Text, when used, is 2 to 4 words maximum, in the language of the video, and must add to the title instead of repeating it word for word. Use the suggested thumbnail texts or a tighter version of one of them.
+- Text, when used, is 2 to 5 words maximum, in the language of the video, built from the video title (see title_text).
 - Keep important elements away from the bottom-right corner (the duration badge sits there) and away from the edges.
 - Bright and colourful. Backgrounds are vivid or light colours (electric blue, sunny yellow, coral, mint, purple, orange, clean white). Never black, charcoal, navy-only, or dark moody studio scenes.
 - No recognisable public figures, no charts full of numbers, no attempt to copy trademarked logos exactly. Products may be named in the text and represented through simplified app icons, interface cards and their signature colours.
@@ -21,11 +21,15 @@ Every option must show the concrete things this video is about, so a viewer reco
 Generic metaphors (stopwatches, keys, envelopes, chess pieces, light bulbs) are forbidden unless the video is literally about them. Fill the `relation` field with the element of the content idea that appears in the frame.
 </relate_to_the_video>
 
+<title_text>
+Two of the four options carry text, and that text is always a compressed version of the VIDEO TITLE (2 to 5 words, capital letters, the language of the video), never a slogan or a different claim. Examples for a title "Notion vs ClickUp: Which Should a Small Agency Buy?": "CLICKUP VS NOTION", "NOTION VS CLICKUP 2026", "NOTION OR CLICKUP?", "WHICH ONE TO BUY?". The two text options must use two different variations. The text sits in bold white or yellow capitals on a solid banner block in one saturated colour (red, orange, blue, purple, green) that spans most of the frame width along the bottom or the top of the image, with the visual above or below it, like a classic YouTube thumbnail banner.
+</title_text>
+
 <the_four_options>
-Option 1, archetype "headline": big bold text on a solid, vivid colour block or inside a thick coloured frame border (flat poster style), with one simple visual of the video's subject next to or below the text. text is required, and the composition field must say which colour block or frame the text sits on.
+Option 1, archetype "headline": title text variation 1 on a solid colour banner across the bottom of the frame, and above it the products, icons or subject of the video, big and clear. text is required.
 Option 2, archetype "human": one person (describe age range, clothing and a strong expression, never a real person) reacting to or interacting with the actual subject of the video, which must be visible in the frame (the screen, the product, the object). Bright, well-lit scene. text must be empty.
 Option 3, archetype "object": the core object or interface of the video as a clean, colourful hero shot, no people. text must be empty.
-Option 4, archetype "format": a concept that follows the video type. Comparison: the two products or sides face to face with a short "VS". Listicle: the items arranged as a set with the big number. Educational: a before/after or a step being performed. Product update, product news, product use case: the product category in real context, with a short label such as "NEW" or the year allowed. Thought leadership: a bold visual contrast or symbol of the thesis. AI news: a striking, newsy scene of the biggest story. Shorts: a vertical, punchy version of the strongest idea. text is optional here, 1 to 3 words.
+Option 4, archetype "format": title text variation 2 (different words from option 1) on a solid colour banner across the top or bottom of the frame, combined with a concept that follows the video type. Comparison: the two products or sides face to face, split by a crack, bolt or diagonal. Listicle: the items arranged as a set with the big number. Educational: a before/after or a step being performed. Product update, product news, product use case: the product category in real context. Thought leadership: a bold visual contrast or symbol of the thesis. AI news: a striking, newsy scene of the biggest story. Shorts: a vertical, punchy version of the strongest idea. text is required.
 </the_four_options>
 
 <variety_rules>
