@@ -2,10 +2,11 @@
 const r = $input.first().json;
 const intake = $('Intake').first().json;
 const MAX = 38000;
+const fmtMin = m => (Number(m) < 1 ? Math.round(Number(m) * 60) + ' s' : (Math.round(Number(m) * 10) / 10) + ' min');
 
 const lines = [];
 lines.push('🤖 ✅ **Script ready: ' + String(r.title || '').trim() + '**');
-lines.push('Requested by **' + (intake.requester_name || 'unknown user') + '** · ' + r.videoTypeLabel + ' · ' + r.language + ' · ' + r.wordCount + ' words (about ' + r.estimatedDurationMinutes + ' min, requested ' + r.requestedMinutes + ' min) · research ' + (r.researchEnabled ? 'on' : 'off'));
+lines.push('Requested by **' + (intake.requester_name || 'unknown user') + '** · ' + r.videoTypeLabel + ' · ' + r.language + ' · ' + r.wordCount + ' words (about ' + fmtMin(r.estimatedDurationMinutes) + ', requested ' + fmtMin(r.requestedMinutes) + ') · research ' + (r.researchEnabled ? 'on' : 'off'));
 for (const n of (intake.notes || [])) lines.push('ℹ️ ' + n);
 lines.push('');
 lines.push('---');
