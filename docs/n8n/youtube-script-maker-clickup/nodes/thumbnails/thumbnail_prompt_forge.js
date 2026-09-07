@@ -9,10 +9,10 @@ let options = Array.isArray(dir.options) ? dir.options.slice(0, 4) : [];
 const ideas = Array.isArray(fa.thumbnailIdeas) ? fa.thumbnailIdeas.map(t => String(t || '').trim()).filter(Boolean) : [];
 const topic = String(intake.contentIdea || fa.title || 'the topic of the video').replace(/\s+/g, ' ').slice(0, 160);
 const FALLBACKS = [
-  { option: 1, archetype: 'headline', style: 'bold flat vector illustration', text: ideas[0] || 'WATCH THIS', subject: 'a single large symbolic object that stands for ' + topic, composition: 'object on the right two thirds, text in the upper left', background: 'flat, solid colour', colours: 'deep navy background, bright yellow accent', mood: 'clear, confident', rationale: 'fallback' },
-  { option: 2, archetype: 'human', style: 'photorealistic photograph', text: '', subject: 'a person in their thirties in casual smart clothing reacting with visible surprise to something about ' + topic, composition: 'head and shoulders on the left third, the subject of their attention on the right', background: 'softly blurred modern workspace', colours: 'light neutral background, orange accent', mood: 'surprised, curious', rationale: 'fallback' },
-  { option: 3, archetype: 'object', style: 'clean 3D render with soft studio lighting', text: '', subject: 'a hero close-up of the central object of ' + topic, composition: 'centred, filling two thirds of the frame', background: 'smooth dark gradient', colours: 'dark teal background, mint accent', mood: 'premium, focused', rationale: 'fallback' },
-  { option: 4, archetype: 'format', style: 'cinematic photograph with dramatic rim light', text: ideas[1] || '', subject: 'a wide scene showing the real-world setting of ' + topic, composition: 'main element in the centre-left, generous space around it', background: 'atmospheric, simple', colours: 'black background, red accent', mood: 'dramatic, newsy', rationale: 'fallback' }
+  { option: 1, archetype: 'headline', style: 'bold flat vector illustration', text: ideas[0] || 'WATCH THIS', subject: 'a simplified, colourful depiction of the main subject of: ' + topic, composition: 'subject in the upper two thirds, text on a solid yellow block across the lower third', background: 'solid electric blue', colours: 'electric blue background, sunny yellow accent', mood: 'bold, clear', relation: topic, rationale: 'fallback' },
+  { option: 2, archetype: 'human', style: 'bright photorealistic photograph', text: '', subject: 'a person in their thirties in casual smart clothing reacting with visible surprise to a screen showing the subject of: ' + topic, composition: 'person on the left half, the screen or object on the right half', background: 'bright white modern workspace', colours: 'white background, coral accent', mood: 'surprised, curious', relation: topic, rationale: 'fallback' },
+  { option: 3, archetype: 'object', style: 'clean 3D render with soft studio lighting', text: '', subject: 'a colourful hero close-up of the central object or interface of: ' + topic, composition: 'centred, filling two thirds of the frame', background: 'smooth mint gradient', colours: 'mint background, purple accent', mood: 'clean, premium', relation: topic, rationale: 'fallback' },
+  { option: 4, archetype: 'format', style: 'isometric illustration', text: ideas[1] || '', subject: 'a bright scene showing the real-world setting and the objects of: ' + topic, composition: 'main element in the centre-left, generous space around it', background: 'light lavender', colours: 'lavender background, orange accent', mood: 'playful, energetic', relation: topic, rationale: 'fallback' }
 ];
 for (let i = 0; i < 4; i++) {
   if (!options[i] || typeof options[i] !== 'object') options[i] = FALLBACKS[i];
@@ -24,7 +24,7 @@ const tidy = (v, fb) => {
 };
 const cleanText = t => String(t || '').replace(/["“”]/g, '').replace(/\s+/g, ' ').trim().split(' ').slice(0, 4).join(' ');
 
-const COMMON = 'This image is a YouTube video thumbnail and must read instantly at a small size: one dominant focal subject filling 50 to 70 percent of the frame, bold high-contrast colours with one vivid accent colour against a clean simpler background, strong directional lighting, crisp sharp focus on the subject, no clutter, no small details, no busy patterns. Professional, premium, polished look, the kind of thumbnail a top channel would publish. No watermarks, no logos, no real brand marks, no real company names, no recognisable real people, no borders, no frames, no split panels unless the concept asks for two sides.';
+const COMMON = 'This image is a YouTube video thumbnail and must read instantly at a small size: one dominant focal subject filling 50 to 70 percent of the frame, bright saturated colours with strong contrast and one vivid accent colour, even bright lighting, crisp sharp focus on the subject, no clutter, no small details, no busy patterns. The whole image must be bright, colourful and energetic, never dark, dim, moody or black. The subject must be immediately recognisable as the topic of the video. Professional, premium, polished look, the kind of thumbnail a top channel would publish. No watermarks, no recognisable real people, no attempt to copy trademarked logos exactly.';
 const SAFE_LANDSCAPE = 'Safe area: leave a clear empty margin of at least 10 percent of the height at the top and at the bottom and at least 6 percent of the width on the left and right. Text and the focal subject must never touch or be cut by any edge, and the bottom-right corner stays empty because YouTube overlays the video duration there. The picture is cropped to 16:9 after generation.';
 const SAFE_PORTRAIT = 'Vertical composition for a YouTube Short. Safe area: leave a clear empty margin of at least 12 percent of the width on the left and on the right and keep all text and the focal subject inside the middle 60 percent of the height, because the top and bottom are covered by the Shorts interface. Text must be smaller than the frame width and never touch or be cut by any edge.';
 const NO_TEXT = 'ABSOLUTELY NO TEXT anywhere in the image: no letters, words, numbers, captions, labels, signage, logos or interface text, and any screen, sign or surface in frame is blank or out of focus.';
@@ -52,10 +52,11 @@ return options.map((o, i) => {
     'Background: ' + background + '.',
     'Colours: ' + colours + '.',
     'Mood: ' + mood + '.',
+    (o.relation ? 'Relation to the video: ' + tidy(o.relation, '') + '.' : ''),
     text ? withText(text) : NO_TEXT,
     COMMON,
     isShorts ? SAFE_PORTRAIT : SAFE_LANDSCAPE
-  ].join(' ');
+  ].filter(Boolean).join(' ');
 
   return { json: {
     option: i + 1,

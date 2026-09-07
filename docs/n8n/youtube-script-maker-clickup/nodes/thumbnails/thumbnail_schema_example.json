@@ -1,1 +1,56 @@
-{"options": [{"option": 1, "archetype": "headline", "style": "bold flat vector illustration", "text": "STOP GUESSING", "subject": "a large magnifying glass over a simple web page shape", "composition": "subject on the right two thirds, text in the upper left", "background": "flat deep navy", "colours": "deep navy background, electric yellow accent", "mood": "urgent, confident", "rationale": "One sentence on why this option fits the video"}, {"option": 2, "archetype": "human", "style": "photorealistic photograph", "text": "", "subject": "a woman in her thirties in a grey sweater raising her eyebrows at a laptop", "composition": "head and shoulders on the left, laptop edge on the right", "background": "softly blurred bright office", "colours": "light neutral background, coral accent", "mood": "surprised, curious", "rationale": "One sentence"}, {"option": 3, "archetype": "object", "style": "clean 3D render with soft studio lighting", "text": "", "subject": "a chrome key floating above a glowing keyhole", "composition": "centred, filling two thirds of the frame", "background": "smooth gradient", "colours": "dark teal background, mint accent", "mood": "premium, mysterious", "rationale": "One sentence"}, {"option": 4, "archetype": "format", "style": "cinematic photograph with dramatic rim light", "text": "VS", "subject": "two smartphones facing each other", "composition": "one on each side, VS text small in the centre", "background": "dark studio", "colours": "black background, red and blue accents", "mood": "competitive, tense", "rationale": "One sentence"}]}
+{
+ "options": [
+  {
+   "option": 1,
+   "archetype": "headline",
+   "style": "bold flat vector illustration",
+   "text": "NOTION VS CLICKUP",
+   "subject": "two simplified app icons, a white document page icon and a purple task board icon, split by a jagged crack",
+   "composition": "icons face to face in the upper two thirds, text on a solid yellow block across the lower third",
+   "background": "solid electric blue",
+   "colours": "electric blue background, sunny yellow accent",
+   "mood": "bold face-off",
+   "relation": "the two products from the comparison as app icons",
+   "rationale": "One sentence on why this option fits the video"
+  },
+  {
+   "option": 2,
+   "archetype": "human",
+   "style": "bright photorealistic photograph",
+   "text": "",
+   "subject": "a woman in her thirties in a coral sweater grinning while pointing at a laptop showing a colourful task board",
+   "composition": "person on the left half, laptop screen on the right half",
+   "background": "bright white office with plants",
+   "colours": "white background, coral accent",
+   "mood": "delighted, confident",
+   "relation": "the task board interface the video compares",
+   "rationale": "One sentence"
+  },
+  {
+   "option": 3,
+   "archetype": "object",
+   "style": "clean 3D render with soft studio lighting",
+   "text": "",
+   "subject": "a floating stack of colourful task cards next to a glowing document page",
+   "composition": "centred, filling two thirds of the frame",
+   "background": "smooth mint gradient",
+   "colours": "mint background, purple accent",
+   "mood": "clean, premium",
+   "relation": "tasks versus docs, the core of the comparison",
+   "rationale": "One sentence"
+  },
+  {
+   "option": 4,
+   "archetype": "format",
+   "style": "isometric illustration",
+   "text": "VS",
+   "subject": "two desks, one covered in document pages and one with a kanban board and a calendar",
+   "composition": "one desk on each side, VS in the centre on a small orange badge",
+   "background": "light lavender",
+   "colours": "lavender background, orange accent",
+   "mood": "playful comparison",
+   "relation": "the docs-first versus tasks-first workflows in the video",
+   "rationale": "One sentence"
+  }
+ ]
+}
