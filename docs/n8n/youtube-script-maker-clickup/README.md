@@ -21,10 +21,19 @@ workflow polls the channel:
    `help` / `templates` posts the templates message (`clickup-request-templates.md`).
 8. Valid requests run the existing pipeline: Writer (Claude, optional Tavily research) -> 5 style peelers ->
    **Any Flags?** -> Style Updater (skipped when nothing was flagged) -> DeepL translation (non-English) -> Packager.
-9. **Compose Result** builds the channel message (script + YouTube metadata + sources), splits it into parts under
+9. **Thumbnail Director** (Grok) designs four deliberately different thumbnail concepts (1 headline text, 2 human reaction
+   without text, 3 object hero without text, 4 format-specific, each in a different visual style and palette).
+   **Thumbnail Prompt Forge** adds the YouTube rules (one focal subject, high contrast, legible at 320 px, safe areas, exact
+   text or no text) and falls back to generic concepts if the director fails. **Thumbnail Image Synthesis** renders them with
+   gpt-image-1 (1536x1024, or 1024x1536 for Shorts, quality high). **Cloudinary Upload** stores the originals in folder
+   `youtube-thumbnails`; **Thumbnail Record Builder** builds delivery URLs cropped to 1280x720 (or 1080x1920 for Shorts)
+   with `c_fill,g_auto,q_auto:good,f_jpg`. A failed option is reported in the channel; the script is still delivered.
+   Sources: `nodes/thumbnails/`.
+10. **Compose Result** builds the channel message (script + YouTube metadata + sources), splits it into parts under
    ClickUp's 40,000 character limit, **Post Result** posts each part and adds the requester as a follower,
-   **Mark Request Done** records the posted message ids.
-10. **On Error** (Error Trigger) -> **Lookup Request** by execution id -> **Compose Error Notice** -> **Post Error**
+   **Mark Request Done** records the posted message ids. A second message lists the four thumbnail options with
+   inline previews and the YouTube-sized URLs.
+11. **On Error** (Error Trigger) -> **Lookup Request** by execution id -> **Compose Error Notice** -> **Post Error**
     -> **Mark Request Failed**. Failures that do not belong to a channel request (for example the poll itself failing)
     are only logged in n8n.
 

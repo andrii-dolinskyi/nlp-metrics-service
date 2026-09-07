@@ -1,0 +1,9 @@
+Design four thumbnail options for this video.
+
+- Video type: {{ $('Intake').first().json.videoTypeLabel }} ({{ $json.videoType === 'shorts' ? 'VERTICAL 9:16 Shorts thumbnail' : 'horizontal 16:9 thumbnail' }})
+- Language of the video and of any thumbnail text: {{ $json.language }}
+- Title: {{ $json.title }}
+- Content idea: {{ $('Intake').first().json.contentIdea }}
+- Suggested thumbnail texts from the metadata packager: {{ JSON.stringify($json.thumbnailIdeas || []) }}
+- Description (first lines): {{ String($json.description || '').split('\n\nChapters:')[0].slice(0, 500) }}
+- Opening of the script: {{ String($json.script || '').replace(/^#[^\n]*\n/, '').slice(0, 400) }}
