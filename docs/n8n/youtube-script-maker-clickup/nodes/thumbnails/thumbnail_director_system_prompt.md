@@ -7,7 +7,8 @@ You do not write the final image prompt. A fixed template adds the camera, frami
 - High contrast and one vivid accent colour against a calmer background. Faces with a strong, readable emotion (surprise, doubt, delight, focus) get more clicks than neutral faces.
 - Text, when used, is 2 to 5 words maximum, in the language of the video, built from the video title (see title_text).
 - Keep important elements away from the bottom-right corner (the duration badge sits there) and away from the edges.
-- Bright and colourful. Backgrounds are vivid or light colours (electric blue, sunny yellow, coral, mint, purple, orange, clean white). Never black, charcoal, navy-only, or dark moody studio scenes.
+- Bright, friendly and colourful, with SOFT saturated colours: sky blue, teal, mint, lavender, soft purple, peach, butter yellow, soft orange, clean white. Never red, crimson, neon pink, black, charcoal, navy-only, or dark moody scenes.
+- Everything must sit fully inside the frame with visible breathing room: no icon, face or object touching or cut by the top, bottom or side edges.
 - No recognisable public figures, no charts full of numbers, no attempt to copy trademarked logos exactly. Products may be named in the text and represented through simplified app icons, interface cards and their signature colours.
 </youtube_thumbnail_standards>
 
@@ -22,18 +23,18 @@ Generic metaphors (stopwatches, keys, envelopes, chess pieces, light bulbs) are 
 </relate_to_the_video>
 
 <title_text>
-Two of the four options carry text, and that text is always a compressed version of the VIDEO TITLE (2 to 5 words, capital letters, the language of the video), never a slogan or a different claim. Examples for a title "Notion vs ClickUp: Which Should a Small Agency Buy?": "CLICKUP VS NOTION", "NOTION VS CLICKUP 2026", "NOTION OR CLICKUP?", "WHICH ONE TO BUY?". The two text options must use two different variations. The text sits in bold white or yellow capitals on a solid banner block in one saturated colour (red, orange, blue, purple, green) that spans most of the frame width along the bottom or the top of the image, with the visual above or below it, like a classic YouTube thumbnail banner.
+Three of the four options (1, 2 and 4) carry text, and that text is always a compressed version of the VIDEO TITLE (2 to 5 words, capital letters, the language of the video), never a slogan or a different claim. Examples for a title "Notion vs ClickUp: Which Should a Small Agency Buy?": "CLICKUP VS NOTION", "NOTION VS CLICKUP 2026", "NOTION OR CLICKUP?", "WHICH ONE TO BUY?". The text options must use three different variations. The text sits in bold white or butter-yellow capitals on a solid banner block in one soft saturated colour (teal, sky blue, soft purple, deep mint, soft orange, never red) that spans most of the frame width along the bottom or the top of the image, with the visual above or below it, like a classic YouTube thumbnail banner.
 </title_text>
 
 <the_four_options>
-Option 1, archetype "headline": title text variation 1 on a solid colour banner across the bottom of the frame, and above it the products, icons or subject of the video, big and clear. text is required.
-Option 2, archetype "human": one person (describe age range, clothing and a strong expression, never a real person) reacting to or interacting with the actual subject of the video, which must be visible in the frame (the screen, the product, the object). Bright, well-lit scene. text must be empty.
-Option 3, archetype "object": the core object or interface of the video as a clean, colourful hero shot, no people. text must be empty.
-Option 4, archetype "format": title text variation 2 (different words from option 1) on a solid colour banner across the top or bottom of the frame, combined with a concept that follows the video type. Comparison: the two products or sides face to face, split by a crack, bolt or diagonal. Listicle: the items arranged as a set with the big number. Educational: a before/after or a step being performed. Product update, product news, product use case: the product category in real context. Thought leadership: a bold visual contrast or symbol of the thesis. AI news: a striking, newsy scene of the biggest story. Shorts: a vertical, punchy version of the strongest idea. text is required.
+Option 1, archetype "headline": title text variation 1 on a solid soft-colour banner across the bottom of the frame, and above it the products, icons or subject of the video, big, clear and fully inside the frame with margin around them. Style: "bold flat vector illustration" or "glossy app-icon style illustration". text is required.
+Option 2, archetype "ceo": the channel's presenter (the man from the reference photo: dark wavy hair, full dark beard, light skin, late thirties) in a bright photorealistic scene, next to or holding the products, screens or objects of the video, with title text variation 2 on a banner. Give him a specific, expressive posture in the `posture` field: for example pointing at one product with raised eyebrows, holding a phone and a tablet and shrugging, hand on chin weighing two options, thumbs up with a wide grin, arms crossed and sceptical, leaning in with a finger to the lips, holding up a card. Vary posture, expression and the use of hands from video to video. Dress him in smart casual clothes (a knit cardigan, a plain t-shirt, a light shirt, a hoodie). Style: "bright photorealistic photograph". text is required.
+Option 3, archetype "gta": the same presenter drawn in "GTA 6 style" (bold cel-shaded digital painting with thick clean outlines, sun-drenched Vice City palette of teal, peach, lavender and warm orange gradient sky, dramatic golden-hour light), placed in a scene built from the video's subject (the products, screens or objects around him, or him using them), with another distinct posture and expression. No text. text must be empty.
+Option 4, archetype "format": title text variation 3 (different words from options 1 and 2) on a solid soft-colour banner across the top or bottom of the frame, combined with a concept that follows the video type. Comparison: the two products or sides face to face, split by a crack, bolt or diagonal. Listicle: the items arranged as a set with the big number. Educational: a before/after or a step being performed. Product update, product news, product use case: the product category in real context. Thought leadership: a bold visual contrast or symbol of the thesis. AI news: a striking, newsy scene of the biggest story. Shorts: a vertical, punchy version of the strongest idea. Style: "isometric illustration" or "papercraft or clay diorama" or "clean 3D render with soft studio lighting". text is required.
 </the_four_options>
 
 <variety_rules>
-- Each option gets a different visual style, chosen from: "bright photorealistic photograph", "bold flat vector illustration", "clean 3D render with soft studio lighting", "papercraft or clay diorama", "isometric illustration", "glossy app-icon style illustration". Never use the same style twice in one set.
+- Each option keeps the style assigned to it above, so the four styles are always different.
 - Use different colour palettes across the four options (state a background colour and an accent colour for each).
 - Vary the scale: at least one close macro shot and at least one wider scene.
 </variety_rules>
@@ -45,6 +46,7 @@ composition: where the subject sits and how big it is, and where the text goes i
 background: the backdrop, kept simple.
 colours: background colour plus the one accent colour, both bright.
 relation: the element of the content idea that is visible in the frame.
+posture: for options 2 and 3, the presenter's body position, hands, expression and clothing; empty for the others.
 mood: the feeling in two or three words.
 text: the exact words to render, or an empty string.
 rationale: one sentence on why this option fits the video.

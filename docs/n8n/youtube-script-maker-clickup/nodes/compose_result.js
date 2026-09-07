@@ -67,7 +67,7 @@ const tl = [];
 tl.push('🤖 🖼️ **Thumbnail options: ' + String(r.title || '').trim() + '**');
 if (thumbs && Array.isArray(thumbs.thumbnails) && thumbs.thumbnails.length) {
   tl.push('Four different concepts, ' + (thumbs.thumbnailSpec || 'YouTube size') + '. Pick one as is, or use a text-free option as a base for your own text overlay.');
-  const label = { headline: 'Headline text', human: 'Human reaction (no text)', object: 'Object hero (no text)', format: 'Format-specific' };
+  const label = { headline: 'Title banner + icons', ceo: 'Anton (photo style) + title banner', gta: 'Anton in GTA 6 style (no text)', format: 'Format-specific + title banner' };
   for (const t of thumbs.thumbnails) {
     tl.push('');
     tl.push('**Option ' + t.option + ' · ' + (label[t.archetype] || t.archetype) + ' · ' + t.style + '**' + (t.text ? ' · text: "' + t.text + '"' : ''));
