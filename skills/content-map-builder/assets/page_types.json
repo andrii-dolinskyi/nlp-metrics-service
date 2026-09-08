@@ -330,40 +330,6 @@
    "default_schema": "Article + FAQPage + BreadcrumbList"
   },
   {
-   "type_id": "blog_article_seo",
-   "family": "guide",
-   "label": "Blog article (SEO)",
-   "definition": "Keyword-led blog article (Content Maker 5.0 SEO route)",
-   "industries": "all",
-   "words": {
-    "min": 1500,
-    "max": 3000
-   },
-   "default_words": 2250,
-   "schema": "BlogPosting, FAQPage",
-   "required_inputs": "articleType, contentIdea, ctaRules",
-   "answer_paragraph": true,
-   "ai_writable": "Y",
-   "default_schema": "BlogPosting + FAQPage + BreadcrumbList"
-  },
-  {
-   "type_id": "blog_article_geo",
-   "family": "guide",
-   "label": "Blog article (GEO)",
-   "definition": "Question-led answer article (Content Maker 5.0 GEO route)",
-   "industries": "all",
-   "words": {
-    "min": 1200,
-    "max": 2500
-   },
-   "default_words": 1850,
-   "schema": "BlogPosting, FAQPage",
-   "required_inputs": "question, answerIdea, productDescription",
-   "answer_paragraph": true,
-   "ai_writable": "Y",
-   "default_schema": "BlogPosting + FAQPage + BreadcrumbList"
-  },
-  {
    "type_id": "explainer_what_is",
    "family": "guide",
    "label": "What-is explainer",

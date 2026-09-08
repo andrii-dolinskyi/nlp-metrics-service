@@ -1,306 +1,215 @@
-# Page Maker 2.0 — architecture, revision 2
+# Page Maker 2.0 — architecture, revision 3
 
 Status: proposal for review before the n8n workflow `MZUUvWCdCXlHKllN` ("Page Maker") is changed.
-Revision 2 applies the feedback of 2026-09-08: no pods or waves, one page per run per language, publishing and hreflang out of scope, Google Sheets kept as the registry, page types researched across industries, blog articles absorbed from Content Maker 5.0.
+Revision 3 applies the 33 comments left on revision 2. Everything that is not "receive a webhook, write an excellent page of the requested type, return it in the Content Maker callback shape" is gone.
 
 ## 0. Scope
 
-**In scope.** One run writes one page of one type in one language: body, answer paragraph, FAQ, meta title and description, JSON-LD, internal links placed in the body, plus a list of already-written pages whose links should be updated because this page now exists, and an indexing signal for those pages.
+**In scope.** One run receives one webhook for one page in one language and returns the page: body in markdown, answer paragraph where the page type calls for one, five FAQs, meta description (and meta title if the app does not send one), JSON-LD from the page type's schema, the internal links the app asked for placed in the body, and the EEAT analysis the Content Maker callback already carries.
 
-**Out of scope.** Publishing, the CMS, hreflang, the order in which pages are published (the user decides by priority in the Snoika app), pods, waves, and anything after the callback.
+**Out of scope, permanently.** Publishing, slugs and link state, any registry of pages, the content map file, brand data stored in n8n, Search Console, index requests, reverse link passes, SEO density loops, outline generation, evaluation sheets and run logs, Strapi output, blog-article types. The app owns pages, plans, slugs, links and client data. n8n owns page-type specifications and writing quality.
 
 ## 1. Run model
 
-The Snoika app calls the webhook once per page per language. The flow does not know or care about order. Every run reads three sources:
+The Snoika app calls `POST /webhook/page-maker` once per page per language. The run reads exactly two sources:
 
-| Source | Scope | Delivered how |
+| Source | Holds | Where |
 |---|---|---|
-| Webhook payload | this page: everything the user typed from the content map, type-specific facts, writing preferences, domain lists | from the Snoika app UI |
-| Client context tables | this brand: ICP and audience test, offer, authors and reviewers, allowed and forbidden claims, proof and data library, CTA map, glossary terms, link exclusions, industry pack | n8n Data Tables keyed by `brandId`, read on every run |
-| Page registry | this site: every planned page with its status and planned links | Google Sheet (kept for now), read and written on every run |
+| Webhook payload | everything about this page and this client: type, H1, outline, keywords, AI prompts, internal links, CTA, facts, writing preferences, domain lists, language | sent by the app |
+| Page type specs | how each page type is written: family, word band, answer paragraph, tables, citations, research depth, schema types, required facts, constraints | n8n Data Table `page_type_specs`, one row per type, custom types included |
 
-Field resolution when a value could come from more than one place: payload → page type descriptor → brand tables → industry pack → family default. The payload always wins.
+Nothing is inferred, looked up elsewhere or carried between runs. If the payload or the spec lacks something the page needs, the run stops and says so in the callback.
 
 Pipeline for one run:
 
 ```
-Parse → Resolve (descriptor + brand + registry) → Link plan → Research (Tavily, by descriptor)
-→ Write in English → 5 peelers → Style Updater → Validate → Section Fixer → Revalidate (real)
-→ Answer-coverage check (AI prompts) → FAQ (EN) → Meta (EN) → JSON-LD
-→ Translate body + FAQ + meta (DeepL, glossary) → Post-translation keyword check → Slug from map
-→ Build payload → Callback → Registry update → Reverse link pass → Index signal → Money Calculator
+Parse → Load spec (page_type_specs by pageType) → Check required facts (stop if missing)
+→ Research (Tavily, depth from spec, domains from payload)
+→ Write in English: H1 and H2 outline exactly as sent, answer paragraph per family,
+  AI prompts answered inside the sections, internal links placed as sent, facts only
+→ 5 peelers → Style Updater → Validate (structure, links, facts, style) → Section Fixer → Revalidate
+→ Answer-coverage check (every AI prompt answered somewhere; misses go back to the fixer once)
+→ FAQ (always 5) → Meta (slug from app; title if missing; description) → JSON-LD (from spec) → EEAT
+→ Translate body, FAQ, meta with DeepL (only for non-English runs)
+→ Build payload → Callback → Money Calculator
 ```
 
-Nothing in the pipeline depends on which pages were written before it, except the link plan and the reverse link pass.
+Progress reporting to the app's progress endpoint stays as in Content Maker 5.0, with the same stage keys minus the ones for stages that no longer exist (outline, SEO edits, quality scores).
 
-## 2. Page types: a catalogue plus a descriptor
+## 2. Page types
 
-### 2.1 Twelve structural families
+### 2.1 Specs as data
 
-Every page type belongs to one family. The family fixes the shape (what opens the page, whether tables, steps or cards dominate, length band, schema); the type fixes the content slots. A niche page is "family plus overrides", which is what makes the fallback in 2.4 work.
+A page type is a row in `page_type_specs`, not a branch in code. The Page Contract node reads the row for `pageType` and derives section budgets and validation from it. Adding a type, including a one-off type for a niche client, is adding a row. The app's page-type dropdown is the list of rows where `ai_writable` is not `N`.
 
-| Family | Reader wants | Opens with | Typical shape | Words |
-|---|---|---|---|---|
-| `hub` | orientation, where to start | 2–4 sentence scope statement | grouped link blocks with blurbs, optional "start here" path, FAQ; pillar variant adds a summary per child topic | index 300–800, pillar 2,000–5,000 |
-| `guide` | understanding or completing a task | answer or definition paragraph | H2s in logical or step order, tables where variables exist, pitfalls, FAQ | 1,200–3,500 |
-| `reference` | one precise fact or definition | 40–60 word direct answer | expansion, example, related terms, compact tables, citations | term 300–900, FAQ page 800–2,000, statistics 1,500–3,000 |
-| `evaluation` | a decision between options | verdict paragraph | criteria, comparison table, per-option sections, who should choose which, FAQ | 1,500–3,500 |
-| `offer` | whether to buy from this company | value proposition and CTA | problem and outcome, what is included, process, proof, differentiators, pricing or how pricing works, FAQ, CTA | 600–2,000 |
-| `proof` | evidence the company delivers | headline result | context, approach, outcome table, quotes, CTA | 800–1,800 |
-| `entity` | who this is | key facts | bio, credentials, focus areas, contact, links to their content | 300–1,200 |
-| `tool` | a personalised output | short framing | the tool, methodology, assumptions table, how to read the result, FAQ | 500–1,500 |
-| `asset` | a downloadable or watchable thing | what is inside | key findings, who it is for, form or player; reports add methodology and findings | gate 300–800, report 2,000–6,000 |
-| `local` | the service near me | location-specific H1 and NAP | services here, local proof, team, directions, area FAQ, CTA | 500–1,500 |
-| `catalogue` | to browse or inspect a specific item | title and key facts | spec table, description, variants, reviews, related; category variant is intro, grid, editorial text, FAQ | item 300–1,200, category 200–800 |
-| `ops` | to operate the product or complete a task | the task | prerequisites, steps, expected result; dated entries; numbered clauses | 200–1,500 |
-
-Two rules the writer carries for every family: answer-first is the default for `guide`, `reference`, `evaluation`, `tool` and programmatic pages; `offer`, `proof`, `entity`, `local` and `catalogue` open with a value proposition or key facts instead. Templated families (`local`, `catalogue`, programmatic `offer`) need page-specific facts before generation or they read as doorway pages.
-
-### 2.2 The catalogue
-
-The research produced 147 page types across the families; 138 are worth generating with a writer, 9 are template or engineering pages (login, cart, API reference, legal policies, search results). The full catalogue with definition, industries, word range, schema, extra inputs, answer-paragraph flag and AI-writable flag is in Appendix A. Every row is stored as a descriptor record, so the workflow reads it as data.
-
-The 13 types in the content-map method map onto it directly:
-
-| Content map type | Catalogue type |
+| Column | Meaning |
 |---|---|
-| PILLAR HUB | `pillar_hub` |
-| Cluster hub | `cluster_hub` |
-| Deep-dive article | `deep_dive_guide` (or `how_to` when procedural) |
-| Supporting article | `supporting_article` |
-| Comparison page | `head_to_head_vs` (two options) or `listicle_best_of` |
-| Alternatives page | `alternatives_page` |
-| Linkable asset | `research_report` or `statistics_page` |
-| Service page | `service_page` |
-| Solution page | `solution_use_case_page` |
-| Industry page | `industry_vertical_page` or `segment_size_page` |
-| Case study | `case_study` |
-| Author page | `author_bio_page` |
-| Glossary term | `glossary_term` |
+| `type_id`, `label`, `family` | id the app sends, label people see, one of the 12 families |
+| `definition`, `industries` | what the page is, where it is common (for the dropdown's help text) |
+| `words_min`, `words_max`, `default_words` | length band; sections get `default_words` divided by the outline length, clamped |
+| `answer_paragraph`, `answer_style`, `answer_max_words` | whether the page opens with a direct answer, and in which style (definition, verdict, key facts, value proposition) |
+| `tables_min`, `citations_min`, `research` | minimum tables, minimum external citations, Tavily depth (none, search, deep) |
+| `schema_types` | JSON-LD blocks to build, for example `Service + Organization + FAQPage + BreadcrumbList` |
+| `required_facts`, `optional_facts` | the fact fields the app must send for this type (drives the UI form) |
+| `constraints` | standing rules for sector types: disclaimers, claim limits, reviewer requirement (a condition page needs a named reviewer and "see a professional" language; a practice-area page needs the "prior results do not guarantee" line) |
+| `opening`, `section_format_hints` | how the family opens, and default formats (table, steps, bullets) when the outline does not say |
+| `ai_writable` | Y, P (writer drafts, facts must be supplied) or N (never written by the flow) |
 
-Blog articles from Content Maker 5.0 become two more types, `blog_article_seo` and `blog_article_geo`, in the `guide` family (section 8). Recommendation: the content-map builder writes the catalogue `type_id` into the map from now on.
+The seed for this table is the catalogue in Appendix A: 145 types in 12 families, 136 writer-usable. Sector constraints in Appendix B become the `constraints` column of the sector types.
 
-### 2.3 The type descriptor: types as data
+### 2.2 Families
 
-A page type is a row in a `pm_page_types` table, not a branch in code. The Page Contract node reads the row and derives sections, budgets and validation from it. Adding a type is adding a row.
+The family fixes the shape: what the page opens with, whether tables, steps or cards dominate, and length. The writer reads the family before the type.
 
-```yaml
-type_id: service_page
-family: offer
-extends: null                         # inherit from another type, override below
-word_range: {min: 800, max: 2000}
-answer_paragraph: {required: false, style: value_prop, max_words: 60}
-section_outline:                      # default; the map's H2 outline replaces it when supplied
-  - {heading: "What problem this service solves", format: prose, required: true}
-  - {heading: "What is included", format: table, required: true}
-  - {heading: "How the engagement runs", format: steps, required: true}
-  - {heading: "Who this is for and who it is not for", format: prose}
-  - {heading: "What it costs and what drives the price", format: prose}
-  - {heading: "How results are measured", format: prose}
-tables: {required: true, min: 1}
-citations: {required: false, min_sources: 0, must_be_dated: true}
-faq: {min: 4, max: 6, source: ai_prompts_then_generated}
-cta: {style: book, positions: [top, end]}
-author: {required: false}
-reviewer: {required: false}
-disclaimers: []                       # industry pack may add
-claim_rules: {no_outcome_promises: true}
-schema_types: {primary: Service, secondary: [Organization, FAQPage, BreadcrumbList]}
-required_facts: [deliverables, process_steps, pricing_model]
-optional_facts: [price_band, proof, certifications, differentiators]
-uniqueness_min_facts: 0
-research: none                        # none | search | deep
-links: {min: 3, max: 5}
-indexable: true
-```
+| Family | Reader wants | Opens with |
+|---|---|---|
+| `hub` | orientation, where to start | scope statement, then grouped links with blurbs |
+| `guide` | understanding or completing a task | answer or definition paragraph |
+| `reference` | one precise fact or definition | 40–60 word direct answer |
+| `evaluation` | a decision between options | verdict paragraph, then criteria and a comparison table |
+| `offer` | whether to buy from this company | value proposition and CTA |
+| `proof` | evidence the company delivers | headline result |
+| `entity` | who this is | key facts |
+| `tool` | a personalised output | short framing |
+| `asset` | a downloadable or watchable thing | what is inside |
+| `local` | the service near me | location-specific H1 and facts |
+| `catalogue` | to browse or inspect a specific item | title and key facts |
+| `ops` | to operate the product or complete a task | the task |
 
-The descriptor is also the UI specification: the Snoika app can render the input form for a page type from `required_facts` and `optional_facts`, so a new type needs no UI change.
+Every type serves one intent, which is why blog articles are not a type of their own: an article is a `deep_dive_guide`, a `how_to`, a `supporting_article`, an `explainer_what_is`, a `listicle_best_of` and so on, and the spec of that type is what makes it good.
 
-### 2.4 Niche clients: the fallback
+## 3. The webhook payload
 
-When a client needs a page that is not in the catalogue, the user creates a descriptor in the UI with the minimum subset: `family`, `word_range`, `answer_paragraph.required`, an outline (or accept the family default), `tables.required`, `citations.required`, `schema_types.primary`, `required_facts`, `faq` counts, `cta.style`. Everything else defaults from the family, or from a catalogue type named in `extends`. Each family also has a `generic_<family>` type so that "a page in this family with this outline and these facts" is always writable. The research report includes a worked example, a university grant programme page, built this way.
-
-### 2.5 Industry packs
-
-Compliance and vocabulary are not page-type properties, so they live in `pm_industry_packs`, selected per brand. Contents: preferred and avoided vocabulary, standing disclaimers by family, claim rules, reviewer requirements, default source domains, and outline overrides per type. The research report's industry table (Appendix B) is the seed: for example, legal pages get the "prior results do not guarantee a similar outcome" disclaimer and a ban on "best", "expert" and "specialist" unless certified; healthcare pages require a named reviewer with credentials and `MedicalWebPage` schema; financial pages require dated sources and risk warnings on the face of the page; recruiting pages require real salary and location data in job schema and equal-opportunity language.
-
-## 3. What the Snoika app sends per run
-
-### 3.1 Universal fields, every page type
+### 3.1 Fields on every run
 
 | Field | Required | Notes |
 |---|---|---|
-| `brandId`, `taskId`, `userId`, `callback_url` | yes | as today |
-| `pageType` | yes | catalogue `type_id`, or `customType` with a descriptor object |
-| `targetLanguage` | yes | one language per run |
-| `coreKeyword` | per descriptor | required unless the descriptor says otherwise (case study, author, integration) |
-| `secondaryKeywords[]` | no | clean terms only; strip volume annotations and drop "vocabulary only" terms in the UI |
-| `searchIntent` | no | informational, commercial, transactional, navigational |
-| `h1` | yes | from the map |
-| `metaTitle` | no | authoritative when given; the Metadata Generator only fills the description |
-| `slugPath` | yes | from the map; for non-English runs, the localised slug from the map |
-| `siteRootUrl` | yes | or taken from the brand table |
-| `h2Outline[]` | no | from the map; replaces the descriptor outline when present; optional `format` per item (prose, table, steps, bullets) |
-| `aiPrompts[]` | no | the map's target AI prompts; drive the answer paragraph, the coverage check and the FAQ |
-| `answerBlock` | no | the map's answer block, seeds the answer paragraph |
-| `words` | no | target; the descriptor range clamps it |
-| `schemaTypes[]` | no | from the map; the descriptor default otherwise |
-| `cta` | no | `{label, url}`; the brand CTA map otherwise |
-| `pillarId`, `clusterId`, `hubSlug` | no | for the link heuristics when `linksOut` is absent |
-| `linksOut[]` | no | slugs from the map's "Internal links OUT" |
-| `localizedKeyword`, `localizedH1` | non-English runs | measured native keyword from the map, checked after translation |
-| `writingPreferences`, `whitelistDomains[]`, `blacklistDomains[]` | no | as today; brand defaults otherwise |
-| `researchDepth` | no | can only lower the descriptor's default |
-| `mode` | no | `write` (default) or `rewrite` with `existingBody` |
+| `taskId`, `brandId`, `userId`, `callback_url` | yes | as in Content Maker 5.0 |
+| `pageType` | yes | `type_id` from the dropdown |
+| `targetLanguage` | yes | language name as today ("English", "German"); one run per language |
+| `clientName`, `clientDescription` | yes | who the page is for and what they do; `clientDescription` is Content Maker's `productDescription` |
+| `h1` | yes | used verbatim as the H1 |
+| `slugPath` | yes | used for canonical and breadcrumb JSON-LD and echoed as `slug` in the callback; the app only sends slugs of published pages for links, this is the page's own slug |
+| `siteRootUrl` | yes | for absolute URLs in JSON-LD |
+| `coreKeyword` | per spec | required unless the spec says the type has no keyword (case study, author, integration); placed in the H1, one H2 and the first 60 words, at most twice more in the body, never repeated to hit a quota |
+| `secondaryKeywords[]` | no | used naturally, never checked by density |
+| `h2Outline[]` | yes | the H2s in order, written exactly as sent; optionally each item carries `format` (prose, table, steps, bullets) |
+| `aiPrompts[]` | yes | the questions the page must be the cited answer to; answered inside the sections where they fit and used as the first FAQ questions |
+| `internalLinks[]` | yes | `{url, anchor}` for every link the page must carry; the app sends only published pages; each is placed once, in body text, never in the H1, the answer paragraph, a heading or a table; an empty list means no internal links |
+| `ctaRules`, `ctaUrl` | yes | what to say about the client and the one action to ask for, as in Content Maker; `ctaUrl` is placed in the closing section |
+| `writingPreferences` | no | client rules: tone, spelling, claims to avoid, formatting |
+| `whitelistDomains[]`, `blacklistDomains[]` | no | research and citation domains, as today |
+| `metaTitle` | no | used when sent; generated otherwise |
+| `facts` | per spec | object keyed by the spec's `required_facts` and `optional_facts` (section 3.2) |
+
+Gone from revision 2: `words`, `schemaTypes`, `researchDepth` (all from the spec), `mode`, `existingBody`, `pillarId`, `clusterId`, `hubSlug`, `linksOut`, `answerBlock`, `localizedKeyword`, `localizedH1`, `pineconeIndex`, `prompt`, `articleType`, `contentIdea`.
 
 ### 3.2 Facts by family
 
-The descriptor's `required_facts` decides what the form asks for. The families need, in addition to the universal fields:
+The spec's `required_facts` decides what the app's form asks for. What each family needs beyond the fields above:
 
 | Family | Required facts | Optional facts |
 |---|---|---|
-| `hub` | child pages: slug, H1, one-line summary (from the registry when present) | start-here path |
-| `guide` | none beyond outline and sources | steps, tools, time, prerequisites, expert quotes |
-| `reference` | definition or the verified facts with source and year | related terms, examples |
-| `evaluation` | competitor or option list with verifiable facts; feature matrix; pricing with an as-of date | own differentiators, criteria weights |
-| `offer` | deliverables or feature list; process; pricing model | price band, proof, certifications, plan matrix |
+| `hub` | child pages: title, one-line summary, URL (published ones) | start-here path |
+| `guide` | none | steps, tools, time, prerequisites, expert quotes, sources |
+| `reference` | the definition or the verified facts with source and year | related terms, examples |
+| `evaluation` | option or competitor list with verifiable facts, feature matrix, pricing with an as-of date | own differentiators, criteria weights |
+| `offer` | deliverables or feature list, process, pricing model | price band, proof, certifications, differentiators, plan matrix |
 | `proof` | client facts, metrics, quotes, permission status | photos, timeline |
 | `entity` | person or organisation record: name, role, credentials, bio, URL, sameAs | publications, awards |
 | `tool` | formula or assumptions, inputs, interpretation ranges | methodology text |
 | `asset` | what is inside, key findings; reports add methodology, sample, dates | author, charts |
 | `local` | NAP, hours, services here, at least three genuinely local facts, local proof | team, parking, photos |
-| `catalogue` | the item record: specs, variants, price, availability; for clinical pages, sources and reviewer | reviews, related items |
+| `catalogue` | the item record: specs, variants, price, availability; clinical pages add sources and reviewer | reviews, related items |
 | `ops` | the exact verified procedure or change list | screenshots, versions |
 
-Missing required facts stop the run with `blocked:missing_facts` in the callback and the registry; the writer never invents them.
+A missing required fact stops the run before any model call; the callback carries `status: blocked` and the list of missing fields. The writer never invents deliverables, prices, metrics or credentials.
 
-### 3.3 Brand tables in n8n
+## 4. Writing rules the spec and payload drive
 
-| Table | Holds |
-|---|---|
-| `pm_brands` | name, description, site root, industry pack, offer model, ICP, audience test, URL convention, default language, glossary path, link exclusions, default domain lists, default writing preferences |
-| `pm_brand_facts` | typed rows: service, deliverable, price_band, proof, certification, metric, feature, claim_allowed, claim_forbidden, competitor, disclaimer; the writer receives only the kinds the descriptor asks for |
-| `pm_brand_people` | authors and reviewers: name, role, credentials, bio, URL, sameAs |
-| `pm_brand_cta` | CTA label and URL by page type or family |
-| `pm_glossary` | term, aliases, slug, language, status; used for automatic first-mention links |
-| `pm_page_types`, `pm_industry_packs` | global, not per brand |
+**Outline is sacred.** The H2s come from the app, in the order sent, verbatim. No outline agent, no added sections, no reordering. Each section gets a word budget from the spec's `default_words` divided by the number of H2s, clamped to the spec's per-section band. Format hints (table, steps, bullets) come from the outline item when present and from the spec otherwise.
 
-## 4. Outline and AI prompts
+**SEO and GEO at once, without reading forced.** The page serves the core keyword through placement (H1, one H2, first 60 words) and serves the AI prompts through answers woven into the section whose H2 is closest to each question: a direct answering sentence first, then the explanation, then the evidence. There are no inserted "Q&A" blocks and no restated questions. After the Style Updater, an answer-coverage check asks a judge model, for each prompt, which passage answers it; a prompt with no passage goes to the Section Fixer once with the instruction to answer it inside the most related section. Prompts still unanswered become FAQ questions. The callback reports coverage per prompt.
 
-**Outline.** When `h2Outline` is supplied, it becomes the section list. Each section gets a word budget from the descriptor's range divided by the section count, clamped to the descriptor's per-section band, and a format hint (table, steps, bullets) from the item or from the descriptor. When it is absent, the descriptor's outline is used, and research may add two to four sections the result page lacks. The first H2 is always the page's own angle; the validator checks the outline headings appear in order.
+**Answer paragraph.** Families `guide`, `reference`, `evaluation` and `tool` open with a direct answer under the H1, in the style the spec names; the other families open with a value proposition or key facts. The flow generates it; nothing is sent for it.
 
-**AI prompts** are used in three places:
+**Internal links.** Exactly the list from the app: every URL placed once with its anchor (a natural variant of the anchor is allowed, never a bare URL), in body text only. The validator checks each URL appears exactly once and that no other internal-looking URL exists. There is no minimum or maximum; the count is whatever the app sent.
 
-1. The answer paragraph must answer the H1's question, seeded by `answerBlock` when given and by the first prompt otherwise.
-2. An **answer-coverage check** after the Style Updater: a judge model returns, for each prompt, the passage that answers it or "none". Every "none" goes to the Section Fixer with the instruction to answer that question inside the most related section. The payload reports `promptCoverage` per prompt.
-3. The **FAQ writer** takes the prompts first, then People Also Ask questions from research, then generated questions, up to the descriptor's FAQ count.
+**Facts and evidence.** Numbers, prices, results, certifications and capabilities come only from `facts` or from the research evidence, each statistic with a named source and a link from the evidence. The spec's `citations_min` sets how many external citations the page needs; `tables_min` how many tables.
 
-## 5. Schema: built from the page type, extensible
+**Style.** The five peelers (participle pile-ups, series of three, hedging, negative parallelism, tailing negations) and the Style Updater stay as built, on the English text. Banned words, em dashes and semicolons stay in the validator. The validator no longer checks keyword density.
 
-`schemaTypes` come from the map when given and from the descriptor otherwise. JSON-LD is assembled from a library of block builders keyed by schema type: Article, BlogPosting, NewsArticle, TechArticle, HowTo (from step sections), FAQPage (from the FAQ), BreadcrumbList (from the slug), Organization, Person and ProfilePage (from the people table), Service, Product and Offer, SoftwareApplication, WebApplication, DefinedTerm and DefinedTermSet, ItemList (from compared options), Dataset and Report, LocalBusiness and its subtypes, Course, Event, JobPosting, MedicalWebPage with `reviewedBy`, LegalService, Review and AggregateRating (only from real reviews). Each builder declares the facts it needs; when a fact is missing the block is omitted and a warning is returned, never invented. A schema type with no builder is generated by a model constrained to that schema.org type and the descriptor's required properties, validated as JSON, and flagged `generated: true` for review. Author blocks stop being stubs: they carry the author record from the brand table.
+**FAQ.** Always five questions and answers, AI prompts first, then People Also Ask questions from research, then generated ones. One answer mentions the client in the way `ctaRules` describes.
 
-## 6. Internal linking, revisited
+**Constraints.** The spec's `constraints` column adds sector rules to the writer prompt and the validator: required disclaimers, claim limits, reviewer lines. General client rules come through `writingPreferences`.
 
-Revision 1 proposed page-id tokens resolved at publish time. That needs a resolver in the publishing path, which is now out of scope. The replacement follows your idea: link only to pages that already exist, and update already-written pages when a new page appears.
+**Model outputs carry the article between markers, not inside JSON.** The Writer, Style Updater, Section Fixer and translation unwrapper return the full page as markdown between `START_ARTICLE` and `END_ARTICLE` tags, extracted by a Code node, as Content Maker does. A whole article inside a JSON string breaks on escaping and truncation; markers do not.
 
-### 6.1 Forward links at write time
+## 5. Schema
 
-The link plan is the map's `linksOut` restricted to registry rows whose status is `written` or `published` (existing site pages are imported as `published`). URL is site root plus slug. Planned targets that do not exist yet are recorded in the page's `pending_out` column and are not linked. The descriptor's link minimum becomes "min of descriptor minimum and available targets", so early pages are not failed for links they cannot have. When `linksOut` is absent, the existing hub, sibling and commercial heuristics run against the registry. Rule 6 (first mention of a glossary term) is a deterministic post-processor against `pm_glossary` rows that exist. Link exclusions from the brand table are rejected by the validator.
+`schema_types` from the spec name the JSON-LD blocks. A library of block builders covers Article, HowTo (from step sections), FAQPage (from the five FAQs), BreadcrumbList (from `slugPath`), Organization, Person and ProfilePage, Service, Product and Offer, SoftwareApplication, WebApplication, DefinedTerm, ItemList (from compared options), Dataset, LocalBusiness and its subtypes, Course, Event, JobPosting, MedicalWebPage with `reviewedBy`, LegalService, Review and AggregateRating (only from real reviews). Each builder declares the facts it needs; a block whose facts are missing is omitted with a warning in the callback, never invented. A schema type with no builder is generated by a model constrained to that schema.org type, validated as JSON and flagged `generated: true`.
 
-### 6.2 Reverse link pass after the page is written
+## 6. Languages
 
-After the callback succeeds, the flow looks up every registry row with status `written` or `published` whose `links_out` or `pending_out` contains the new page's slug. For each, it produces a link update:
+As built: everything in English through the peelers, the Style Updater, validation, fixing and revalidation. FAQ, meta title and meta description are generated in English too, so every check runs on checked text. Then one DeepL call per text unit (body, FAQ, meta title, meta description) with `tag_handling: html` so the internal links the app sent survive translation untouched. One run per language; the app sends the language's own H1, outline, prompts, links and slug. Languages DeepL does not support fall back to a model translation.
 
-1. Deterministic first: if an anchor hint for the new page (H1, core keyword, short form) already occurs in the source body outside headings, tables, the answer paragraph and existing links, wrap it.
-2. Otherwise a small model edit adds one sentence containing the link in the most related section. The edit is validated by diff: exactly one link added, no other change.
-3. The registry row's `pending_out` loses the slug; a `pm_link_ledger` row is written.
+## 7. Callback
 
-Two ways to run it. **Stateless (recommended):** the main run only returns `inboundUpdatesNeeded: [{slug, anchorHints}]`; the Snoika app calls a second entry point, `mode: link_update`, with the source page's current body and receives the modified body. The body stays owned by the app, so an edit a person made after delivery is never overwritten. **Self-contained:** the registry keeps the last delivered markdown per page and the flow posts updates to the callback itself. This works without app changes but goes stale as soon as anyone edits a page outside the flow.
+`POST {callback_url}/execution-started` at the start and the page at the end, in the Content Maker 5.0 shape without the Strapi block:
 
-Volume: the TruAlign map has 2,480 links over 269 pages, about nine inbound updates per new page, most of them deterministic. A hub written early receives one small update per child page as the children arrive, which replaces the manual Friday link pass.
+```
+{
+  taskId, brandId, userId, n8nExecutionId,
+  slug,                 // echoed from slugPath
+  metaTitle,            // sent by the app or generated
+  metaDescription,
+  articleTextMd,        // the page as markdown, H1 included, internal links in place
+  faq: [{question, answer}] × 5,
+  eeat: {experience, expertise, authoritativeness, trustworthiness, overall, priorityFix},
+  jsonLd,               // array of schema blocks, from the spec
+  pageType, language,
+  promptCoverage: [{prompt, answered}],
+  status: "ok" | "blocked", missing: [...]   // blocked when required facts are absent
+}
+```
 
-### 6.3 Plan changes
+`metaTitle`, `jsonLd`, `pageType`, `language`, `promptCoverage` and `status` are additions to the Content Maker shape; the rest is identical. `articleText` (Strapi blocks) and `similarArticles` are dropped.
 
-- Page will never be published: status `cancelled` in the registry. The same link-update mechanism runs in reverse, unwrapping links to it in every source to plain text. If a `replaced_by` slug is set, the link is re-pointed instead.
-- Slug changes before writing: the registry is keyed by slug, so the row is renamed and `links_out` lists are rewritten by the importer. Nothing else references it.
-- URL changes after publish: `redirect_to` in the registry; sources are updated on the next link pass; the 301 covers the interval.
-- Page re-targeted: anchor hints change; the audit flags anchors that no longer match.
-- Map grows: new rows are `planned`; `links_out` additions on written pages become link updates.
+## 8. Relation to Content Maker 5.0
 
-### 6.4 Index check and reindex request
+Page Maker replaces it. Kept from 5.0: the callback contract above, the progress reporter, the five peelers and the Style Updater, the writer with live research, DeepL translation, FAQ, metadata, EEAT analysis, the Money Calculator. Dropped from 5.0: the outliner, the SEO density check and edit loop, Pinecone internal links, the GEO route switch, the STRAPI converter, the evaluation and run-log sheets. Blog articles are written as catalogue types.
 
-After link updates, for each affected page with a `published_url`, the flow can call the Google Search Console URL Inspection API (`urlInspection.index.inspect`, 2,000 requests per day per property, needs the property verified and a service account added to it). The result says whether the URL is indexed. If not indexed, nothing happens; the page will be crawled fresh. If indexed, the flow asks for a recrawl. Two facts to know here: Google has no public endpoint to request indexing of general pages (the Indexing API is restricted to job postings and live events), and IndexNow covers Bing, Yandex, Naver and Seznam but not Google. So the flow emits `indexSignals: [{url, indexed, checkedAt}]` and calls an optional `indexingHookUrl` the app provides; the app decides what to do with it (sitemap `lastmod`, IndexNow, or a manual request).
-
-### 6.5 Registry sheet
-
-One tab per brand, keyed by slug and language: `slug`, `lang`, `page_type`, `h1`, `core_kw`, `pillar`, `cluster`, `priority`, `status` (planned, blocked, written, published, cancelled, redirected), `published_url`, `replaced_by`, `redirect_to`, `links_out`, `pending_out`, `anchor_hints`, `inbound_count`, `version`, `written_at`, `execution_id`. The read node's range bug is fixed and an empty read fails the run instead of passing silently. Who sets `published`: the app on publish, or a person; the flow only needs the value.
-
-### 6.6 Is it too complex?
-
-The reverse pass is moderate: one registry query, N small edits, N callbacks. The complexity is not in n8n but in ownership of the page body after delivery, which is why the stateless variant is recommended. The index check is a single HTTP call per page once GSC access exists per property; the reindex request is the part that cannot be promised for Google.
-
-## 7. Languages
-
-Sequence, as built: everything in English through the five peelers, the Style Updater, validation, fixing and revalidation; FAQ and metadata are generated in English too, so every check runs on checked text. Then one DeepL call per text unit (body, FAQ, meta title, meta description) with the brand glossary: measured native keywords per page and the terms that stay English. Then a post-translation check: `localizedKeyword` must appear in the H1, the meta title and the first sixty words; if not, a targeted fix in the target language, and if still not, a warning in the payload. The slug is the localised slug from the map, never a transliteration. JSON-LD `inLanguage` becomes a BCP-47 code. One run per language, one registry row per slug and language; forward links resolve within the language only. Languages DeepL does not support fall back to a model translation with the same glossary.
-
-## 8. Blog articles: absorbing Content Maker 5.0
-
-Content Maker 5.0 is the same pipeline shape (outline, write, five peelers, Style Updater, translate, FAQ, meta, callback) with different prompts and a few stages Page Maker lacks. Two catalogue types carry it:
-
-| Type | Family | Inputs beyond the universal fields | Writer rules ported from 5.0 |
-|---|---|---|---|
-| `blog_article_seo` | `guide` | `articleType`, `contentIdea`, `ctaRules`; `articleTitle` is the H1 | keyword in the first and last 30 words, intro ≤150 words, conclusion ≤100 with the CTA in its last paragraph, minimum 15 dated external links, density gate (core 0.55–1.3%, secondaries 0.2–0.4%) |
-| `blog_article_geo` | `guide` | `question` (the H1 anchor), `answerIdea`, `productDescription` | 40–60 word opening answer, each H2/H3 130–180 words opening with a direct answer plus one sourced claim, one link per section, final H2 is the CTA section |
-
-In 5.0 the GEO route is switched by a non-empty `prompt`; in Page Maker the page type switches it and the UI maps the field.
-
-What Page Maker absorbs from 5.0, in order of weight:
-
-1. **Outliner stage.** 5.0 researches the audience or the client with Tavily and produces the H2/H3 outline. Page Maker gets the same node as the fallback for every type when no `h2Outline` is supplied, which is the common case for blog articles and for pages written outside a content map.
-2. **SEO density loop.** The deterministic density check plus Edit Finder and Edit Applier become part of validation for types whose descriptor sets `keyword_density: true` (the SEO article; optional for guides).
-3. **Re-citation in the target language.** 5.0 strips all links before translation and re-sources citations with target-country search. Pages keep their citations through translation today. The descriptor gets a flag, `recite_in_target_language`, true for blog types, false by default.
-4. **Internal links from Pinecone.** 5.0 finds internal links by vector search over the client's existing blog. The registry only knows planned pages, so `pineconeIndex` and `pineconeNamespace` stay as an optional second link source, with the same 7 links, 2 per section, CTA-link rules folded into the validator.
-5. **EEAT analysis** (experience, expertise, authoritativeness, trust with evidence and a priority fix) runs for every type; it is one cheap model call and the payload carries it.
-6. **Progress reporting.** The nine stage keys sent to the progress sub-workflow (`article_request_received` through `final_assets_ready`) are kept, with `jobType` set from the family.
-7. **Callback shape.** 5.0 posts to `/blog-post` with Strapi rich-text blocks in `articleText` plus `articleTextMd`; Page Maker posts to `/page` with markdown. The payload for blog types carries both `markdown` and `articleText` blocks; which endpoint the app consumes is the app's choice.
-8. **Evaluation and logs.** The English-SEO quality score (metrics, SEO, rules compliance) and the Stats sheet, the run-log sheet, execution custom data and the error workflow are kept as they are. The Money Calculator receives the real title.
-
-Once these are in, 5.0 can be retired, and blog articles get everything pages have: the descriptor, the brand tables, the registry links and the reverse link pass.
-
-## 9. Output payload
-
-Today's payload plus: `answerParagraph`, `sections[] {h2, words}`, `promptCoverage[] {prompt, answered, passage}`, `faq[]` in the target language, `relatedLinks[]` (all planned children or siblings with status, for a template block), `pendingLinks[]`, `inboundUpdatesNeeded[]`, `indexSignals[]`, `language` as a BCP-47 code, `localizedKeywordCheck`, `schemaWarnings[]`, `blocked` with a reason when facts are missing, and `version`.
-
-## 10. Node-level delta in the n8n workflow
+## 9. Node-level delta in the n8n workflow
 
 | Node | Change |
 |---|---|
-| Parse Request | new fields from 3.1; `customType` descriptor; `mode` |
-| Page Contract | reads `pm_page_types` and the industry pack instead of the hardcoded `S` and `BP`; outline from payload wins |
-| Load Page Registry | range fixed, fails loudly, filters by brand and language |
-| Link Plan | `linksOut` ∩ existing rows; heuristics as fallback; `pending_out` written back |
-| Prep Writer | sections from the outline, facts from brand tables by kind, disclaimers from the pack |
-| Validate Draft | outline order, prompt coverage, disclaimers, link exclusions, anchor rules |
+| Parse Request | fields from 3.1; `facts` object; `internalLinks[]`; `h2Outline[]`; `aiPrompts[]`; drop the removed fields |
+| Page Contract | replaced by a Data Table lookup of `page_type_specs`; sections come from `h2Outline`, budgets from the spec |
+| Load Page Registry, Link Plan | removed; the link plan is `internalLinks` as sent |
+| Research Queries | built from H1, core keyword, H2s and AI prompts; depth from the spec |
+| Prep Writer | outline verbatim, family opening, AI prompts as questions to answer in place, links as given, facts by kind, spec constraints |
+| Page Writer, Style Updater, Section Fixer | output between `START_ARTICLE` and `END_ARTICLE`, extracted by code |
+| Validate Draft | outline order and verbatim headings, link presence and placement, fact discipline, citations and tables from the spec, constraints, style; no density |
 | Revalidate | actually re-runs Validate |
-| new: Answer Coverage | judge model over `aiPrompts` |
-| FAQ Writer, Metadata Generator | moved before translation, prompts-first FAQ, meta title passthrough |
-| DeepL Translate | body, FAQ and meta in one batch with the glossary |
-| new: Localized Keyword Check | after translation |
-| Build JSON-LD | block builders from `schemaTypes`, people table for authors, generated fallback |
-| new: Reverse Link Pass | registry query, deterministic wrap, model insert, ledger |
-| new: Index Signal | URL Inspection API, optional hook |
-| new webhook: `page-maker/link-update` | stateless link update entry point |
-| Money Calculator | passes the real title |
+| new: Answer Coverage | judge over `aiPrompts`, one fixer round for misses |
+| FAQ Writer | five questions, prompts first, client mention per `ctaRules` |
+| Metadata Generator | slug removed (from app); meta title only when absent; description |
+| Build JSON-LD | block builders from the spec's `schema_types`; generated fallback |
+| new: EEAT Analysis | ported from Content Maker |
+| DeepL Translate | body, FAQ and meta in one batch, links preserved |
+| Build Payload, Send Page | Content Maker shape from section 7 |
+| Mark Page Written | removed |
+| Calculate Money | passes the real title |
 
-## 11. Open points
+## 10. Open points
 
-1. Can the Snoika app supply the current body of a written page when asked for a link update (stateless variant), or should the registry keep the last delivered markdown?
-2. Do we have Search Console access per client property (service account added to the property)? Without it the index check is skipped.
-3. Who sets `published` in the registry: the app on publish, or a person? Forward linking depends on it.
+1. Meta title: should the app always send it, or should the flow generate it when absent (current proposal)?
+2. Non-English runs: keep the English citations through translation (current proposal), or strip and re-source them in the target language as Content Maker 5.0 does for its `_lang` route?
+3. The five payload additions in section 7: confirm they are acceptable to the app.
 
 ## Appendix A. Page-type catalogue
 
-147 types. Columns: AP = needs an answer paragraph under the H1. AI = worth generating with a writer: Y yes, P partial (writer drafts, facts must be supplied and verified), N no (template or engineering owns it). Inputs are in addition to keyword, H1, audience, voice and link targets. Word ranges are defaults the descriptor overrides.
+145 types. Columns: AP = needs an answer paragraph under the H1. AI = worth generating with a writer: Y yes, P partial (writer drafts, facts must be supplied and verified), N no (template or engineering owns it). Inputs are in addition to keyword, H1, audience, voice and link targets. Word ranges are defaults the descriptor overrides.
 
 ### hub
 
@@ -325,8 +234,6 @@ Today's payload plus: `answerParagraph`, `sections[] {h2, words}`, `promptCovera
 | `deep_dive_guide` | Complete guide to one topic | all | 2,000–4,000 | Article, FAQPage | sub-topic outline, sources, expert quotes, author | Y | Y |
 | `how_to` | Step-by-step instructions for one task | all; SaaS, trades, DIY, finance | 1,000–2,500 | HowTo, Article | steps, tools, time, prerequisites | Y | Y |
 | `supporting_article` | Narrow cluster article on one sub-question | all | 800–1,800 | Article | parent hub slug, sources | Y | Y |
-| `blog_article_seo` | Keyword-led blog article (Content Maker 5.0 SEO route) | all | 1,500–3,000 | BlogPosting, FAQPage | articleType, contentIdea, ctaRules | Y | Y |
-| `blog_article_geo` | Question-led answer article (Content Maker 5.0 GEO route) | all | 1,200–2,500 | BlogPosting, FAQPage | question, answerIdea, productDescription | Y | Y |
 | `explainer_what_is` | "What is X" conceptual article | SaaS, finance, health, legal, industrial | 1,000–2,000 | Article, FAQPage | sources, examples, related terms | Y | Y |
 | `checklist` | Actionable checklist with context per item | compliance, ops, moving, events, HR | 800–1,800 | HowTo or Article, ItemList | items, downloadable version | Y | Y |
 | `regulation_compliance_explainer` | Plain-language explanation of a law or standard | legal, finance, HR, health, energy, telecom | 1,500–3,000 | Article, FAQPage | official citations, jurisdiction, dates, penalties, reviewer | Y | P |
@@ -509,7 +416,7 @@ Today's payload plus: `answerParagraph`, `sections[] {h2, words}`, `promptCovera
 | `error_404_page` | Not-found page | all | 50–150 | WebPage | top links | N | Y |
 | `homepage` | Site home | all | 300–1,000 | WebSite, Organization | positioning, key links, proof | N | P |
 
-## Appendix B. Industry constraints
+## Appendix B. Sector constraints (seed for the `constraints` column)
 
 Seed content for `pm_industry_packs`. Each row: the page types that make up most of a site in that industry, then the constraints the writer and validator enforce.
 

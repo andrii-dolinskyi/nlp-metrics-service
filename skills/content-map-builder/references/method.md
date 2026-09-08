@@ -20,7 +20,7 @@ One sentence per client: "Would a <ICP> with a <problem the client solves> type 
 
 ## Page types
 
-The full list is `references/page_types.md` (147 types in 12 families, with default words, schema and the facts the client must supply for each; `assets/page_types.json` is the same data for the scripts). `page_type` in run.json is the catalogue `type_id`. The thirteen that every B2B map uses, with their defaults:
+The full list is `references/page_types.md` (145 types in 12 families, with default words, schema and the facts the client must supply for each; `assets/page_types.json` is the same data for the scripts). `page_type` in run.json is the catalogue `type_id`. The thirteen that every B2B map uses, with their defaults:
 
 | type_id | Label | Words | Schema |
 |---|---|---|---|

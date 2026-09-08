@@ -59,15 +59,13 @@ Columns: default words (allowed range), default schema, what the client must sup
 | `template_gallery_hub` | Template gallery hub | Index of templates or examples | SaaS, agencies, creators | 550 (300–800) | CollectionPage + BreadcrumbList | template inventory | N | Y |
 | `topic_hub_programmatic` | Topic hub programmatic | Programmatic hub for a modifier set ("LLC by state") | programmatic sites, legal-tech, fintech | 550 (300–800) | CollectionPage + BreadcrumbList | entity list, child slugs | N | Y |
 
-### guide (14)
+### guide (12)
 
 | type_id | Label | What it is | Common industries | Words | Schema | Client must supply | AP | AI |
 |---|---|---|---|---|---|---|---|---|
 | `deep_dive_guide` | Deep-dive guide | Complete guide to one topic | all | 2,000 (2,000–4,000) | Article + FAQPage + HowTo + BreadcrumbList | sub-topic outline, sources, expert quotes, author | Y | Y |
 | `how_to` | How-to guide | Step-by-step instructions for one task | all; SaaS, trades, DIY, finance | 1,750 (1,000–2,500) | HowTo + Article + BreadcrumbList | steps, tools, time, prerequisites | Y | Y |
 | `supporting_article` | Supporting article | Narrow cluster article on one sub-question | all | 1,400 (800–1,800) | Article + FAQPage + BreadcrumbList | parent hub slug, sources | Y | Y |
-| `blog_article_seo` | Blog article (SEO) | Keyword-led blog article (Content Maker 5.0 SEO route) | all | 2,250 (1,500–3,000) | BlogPosting + FAQPage + BreadcrumbList | articleType, contentIdea, ctaRules | Y | Y |
-| `blog_article_geo` | Blog article (GEO) | Question-led answer article (Content Maker 5.0 GEO route) | all | 1,850 (1,200–2,500) | BlogPosting + FAQPage + BreadcrumbList | question, answerIdea, productDescription | Y | Y |
 | `explainer_what_is` | What-is explainer | "What is X" conceptual article | SaaS, finance, health, legal, industrial | 1,500 (1,000–2,000) | Article + FAQPage + BreadcrumbList | sources, examples, related terms | Y | Y |
 | `checklist` | Checklist | Actionable checklist with context per item | compliance, ops, moving, events, HR | 1,300 (800–1,800) | HowTo + Article + ItemList + BreadcrumbList | items, downloadable version | Y | Y |
 | `regulation_compliance_explainer` | Regulation compliance explainer | Plain-language explanation of a law or standard | legal, finance, HR, health, energy, telecom | 2,250 (1,500–3,000) | Article + FAQPage + BreadcrumbList | official citations, jurisdiction, dates, penalties, reviewer | Y | P |
