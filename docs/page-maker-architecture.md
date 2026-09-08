@@ -439,3 +439,25 @@ Seed content for `pm_industry_packs`. Each row: the page types that make up most
 | Nonprofits and government-adjacent | program, donate, impact report, about, event, careers or volunteer, resource library, press release | publish financials and registration numbers; tax-deductibility language matches status; Google Ad Grant content quality; plain-language and accessibility standards; no political endorsement |
 | Media, publishers, marketplaces, directories | media: supporting article, pillar hub, best-of, review, author bio, video; marketplaces: product category, top-in-location, partner or vendor profile, listing detail, job category | category pages carry most traffic; vendor profiles need unique copy; affiliate disclosure on reviews and best-of; Review schema only for real reviews; UGC moderation |
 | Logistics and telecom | service, route or lane and plan or tariff, industry vertical, calculator, regional landing, migration or switch, help centre article, location | telecom: regulated price and contract disclosures, coverage claims match maps, "up to" speed rules, switching pages state early termination terms; logistics: customs and Incoterms content needs jurisdiction and date, transit times as ranges |
+
+## 11. As built (2026-09-08)
+
+Workflow `MZUUvWCdCXlHKllN` was rebuilt in place and renamed "Content Maker 6.0". 70 nodes; every node reachable from the webhook. The request and callback contract is in `docs/content-maker-6-webhook.md`.
+
+Differences from the plan above, all small:
+
+- The Style Updater keeps Content Maker's 15,000-character editor prompt inside the `Prep Update` node unchanged. Its closing instruction to return JSON is rewritten at the Style Updater node's system-message expression to ask for the START_ARTICLE and END_ARTICLE markers, and the article is taken from `Extract Draft` rather than from the parser.
+- Section Fixer, Coverage Fixer and the writer return the page between markers; `Extract Draft`, `Extract Updated`, `Extract Fixed` and `Extract Coverage` are Code nodes that strip the markers and fall back to the previous version of the page when a model returns nothing usable.
+- When a spec's `research` is `none`, `citations_min` is forced to 0, because the validator only accepts citations that came from the research evidence.
+- A run without `facts` for the offer, proof, entity, local, catalogue, evaluation and tool families stops with `status: blocked` before any model is called.
+- Progress reporting calls the Content Plan Progress Reporter sub-workflow at `article_request_received`, `draft_written` and `final_assets_ready`.
+
+Tests run against the draft, callbacks captured by the `CM6 Test Callback Receiver` helper:
+
+| Run | Input | Result |
+|---|---|---|
+| 15926 | `service_page`, English, 8 H2s, 4 AI prompts, 3 internal links, facts object | Success in 11 min 36 s. H1 and all 8 H2s verbatim, 3 links placed once each, 1,060 words, 14 table rows, 5 FAQs (prompts first, client named), Service + Organization + FAQPage + BreadcrumbList JSON-LD, EEAT block, callback received. First validation failed only on the citation minimum, which led to the `research: none` rule above. Prose recycled client facts across sections, which led to the anti-repetition rules in the writer prompt. |
+| 15947 | `service_page` without facts | Blocked in 0.4 s; callback carried the five missing fact names. |
+| 15953 | `supporting_article`, German, 6 H2s, 3 AI prompts, 2 internal links, no facts | Success in 11 min 16 s. Research produced 55 evidence lines from 40 sources; the page cites 3 of them. Answer paragraph present, outline verbatim, validation passed on the first pass, all 3 prompts judged answered without a fix round, body, FAQ, meta title and description translated to German with every link intact. |
+
+Known limits after the tests: a translated meta title is not re-checked for length (the German title ran to 120 characters); the E-E-A-T judge scores pages without named authors or case studies low, which is informational; the two helper workflows are test tooling and can be deleted once the app calls the production webhook.
