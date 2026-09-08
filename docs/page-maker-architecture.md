@@ -58,7 +58,7 @@ Two rules the writer carries for every family: answer-first is the default for `
 
 ### 2.2 The catalogue
 
-The research produced 118 page types across the families; 105 are worth generating with a writer, 13 are template or engineering pages (login, cart, API reference, legal policies, search results). The full catalogue with definition, industries, word range, schema, extra inputs, answer-paragraph flag and AI-writable flag is in Appendix A. Every row is stored as a descriptor record, so the workflow reads it as data.
+The research produced 147 page types across the families; 138 are worth generating with a writer, 9 are template or engineering pages (login, cart, API reference, legal policies, search results). The full catalogue with definition, industries, word range, schema, extra inputs, answer-paragraph flag and AI-writable flag is in Appendix A. Every row is stored as a descriptor record, so the workflow reads it as data.
 
 The 13 types in the content-map method map onto it directly:
 
@@ -300,7 +300,7 @@ Today's payload plus: `answerParagraph`, `sections[] {h2, words}`, `promptCovera
 
 ## Appendix A. Page-type catalogue
 
-118 types. Columns: AP = needs an answer paragraph under the H1. AI = worth generating with a writer: Y yes, P partial (writer drafts, facts must be supplied and verified), N no (template or engineering owns it). Inputs are in addition to keyword, H1, audience, voice and link targets. Word ranges are defaults the descriptor overrides.
+147 types. Columns: AP = needs an answer paragraph under the H1. AI = worth generating with a writer: Y yes, P partial (writer drafts, facts must be supplied and verified), N no (template or engineering owns it). Inputs are in addition to keyword, H1, audience, voice and link targets. Word ranges are defaults the descriptor overrides.
 
 ### hub
 

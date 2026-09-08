@@ -1,0 +1,2582 @@
+{
+ "version": "2026-09-08",
+ "families": {
+  "hub": {
+   "label": "Hub",
+   "points": 15,
+   "low_volume_ok": true,
+   "opens": "scope statement"
+  },
+  "guide": {
+   "label": "Guide",
+   "points": 8,
+   "low_volume_ok": false,
+   "opens": "answer paragraph"
+  },
+  "reference": {
+   "label": "Reference",
+   "points": 3,
+   "low_volume_ok": false,
+   "opens": "direct answer"
+  },
+  "evaluation": {
+   "label": "Evaluation",
+   "points": 8,
+   "low_volume_ok": false,
+   "opens": "verdict paragraph"
+  },
+  "offer": {
+   "label": "Offer",
+   "points": 12,
+   "low_volume_ok": true,
+   "opens": "value proposition and CTA"
+  },
+  "proof": {
+   "label": "Proof",
+   "points": 6,
+   "low_volume_ok": true,
+   "opens": "headline result"
+  },
+  "entity": {
+   "label": "Entity",
+   "points": 5,
+   "low_volume_ok": true,
+   "opens": "key facts"
+  },
+  "tool": {
+   "label": "Tool",
+   "points": 8,
+   "low_volume_ok": false,
+   "opens": "short framing"
+  },
+  "asset": {
+   "label": "Asset",
+   "points": 8,
+   "low_volume_ok": false,
+   "opens": "what is inside"
+  },
+  "local": {
+   "label": "Local",
+   "points": 10,
+   "low_volume_ok": true,
+   "opens": "location H1 and NAP"
+  },
+  "catalogue": {
+   "label": "Catalogue",
+   "points": 8,
+   "low_volume_ok": true,
+   "opens": "title and key facts"
+  },
+  "ops": {
+   "label": "Ops",
+   "points": 2,
+   "low_volume_ok": true,
+   "opens": "the task"
+  }
+ },
+ "aliases": {
+  "PILLAR HUB": "pillar_hub",
+  "Pillar hub": "pillar_hub",
+  "Cluster hub": "cluster_hub",
+  "Deep-dive article": "deep_dive_guide",
+  "Supporting article": "supporting_article",
+  "Comparison page": "head_to_head_vs",
+  "Alternatives page": "alternatives_page",
+  "Linkable asset": "research_report",
+  "Service page": "service_page",
+  "Solution page": "solution_use_case_page",
+  "Industry page": "industry_vertical_page",
+  "Case study": "case_study",
+  "Author page": "author_bio_page",
+  "Glossary term": "glossary_term"
+ },
+ "types": [
+  {
+   "type_id": "pillar_hub",
+   "family": "hub",
+   "label": "Pillar hub",
+   "definition": "Broad topic overview that summarises and links every cluster page",
+   "industries": "all content-led sites",
+   "words": {
+    "min": 2000,
+    "max": 5000
+   },
+   "default_words": 2500,
+   "schema": "Article, CollectionPage, FAQPage",
+   "required_inputs": "child list with slugs and one-line summaries, scope boundaries",
+   "answer_paragraph": true,
+   "ai_writable": "Y",
+   "default_schema": "Article + FAQPage + BreadcrumbList + Organization"
+  },
+  {
+   "type_id": "cluster_hub",
+   "family": "hub",
+   "label": "Cluster hub",
+   "definition": "Mid-level index for a sub-topic within a pillar",
+   "industries": "same",
+   "words": {
+    "min": 800,
+    "max": 2000
+   },
+   "default_words": 1800,
+   "schema": "CollectionPage, Article",
+   "required_inputs": "child list, parent pillar slug",
+   "answer_paragraph": true,
+   "ai_writable": "Y",
+   "default_schema": "Article + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "resource_library",
+   "family": "hub",
+   "label": "Resource library",
+   "definition": "Index of downloadable or watchable assets",
+   "industries": "SaaS, B2B services, nonprofits, education",
+   "words": {
+    "min": 300,
+    "max": 800
+   },
+   "default_words": 550,
+   "schema": "CollectionPage, ItemList",
+   "required_inputs": "asset inventory",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "CollectionPage + ItemList + BreadcrumbList"
+  },
+  {
+   "type_id": "blog_category_hub",
+   "family": "hub",
+   "label": "Blog category hub",
+   "definition": "Blog category landing with editorial intro",
+   "industries": "all",
+   "words": {
+    "min": 200,
+    "max": 600
+   },
+   "default_words": 400,
+   "schema": "CollectionPage",
+   "required_inputs": "category scope, top posts",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "CollectionPage + BreadcrumbList"
+  },
+  {
+   "type_id": "glossary_index",
+   "family": "hub",
+   "label": "Glossary index",
+   "definition": "A–Z index of terms with one-line definitions",
+   "industries": "SaaS, finance, legal, health, industrial",
+   "words": {
+    "min": 500,
+    "max": 1500
+   },
+   "default_words": 1000,
+   "schema": "DefinedTermSet, CollectionPage",
+   "required_inputs": "term list",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "DefinedTermSet + CollectionPage + BreadcrumbList"
+  },
+  {
+   "type_id": "service_area_hub",
+   "family": "hub",
+   "label": "Service area hub",
+   "definition": "Index of all city or region pages served",
+   "industries": "local services, trades, healthcare networks, law, real estate",
+   "words": {
+    "min": 300,
+    "max": 800
+   },
+   "default_words": 550,
+   "schema": "CollectionPage, LocalBusiness",
+   "required_inputs": "area list, map",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "CollectionPage + LocalBusiness + BreadcrumbList"
+  },
+  {
+   "type_id": "location_index",
+   "family": "hub",
+   "label": "Location index",
+   "definition": "Directory of physical branches",
+   "industries": "multi-location retail, healthcare, banks, dealerships",
+   "words": {
+    "min": 200,
+    "max": 600
+   },
+   "default_words": 400,
+   "schema": "CollectionPage, ItemList",
+   "required_inputs": "location data per site",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "CollectionPage + ItemList + BreadcrumbList"
+  },
+  {
+   "type_id": "industry_hub",
+   "family": "hub",
+   "label": "Industry hub",
+   "definition": "Index of all vertical pages",
+   "industries": "SaaS, agencies, manufacturing, insurance, staffing",
+   "words": {
+    "min": 300,
+    "max": 800
+   },
+   "default_words": 550,
+   "schema": "CollectionPage",
+   "required_inputs": "vertical list",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "CollectionPage + BreadcrumbList"
+  },
+  {
+   "type_id": "integration_directory",
+   "family": "hub",
+   "label": "Integration directory",
+   "definition": "Index of integration pages by category",
+   "industries": "SaaS",
+   "words": {
+    "min": 300,
+    "max": 800
+   },
+   "default_words": 550,
+   "schema": "CollectionPage, ItemList",
+   "required_inputs": "integration list",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "CollectionPage + ItemList + BreadcrumbList"
+  },
+  {
+   "type_id": "template_gallery_hub",
+   "family": "hub",
+   "label": "Template gallery hub",
+   "definition": "Index of templates or examples",
+   "industries": "SaaS, agencies, creators",
+   "words": {
+    "min": 300,
+    "max": 800
+   },
+   "default_words": 550,
+   "schema": "CollectionPage",
+   "required_inputs": "template inventory",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "CollectionPage + BreadcrumbList"
+  },
+  {
+   "type_id": "topic_hub_programmatic",
+   "family": "hub",
+   "label": "Topic hub programmatic",
+   "definition": "Programmatic hub for a modifier set (\"LLC by state\")",
+   "industries": "programmatic sites, legal-tech, fintech",
+   "words": {
+    "min": 300,
+    "max": 800
+   },
+   "default_words": 550,
+   "schema": "CollectionPage",
+   "required_inputs": "entity list, child slugs",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "CollectionPage + BreadcrumbList"
+  },
+  {
+   "type_id": "deep_dive_guide",
+   "family": "guide",
+   "label": "Deep-dive guide",
+   "definition": "Complete guide to one topic",
+   "industries": "all",
+   "words": {
+    "min": 2000,
+    "max": 4000
+   },
+   "default_words": 2000,
+   "schema": "Article, FAQPage",
+   "required_inputs": "sub-topic outline, sources, expert quotes, author",
+   "answer_paragraph": true,
+   "ai_writable": "Y",
+   "default_schema": "Article + FAQPage + HowTo + BreadcrumbList"
+  },
+  {
+   "type_id": "how_to",
+   "family": "guide",
+   "label": "How-to guide",
+   "definition": "Step-by-step instructions for one task",
+   "industries": "all; SaaS, trades, DIY, finance",
+   "words": {
+    "min": 1000,
+    "max": 2500
+   },
+   "default_words": 1750,
+   "schema": "HowTo, Article",
+   "required_inputs": "steps, tools, time, prerequisites",
+   "answer_paragraph": true,
+   "ai_writable": "Y",
+   "default_schema": "HowTo + Article + BreadcrumbList"
+  },
+  {
+   "type_id": "supporting_article",
+   "family": "guide",
+   "label": "Supporting article",
+   "definition": "Narrow cluster article on one sub-question",
+   "industries": "all",
+   "words": {
+    "min": 800,
+    "max": 1800
+   },
+   "default_words": 1400,
+   "schema": "Article",
+   "required_inputs": "parent hub slug, sources",
+   "answer_paragraph": true,
+   "ai_writable": "Y",
+   "default_schema": "Article + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "blog_article_seo",
+   "family": "guide",
+   "label": "Blog article (SEO)",
+   "definition": "Keyword-led blog article (Content Maker 5.0 SEO route)",
+   "industries": "all",
+   "words": {
+    "min": 1500,
+    "max": 3000
+   },
+   "default_words": 2250,
+   "schema": "BlogPosting, FAQPage",
+   "required_inputs": "articleType, contentIdea, ctaRules",
+   "answer_paragraph": true,
+   "ai_writable": "Y",
+   "default_schema": "BlogPosting + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "blog_article_geo",
+   "family": "guide",
+   "label": "Blog article (GEO)",
+   "definition": "Question-led answer article (Content Maker 5.0 GEO route)",
+   "industries": "all",
+   "words": {
+    "min": 1200,
+    "max": 2500
+   },
+   "default_words": 1850,
+   "schema": "BlogPosting, FAQPage",
+   "required_inputs": "question, answerIdea, productDescription",
+   "answer_paragraph": true,
+   "ai_writable": "Y",
+   "default_schema": "BlogPosting + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "explainer_what_is",
+   "family": "guide",
+   "label": "What-is explainer",
+   "definition": "\"What is X\" conceptual article",
+   "industries": "SaaS, finance, health, legal, industrial",
+   "words": {
+    "min": 1000,
+    "max": 2000
+   },
+   "default_words": 1500,
+   "schema": "Article, FAQPage",
+   "required_inputs": "sources, examples, related terms",
+   "answer_paragraph": true,
+   "ai_writable": "Y",
+   "default_schema": "Article + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "checklist",
+   "family": "guide",
+   "label": "Checklist",
+   "definition": "Actionable checklist with context per item",
+   "industries": "compliance, ops, moving, events, HR",
+   "words": {
+    "min": 800,
+    "max": 1800
+   },
+   "default_words": 1300,
+   "schema": "HowTo or Article, ItemList",
+   "required_inputs": "items, downloadable version",
+   "answer_paragraph": true,
+   "ai_writable": "Y",
+   "default_schema": "HowTo + Article + ItemList + BreadcrumbList"
+  },
+  {
+   "type_id": "regulation_compliance_explainer",
+   "family": "guide",
+   "label": "Regulation compliance explainer",
+   "definition": "Plain-language explanation of a law or standard",
+   "industries": "legal, finance, HR, health, energy, telecom",
+   "words": {
+    "min": 1500,
+    "max": 3000
+   },
+   "default_words": 2250,
+   "schema": "Article, FAQPage",
+   "required_inputs": "official citations, jurisdiction, dates, penalties, reviewer",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "Article + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "process_page",
+   "family": "guide",
+   "label": "Process",
+   "definition": "What happens when you work with us",
+   "industries": "professional services, healthcare, legal, construction",
+   "words": {
+    "min": 700,
+    "max": 1500
+   },
+   "default_words": 1100,
+   "schema": "Article or Service",
+   "required_inputs": "steps, timelines",
+   "answer_paragraph": true,
+   "ai_writable": "Y",
+   "default_schema": "Article + Service + BreadcrumbList"
+  },
+  {
+   "type_id": "mistakes_pitfalls",
+   "family": "guide",
+   "label": "Mistakes pitfalls",
+   "definition": "Mistakes to avoid",
+   "industries": "all",
+   "words": {
+    "min": 1000,
+    "max": 2000
+   },
+   "default_words": 1500,
+   "schema": "Article",
+   "required_inputs": "mistake list with fixes",
+   "answer_paragraph": true,
+   "ai_writable": "Y",
+   "default_schema": "Article + BreadcrumbList"
+  },
+  {
+   "type_id": "trend_outlook",
+   "family": "guide",
+   "label": "Trend outlook",
+   "definition": "Annual trends or state of X",
+   "industries": "B2B, agencies, tech, HR, retail",
+   "words": {
+    "min": 1500,
+    "max": 3000
+   },
+   "default_words": 2250,
+   "schema": "Article",
+   "required_inputs": "data sources, quotes, year",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "Article + BreadcrumbList"
+  },
+  {
+   "type_id": "symptom_problem_page",
+   "family": "guide",
+   "label": "Symptom problem",
+   "definition": "Why is X happening, signs of X",
+   "industries": "healthcare, trades, auto, IT",
+   "words": {
+    "min": 1000,
+    "max": 2000
+   },
+   "default_words": 1500,
+   "schema": "Article or MedicalWebPage, FAQPage",
+   "required_inputs": "causes, severity guidance, when-to-call thresholds, reviewer",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "Article + MedicalWebPage + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "destination_guide",
+   "family": "guide",
+   "label": "Destination guide",
+   "definition": "Travel or area guide",
+   "industries": "travel, hospitality, real estate, relocation",
+   "words": {
+    "min": 1500,
+    "max": 3500
+   },
+   "default_words": 2500,
+   "schema": "Article, TouristDestination, FAQPage",
+   "required_inputs": "place data, attractions, seasons",
+   "answer_paragraph": true,
+   "ai_writable": "Y",
+   "default_schema": "Article + TouristDestination + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "career_guide",
+   "family": "guide",
+   "label": "Career guide",
+   "definition": "How to become an X",
+   "industries": "recruiting, education, professional bodies",
+   "words": {
+    "min": 1500,
+    "max": 2500
+   },
+   "default_words": 2000,
+   "schema": "Article, FAQPage",
+   "required_inputs": "requirements, salary data, steps",
+   "answer_paragraph": true,
+   "ai_writable": "Y",
+   "default_schema": "Article + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "glossary_term",
+   "family": "reference",
+   "label": "Glossary term",
+   "definition": "Single term definition",
+   "industries": "SaaS, finance, legal, health, industrial, marketing",
+   "words": {
+    "min": 300,
+    "max": 900
+   },
+   "default_words": 450,
+   "schema": "DefinedTerm, Article, FAQPage",
+   "required_inputs": "definition, example, related terms, glossary slug",
+   "answer_paragraph": true,
+   "ai_writable": "Y",
+   "default_schema": "DefinedTerm + DefinedTermSet + BreadcrumbList"
+  },
+  {
+   "type_id": "faq_page",
+   "family": "reference",
+   "label": "FAQ page",
+   "definition": "Standalone FAQ for a topic or service",
+   "industries": "all; healthcare, legal, insurance, local",
+   "words": {
+    "min": 800,
+    "max": 2000
+   },
+   "default_words": 1400,
+   "schema": "FAQPage",
+   "required_inputs": "question list with source answers",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "statistics_page",
+   "family": "reference",
+   "label": "Statistics page",
+   "definition": "Curated statistics roundup with citations",
+   "industries": "B2B, SaaS, agencies, HR, health, finance",
+   "words": {
+    "min": 1500,
+    "max": 3000
+   },
+   "default_words": 2250,
+   "schema": "Article, Dataset, ItemList",
+   "required_inputs": "verified stats with source and year each",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "Article + Dataset + ItemList + BreadcrumbList"
+  },
+  {
+   "type_id": "spec_sheet",
+   "family": "reference",
+   "label": "Spec sheet",
+   "definition": "Technical specification page",
+   "industries": "manufacturing, industrial, electronics, energy, telecom",
+   "words": {
+    "min": 300,
+    "max": 1000
+   },
+   "default_words": 650,
+   "schema": "Product, PropertyValue, TechArticle",
+   "required_inputs": "spec table, tolerances, certifications, datasheet",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "Product + PropertyValue + TechArticle + BreadcrumbList"
+  },
+  {
+   "type_id": "question_page",
+   "family": "reference",
+   "label": "Question",
+   "definition": "Single-question page",
+   "industries": "legal, healthcare, finance, insurance, HR",
+   "words": {
+    "min": 500,
+    "max": 1200
+   },
+   "default_words": 850,
+   "schema": "Article or QAPage, FAQPage",
+   "required_inputs": "authoritative answer, jurisdiction, reviewer",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "Article + QAPage + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "entity_lookup",
+   "family": "reference",
+   "label": "Entity lookup",
+   "definition": "Programmatic fact page about an entity",
+   "industries": "data sites, fintech, health, HR",
+   "words": {
+    "min": 300,
+    "max": 800
+   },
+   "default_words": 550,
+   "schema": "Article or Dataset",
+   "required_inputs": "structured entity record",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "Article + Dataset + BreadcrumbList"
+  },
+  {
+   "type_id": "country_region_guide",
+   "family": "reference",
+   "label": "Country region guide",
+   "definition": "Regulatory or practical reference by jurisdiction",
+   "industries": "HR, fintech, legal-tech, logistics, travel",
+   "words": {
+    "min": 1200,
+    "max": 2500
+   },
+   "default_words": 1850,
+   "schema": "Article, FAQPage",
+   "required_inputs": "jurisdiction data, sources, dates",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "Article + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "salary_guide",
+   "family": "reference",
+   "label": "Salary guide",
+   "definition": "Compensation reference by role or region",
+   "industries": "recruiting, HR, education",
+   "words": {
+    "min": 1000,
+    "max": 2500
+   },
+   "default_words": 1750,
+   "schema": "Article, Dataset, FAQPage",
+   "required_inputs": "salary data with source and methodology",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "Article + Dataset + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "listicle_best_of",
+   "family": "evaluation",
+   "label": "Best-of list",
+   "definition": "Best X ranked list",
+   "industries": "SaaS, e-commerce, agencies, marketplaces, travel",
+   "words": {
+    "min": 1500,
+    "max": 3500
+   },
+   "default_words": 2500,
+   "schema": "Article, ItemList",
+   "required_inputs": "candidate list, criteria, pricing, own position",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "Article + ItemList + BreadcrumbList"
+  },
+  {
+   "type_id": "head_to_head_vs",
+   "family": "evaluation",
+   "label": "Head-to-head comparison",
+   "definition": "A vs B comparison",
+   "industries": "SaaS, fintech, insurance, e-commerce, auto, education",
+   "words": {
+    "min": 1500,
+    "max": 3000
+   },
+   "default_words": 1800,
+   "schema": "Article, FAQPage",
+   "required_inputs": "feature matrix, pricing for both, ideal user for each",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "Article + FAQPage + ItemList + BreadcrumbList"
+  },
+  {
+   "type_id": "alternatives_page",
+   "family": "evaluation",
+   "label": "Alternatives page",
+   "definition": "Competitor alternatives list with own product positioned",
+   "industries": "SaaS, fintech, services",
+   "words": {
+    "min": 1500,
+    "max": 3000
+   },
+   "default_words": 1600,
+   "schema": "Article, ItemList",
+   "required_inputs": "competitor list with verifiable weaknesses, own differentiators",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "Article + ItemList + BreadcrumbList"
+  },
+  {
+   "type_id": "competitor_comparison_own",
+   "family": "evaluation",
+   "label": "Us-vs-competitor page",
+   "definition": "Us vs competitor first-party page",
+   "industries": "SaaS, services, insurance, telecom",
+   "words": {
+    "min": 1000,
+    "max": 2000
+   },
+   "default_words": 1500,
+   "schema": "WebPage, FAQPage",
+   "required_inputs": "feature matrix, pricing, proof",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "WebPage + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "review_page",
+   "family": "evaluation",
+   "label": "Review",
+   "definition": "In-depth review of one third-party product",
+   "industries": "media, affiliates, marketplaces",
+   "words": {
+    "min": 1500,
+    "max": 3000
+   },
+   "default_words": 2250,
+   "schema": "Review, Product",
+   "required_inputs": "hands-on notes, rubric, pricing",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "Review + Product + BreadcrumbList"
+  },
+  {
+   "type_id": "cost_page",
+   "family": "evaluation",
+   "label": "Cost page",
+   "definition": "How much does X cost",
+   "industries": "trades, legal, healthcare, agencies, real estate, auto, education",
+   "words": {
+    "min": 1200,
+    "max": 2500
+   },
+   "default_words": 1850,
+   "schema": "Article, FAQPage",
+   "required_inputs": "price ranges with factors and sources, own pricing",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "Article + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "is_x_worth_it",
+   "family": "evaluation",
+   "label": "Is-it-worth-it page",
+   "definition": "Value judgement on a purchase or decision",
+   "industries": "consumer and B2B",
+   "words": {
+    "min": 1000,
+    "max": 2000
+   },
+   "default_words": 1500,
+   "schema": "Article, FAQPage",
+   "required_inputs": "costs, benefits, breakeven data",
+   "answer_paragraph": true,
+   "ai_writable": "Y",
+   "default_schema": "Article + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "diy_vs_pro",
+   "family": "evaluation",
+   "label": "DIY-vs-professional page",
+   "definition": "X vs doing it yourself",
+   "industries": "trades, legal, accounting, agencies, home services",
+   "words": {
+    "min": 1000,
+    "max": 2000
+   },
+   "default_words": 1500,
+   "schema": "Article, FAQPage",
+   "required_inputs": "cost, time and risk comparison data",
+   "answer_paragraph": true,
+   "ai_writable": "Y",
+   "default_schema": "Article + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "category_comparison",
+   "family": "evaluation",
+   "label": "Category comparison",
+   "definition": "Types of X compared",
+   "industries": "insurance, finance, materials, health, education",
+   "words": {
+    "min": 1200,
+    "max": 2500
+   },
+   "default_words": 1850,
+   "schema": "Article, ItemList",
+   "required_inputs": "category attributes table",
+   "answer_paragraph": true,
+   "ai_writable": "Y",
+   "default_schema": "Article + ItemList + BreadcrumbList"
+  },
+  {
+   "type_id": "buying_guide",
+   "family": "evaluation",
+   "label": "Buying guide",
+   "definition": "How to choose X, then picks",
+   "industries": "e-commerce, retail, industrial, auto, insurance",
+   "words": {
+    "min": 1500,
+    "max": 3000
+   },
+   "default_words": 2250,
+   "schema": "Article, ItemList, FAQPage",
+   "required_inputs": "criteria, product list, specs, price bands",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "Article + ItemList + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "top_in_location",
+   "family": "evaluation",
+   "label": "Best-in-location list",
+   "definition": "Best X in city",
+   "industries": "marketplaces, directories, travel, local media, real estate",
+   "words": {
+    "min": 1000,
+    "max": 2500
+   },
+   "default_words": 1750,
+   "schema": "ItemList, LocalBusiness",
+   "required_inputs": "verified local entity list, ratings, addresses",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "ItemList + LocalBusiness + BreadcrumbList"
+  },
+  {
+   "type_id": "migration_switch_page",
+   "family": "evaluation",
+   "label": "Migration switch",
+   "definition": "Switching from A to B",
+   "industries": "SaaS, telecom, banks, energy, insurance",
+   "words": {
+    "min": 1000,
+    "max": 2000
+   },
+   "default_words": 1500,
+   "schema": "Article or HowTo, FAQPage",
+   "required_inputs": "migration steps, data mapping, incentives",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "Article + HowTo + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "service_page",
+   "family": "offer",
+   "label": "Service page",
+   "definition": "Core commercial page for one service",
+   "industries": "professional services, agencies, trades, healthcare, legal, logistics",
+   "words": {
+    "min": 800,
+    "max": 2000
+   },
+   "default_words": 1200,
+   "schema": "Service, FAQPage, Organization",
+   "required_inputs": "deliverables, process, pricing model, proof, differentiators",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "Service + Organization + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "solution_use_case_page",
+   "family": "offer",
+   "label": "Solution page",
+   "definition": "Product framed around one job to be done",
+   "industries": "SaaS, fintech, industrial",
+   "words": {
+    "min": 800,
+    "max": 1800
+   },
+   "default_words": 1100,
+   "schema": "WebPage or Service, FAQPage",
+   "required_inputs": "pain points, feature mapping, outcomes, proof",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "Service + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "industry_vertical_page",
+   "family": "offer",
+   "label": "Industry page",
+   "definition": "Product or service framed for one industry",
+   "industries": "SaaS, agencies, insurance, staffing, manufacturing, logistics, telecom",
+   "words": {
+    "min": 800,
+    "max": 1800
+   },
+   "default_words": 1300,
+   "schema": "Service or WebPage, FAQPage",
+   "required_inputs": "industry pains, regulations, proof, vertical vocabulary",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "Service + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "role_persona_page",
+   "family": "offer",
+   "label": "Role page",
+   "definition": "Framed for a job title or persona",
+   "industries": "SaaS, B2B services",
+   "words": {
+    "min": 700,
+    "max": 1500
+   },
+   "default_words": 1100,
+   "schema": "WebPage",
+   "required_inputs": "persona goals and objections, features that matter",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "WebPage + BreadcrumbList"
+  },
+  {
+   "type_id": "segment_size_page",
+   "family": "offer",
+   "label": "Segment page",
+   "definition": "Framed for company size or segment",
+   "industries": "SaaS, fintech, telecom, insurance",
+   "words": {
+    "min": 700,
+    "max": 1500
+   },
+   "default_words": 1100,
+   "schema": "WebPage",
+   "required_inputs": "segment needs, plan mapping, proof",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "WebPage + BreadcrumbList"
+  },
+  {
+   "type_id": "feature_page",
+   "family": "offer",
+   "label": "Feature",
+   "definition": "One product feature explained",
+   "industries": "SaaS, hardware, auto, telecom",
+   "words": {
+    "min": 600,
+    "max": 1500
+   },
+   "default_words": 1050,
+   "schema": "SoftwareApplication or Product, FAQPage",
+   "required_inputs": "feature spec, screenshots, use cases, plan availability",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "SoftwareApplication + Product + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "integration_page",
+   "family": "offer",
+   "label": "Integration",
+   "definition": "Product plus partner integration page",
+   "industries": "SaaS, fintech, e-commerce platforms",
+   "words": {
+    "min": 500,
+    "max": 1200
+   },
+   "default_words": 850,
+   "schema": "SoftwareApplication, HowTo, FAQPage",
+   "required_inputs": "partner data, triggers and actions, setup steps",
+   "answer_paragraph": true,
+   "ai_writable": "Y",
+   "default_schema": "SoftwareApplication + HowTo + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "x_for_y_programmatic",
+   "family": "offer",
+   "label": "X-for-Y page",
+   "definition": "Templated product for segment, place or use",
+   "industries": "SaaS, services, legal-tech, fintech, marketplaces",
+   "words": {
+    "min": 500,
+    "max": 1200
+   },
+   "default_words": 850,
+   "schema": "WebPage or Service, FAQPage",
+   "required_inputs": "at least three page-specific facts, entity data",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "WebPage + Service + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "pricing_page",
+   "family": "offer",
+   "label": "Pricing",
+   "definition": "Plans, tiers, billing FAQ",
+   "industries": "SaaS, telecom, subscriptions, agencies, education",
+   "words": {
+    "min": 400,
+    "max": 1200
+   },
+   "default_words": 800,
+   "schema": "Product, Offer, PriceSpecification, FAQPage",
+   "required_inputs": "plan matrix, prices, limits, add-ons",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "Product + Offer + PriceSpecification + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "product_landing_page",
+   "family": "offer",
+   "label": "Product landing",
+   "definition": "Long-form single-product persuasion page",
+   "industries": "DTC e-commerce, courses, hardware, apps",
+   "words": {
+    "min": 800,
+    "max": 2500
+   },
+   "default_words": 1650,
+   "schema": "Product, Offer, FAQPage",
+   "required_inputs": "benefits, specs, proof, guarantees, objections",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "Product + Offer + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "quote_request_page",
+   "family": "offer",
+   "label": "Quote request",
+   "definition": "Quote or estimate page with form",
+   "industries": "insurance, trades, logistics, manufacturing, printing",
+   "words": {
+    "min": 300,
+    "max": 700
+   },
+   "default_words": 500,
+   "schema": "ContactPage, Service",
+   "required_inputs": "form fields, turnaround, what affects the quote",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "ContactPage + Service + BreadcrumbList"
+  },
+  {
+   "type_id": "brand_page",
+   "family": "offer",
+   "label": "Brand",
+   "definition": "Brand or manufacturer page within a retailer",
+   "industries": "e-commerce, distribution, auto, industrial",
+   "words": {
+    "min": 400,
+    "max": 1000
+   },
+   "default_words": 700,
+   "schema": "Brand, CollectionPage",
+   "required_inputs": "brand facts, product lines, authorised status",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "Brand + CollectionPage + BreadcrumbList"
+  },
+  {
+   "type_id": "partnership_program_page",
+   "family": "offer",
+   "label": "Partnership program",
+   "definition": "Partner, affiliate or reseller program",
+   "industries": "SaaS, telecom, fintech, manufacturing",
+   "words": {
+    "min": 600,
+    "max": 1200
+   },
+   "default_words": 900,
+   "schema": "WebPage, Offer",
+   "required_inputs": "program terms, tiers, benefits",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "WebPage + Offer + BreadcrumbList"
+  },
+  {
+   "type_id": "course_program_page",
+   "family": "offer",
+   "label": "Course program",
+   "definition": "Course, degree or bootcamp",
+   "industries": "education, edtech, training",
+   "words": {
+    "min": 800,
+    "max": 2000
+   },
+   "default_words": 1400,
+   "schema": "Course, CourseInstance, Offer, FAQPage",
+   "required_inputs": "curriculum, duration, outcomes, prerequisites, price, accreditation",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "Course + CourseInstance + Offer + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "membership_plan_page",
+   "family": "offer",
+   "label": "Membership plan",
+   "definition": "Gym, club or subscription plan",
+   "industries": "fitness, media, associations, coworking",
+   "words": {
+    "min": 500,
+    "max": 1200
+   },
+   "default_words": 850,
+   "schema": "Offer, Product",
+   "required_inputs": "plan details, terms",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "Offer + Product + BreadcrumbList"
+  },
+  {
+   "type_id": "financing_page",
+   "family": "offer",
+   "label": "Financing",
+   "definition": "Payment plans and financing",
+   "industries": "auto, trades, dental, furniture, education",
+   "words": {
+    "min": 500,
+    "max": 1000
+   },
+   "default_words": 750,
+   "schema": "WebPage, LoanOrCredit, FAQPage",
+   "required_inputs": "lender terms, APR ranges, eligibility, disclosures",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "WebPage + LoanOrCredit + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "ad_landing_page",
+   "family": "offer",
+   "label": "Ad landing",
+   "definition": "Campaign page, usually noindex, single CTA",
+   "industries": "all",
+   "words": {
+    "min": 300,
+    "max": 1000
+   },
+   "default_words": 650,
+   "schema": "WebPage",
+   "required_inputs": "offer, audience, message match, form",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "WebPage + BreadcrumbList"
+  },
+  {
+   "type_id": "squeeze_lead_magnet_page",
+   "family": "offer",
+   "label": "Squeeze lead magnet",
+   "definition": "Minimal asset-for-contact page",
+   "industries": "all",
+   "words": {
+    "min": 150,
+    "max": 400
+   },
+   "default_words": 300,
+   "schema": "WebPage",
+   "required_inputs": "asset summary, form",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "WebPage + BreadcrumbList"
+  },
+  {
+   "type_id": "pre_launch_waitlist_page",
+   "family": "offer",
+   "label": "Pre launch waitlist",
+   "definition": "Coming soon capture page",
+   "industries": "startups, launches, developments",
+   "words": {
+    "min": 150,
+    "max": 400
+   },
+   "default_words": 300,
+   "schema": "WebPage",
+   "required_inputs": "launch date, teaser",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "WebPage + BreadcrumbList"
+  },
+  {
+   "type_id": "donate_page",
+   "family": "offer",
+   "label": "Donate",
+   "definition": "Donation conversion page",
+   "industries": "nonprofits",
+   "words": {
+    "min": 300,
+    "max": 800
+   },
+   "default_words": 550,
+   "schema": "DonateAction, NGO",
+   "required_inputs": "giving levels, impact per amount, tax status",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "DonateAction + NGO + BreadcrumbList"
+  },
+  {
+   "type_id": "program_page",
+   "family": "offer",
+   "label": "Program",
+   "definition": "Nonprofit program page",
+   "industries": "nonprofits, government-adjacent",
+   "words": {
+    "min": 600,
+    "max": 1500
+   },
+   "default_words": 1050,
+   "schema": "WebPage or Service, NGO",
+   "required_inputs": "goals, beneficiaries, outcomes, funders",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "WebPage + Service + NGO + BreadcrumbList"
+  },
+  {
+   "type_id": "specials_offers_page",
+   "family": "offer",
+   "label": "Specials offers",
+   "definition": "Current promotions",
+   "industries": "auto dealers, retail, restaurants, trades",
+   "words": {
+    "min": 200,
+    "max": 600
+   },
+   "default_words": 400,
+   "schema": "Offer, SpecialAnnouncement",
+   "required_inputs": "offer list with expiry",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "Offer + SpecialAnnouncement + BreadcrumbList"
+  },
+  {
+   "type_id": "case_study",
+   "family": "proof",
+   "label": "Case study",
+   "definition": "One client story",
+   "industries": "B2B services, SaaS, agencies, manufacturing, construction",
+   "words": {
+    "min": 800,
+    "max": 1800
+   },
+   "default_words": 900,
+   "schema": "Article, Organization",
+   "required_inputs": "client facts, metrics, quotes, permission status",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "Article + CaseStudy + BreadcrumbList"
+  },
+  {
+   "type_id": "case_results_page",
+   "family": "proof",
+   "label": "Case results",
+   "definition": "Verdicts and settlements list",
+   "industries": "legal",
+   "words": {
+    "min": 400,
+    "max": 1200
+   },
+   "default_words": 800,
+   "schema": "ItemList, WebPage",
+   "required_inputs": "results with dates, disclaimer",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "ItemList + WebPage + BreadcrumbList"
+  },
+  {
+   "type_id": "testimonials_reviews_page",
+   "family": "proof",
+   "label": "Testimonials reviews",
+   "definition": "Aggregated reviews",
+   "industries": "all local and services",
+   "words": {
+    "min": 400,
+    "max": 1200
+   },
+   "default_words": 800,
+   "schema": "Review, AggregateRating, Organization",
+   "required_inputs": "verified review text, ratings source",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "Review + AggregateRating + Organization + BreadcrumbList"
+  },
+  {
+   "type_id": "portfolio_project_page",
+   "family": "proof",
+   "label": "Portfolio project",
+   "definition": "One completed project",
+   "industries": "construction, architecture, agencies, interiors, landscaping",
+   "words": {
+    "min": 400,
+    "max": 1000
+   },
+   "default_words": 700,
+   "schema": "CreativeWork, Article, Place",
+   "required_inputs": "project facts, location, photos, scope",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "CreativeWork + Article + Place + BreadcrumbList"
+  },
+  {
+   "type_id": "impact_report_page",
+   "family": "proof",
+   "label": "Impact report",
+   "definition": "Annual impact summary",
+   "industries": "nonprofits, ESG, energy",
+   "words": {
+    "min": 1000,
+    "max": 2500
+   },
+   "default_words": 1750,
+   "schema": "Report, Article",
+   "required_inputs": "outcome metrics, financials, stories",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "Report + Article + BreadcrumbList"
+  },
+  {
+   "type_id": "awards_certifications_page",
+   "family": "proof",
+   "label": "Awards certifications",
+   "definition": "Credentials and accreditations",
+   "industries": "manufacturing, healthcare, legal, finance, trades, logistics",
+   "words": {
+    "min": 300,
+    "max": 800
+   },
+   "default_words": 550,
+   "schema": "Organization, ItemList",
+   "required_inputs": "credential list with issuing bodies",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "Organization + ItemList + BreadcrumbList"
+  },
+  {
+   "type_id": "customer_logos_wall",
+   "family": "proof",
+   "label": "Customer logos wall",
+   "definition": "Trusted-by index",
+   "industries": "SaaS, agencies",
+   "words": {
+    "min": 100,
+    "max": 400
+   },
+   "default_words": 250,
+   "schema": "Organization",
+   "required_inputs": "logo list",
+   "answer_paragraph": false,
+   "ai_writable": "N",
+   "default_schema": "Organization"
+  },
+  {
+   "type_id": "about_page",
+   "family": "entity",
+   "label": "About",
+   "definition": "Company story, mission, facts",
+   "industries": "all",
+   "words": {
+    "min": 500,
+    "max": 1200
+   },
+   "default_words": 850,
+   "schema": "AboutPage, Organization",
+   "required_inputs": "founding facts, team size, locations, values",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "AboutPage + Organization + BreadcrumbList"
+  },
+  {
+   "type_id": "team_index",
+   "family": "entity",
+   "label": "Team index",
+   "definition": "Team directory",
+   "industries": "services, healthcare, legal, agencies",
+   "words": {
+    "min": 200,
+    "max": 500
+   },
+   "default_words": 350,
+   "schema": "CollectionPage, Person list",
+   "required_inputs": "roster",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "CollectionPage + Person + BreadcrumbList"
+  },
+  {
+   "type_id": "team_member_bio",
+   "family": "entity",
+   "label": "Team member bio",
+   "definition": "Individual staff profile",
+   "industries": "services, agencies, law, finance",
+   "words": {
+    "min": 300,
+    "max": 800
+   },
+   "default_words": 550,
+   "schema": "ProfilePage, Person",
+   "required_inputs": "CV facts, credentials",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "ProfilePage + Person + BreadcrumbList"
+  },
+  {
+   "type_id": "author_bio_page",
+   "family": "entity",
+   "label": "Author page",
+   "definition": "Author page for bylines",
+   "industries": "media, health, finance, SaaS blogs",
+   "words": {
+    "min": 300,
+    "max": 800
+   },
+   "default_words": 1400,
+   "schema": "ProfilePage, Person",
+   "required_inputs": "credentials, sameAs, published articles",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "Person + ProfilePage + BreadcrumbList"
+  },
+  {
+   "type_id": "attorney_bio",
+   "family": "entity",
+   "label": "Attorney bio",
+   "definition": "Lawyer profile",
+   "industries": "legal",
+   "words": {
+    "min": 500,
+    "max": 1200
+   },
+   "default_words": 850,
+   "schema": "ProfilePage, Person",
+   "required_inputs": "admissions, education, results with disclaimer",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "ProfilePage + Person + BreadcrumbList"
+  },
+  {
+   "type_id": "provider_profile",
+   "family": "entity",
+   "label": "Provider profile",
+   "definition": "Clinician profile",
+   "industries": "healthcare, dental, veterinary, therapy",
+   "words": {
+    "min": 400,
+    "max": 1000
+   },
+   "default_words": 700,
+   "schema": "ProfilePage, Physician, MedicalOrganization",
+   "required_inputs": "specialties, board certs, insurances, locations, NPI",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "ProfilePage + Physician + MedicalOrganization + BreadcrumbList"
+  },
+  {
+   "type_id": "agent_profile",
+   "family": "entity",
+   "label": "Agent profile",
+   "definition": "Real estate or insurance agent",
+   "industries": "real estate, insurance, finance",
+   "words": {
+    "min": 400,
+    "max": 900
+   },
+   "default_words": 650,
+   "schema": "ProfilePage, RealEstateAgent",
+   "required_inputs": "licence number, areas, listings, reviews",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "ProfilePage + RealEstateAgent + BreadcrumbList"
+  },
+  {
+   "type_id": "partner_vendor_profile",
+   "family": "entity",
+   "label": "Partner vendor profile",
+   "definition": "Partner or vendor listing",
+   "industries": "marketplaces, partner programs, directories",
+   "words": {
+    "min": 300,
+    "max": 800
+   },
+   "default_words": 550,
+   "schema": "ProfilePage, Organization",
+   "required_inputs": "partner data, services, ratings",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "ProfilePage + Organization + BreadcrumbList"
+  },
+  {
+   "type_id": "company_facts_page",
+   "family": "entity",
+   "label": "Company facts",
+   "definition": "Programmatic company profile",
+   "industries": "data sites, recruiting, fintech",
+   "words": {
+    "min": 300,
+    "max": 800
+   },
+   "default_words": 550,
+   "schema": "Organization, ProfilePage",
+   "required_inputs": "structured company record",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "Organization + ProfilePage + BreadcrumbList"
+  },
+  {
+   "type_id": "press_room",
+   "family": "entity",
+   "label": "Press room",
+   "definition": "Media kit and releases index",
+   "industries": "mid and large companies, nonprofits",
+   "words": {
+    "min": 200,
+    "max": 500
+   },
+   "default_words": 350,
+   "schema": "CollectionPage, Organization",
+   "required_inputs": "press contact, assets",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "CollectionPage + Organization + BreadcrumbList"
+  },
+  {
+   "type_id": "press_release_news",
+   "family": "entity",
+   "label": "Press release news",
+   "definition": "Single press release",
+   "industries": "all",
+   "words": {
+    "min": 400,
+    "max": 900
+   },
+   "default_words": 650,
+   "schema": "NewsArticle",
+   "required_inputs": "facts, quotes, boilerplate, date",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "NewsArticle + BreadcrumbList"
+  },
+  {
+   "type_id": "calculator_page",
+   "family": "tool",
+   "label": "Calculator",
+   "definition": "Calculator with explanatory copy",
+   "industries": "fintech, real estate, SaaS, health, logistics, HR, energy",
+   "words": {
+    "min": 500,
+    "max": 1500
+   },
+   "default_words": 1000,
+   "schema": "WebApplication, HowTo, FAQPage",
+   "required_inputs": "formula or assumptions, inputs, interpretation ranges",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "WebApplication + HowTo + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "quiz_assessment_page",
+   "family": "tool",
+   "label": "Quiz assessment",
+   "definition": "Self-assessment or eligibility quiz",
+   "industries": "healthcare, education, insurance, SaaS",
+   "words": {
+    "min": 300,
+    "max": 1000
+   },
+   "default_words": 650,
+   "schema": "WebApplication, Quiz",
+   "required_inputs": "question logic, result descriptions",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "WebApplication + Quiz + BreadcrumbList"
+  },
+  {
+   "type_id": "configurator_estimator",
+   "family": "tool",
+   "label": "Configurator estimator",
+   "definition": "Configurator or instant estimate",
+   "industries": "manufacturing, construction, auto, printing",
+   "words": {
+    "min": 300,
+    "max": 800
+   },
+   "default_words": 550,
+   "schema": "WebApplication, Product",
+   "required_inputs": "option data, pricing rules",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "WebApplication + Product + BreadcrumbList"
+  },
+  {
+   "type_id": "generator_checker_tool",
+   "family": "tool",
+   "label": "Generator checker tool",
+   "definition": "Free utility",
+   "industries": "SaaS, marketing, legal-tech",
+   "words": {
+    "min": 500,
+    "max": 1200
+   },
+   "default_words": 850,
+   "schema": "WebApplication, FAQPage",
+   "required_inputs": "tool purpose, limits",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "WebApplication + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "interactive_map_finder",
+   "family": "tool",
+   "label": "Locator page",
+   "definition": "Store or provider locator",
+   "industries": "retail, healthcare, auto, telecom, banks",
+   "words": {
+    "min": 100,
+    "max": 400
+   },
+   "default_words": 250,
+   "schema": "WebApplication, ItemList",
+   "required_inputs": "location dataset",
+   "answer_paragraph": false,
+   "ai_writable": "N",
+   "default_schema": "WebApplication + ItemList"
+  },
+  {
+   "type_id": "research_report",
+   "family": "asset",
+   "label": "Research report",
+   "definition": "Original research findings",
+   "industries": "B2B, SaaS, agencies, HR, fintech, industry bodies",
+   "words": {
+    "min": 2000,
+    "max": 6000
+   },
+   "default_words": 2200,
+   "schema": "Report, Dataset, Article",
+   "required_inputs": "methodology, sample, findings, charts, author",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "Article + Dataset + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "whitepaper_ebook_gate",
+   "family": "asset",
+   "label": "Whitepaper or ebook gate",
+   "definition": "Gated asset landing page",
+   "industries": "B2B, SaaS, finance, industrial",
+   "words": {
+    "min": 300,
+    "max": 800
+   },
+   "default_words": 550,
+   "schema": "DigitalDocument, WebPage",
+   "required_inputs": "asset outline, takeaways, form",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "DigitalDocument + WebPage + BreadcrumbList"
+  },
+  {
+   "type_id": "template_example_page",
+   "family": "asset",
+   "label": "Template example",
+   "definition": "Downloadable or copyable template",
+   "industries": "SaaS, HR, legal-tech, finance, agencies",
+   "words": {
+    "min": 600,
+    "max": 1500
+   },
+   "default_words": 1050,
+   "schema": "CreativeWork, HowTo",
+   "required_inputs": "template file, fields explained",
+   "answer_paragraph": true,
+   "ai_writable": "Y",
+   "default_schema": "CreativeWork + HowTo + BreadcrumbList"
+  },
+  {
+   "type_id": "webinar_page",
+   "family": "asset",
+   "label": "Webinar",
+   "definition": "Registration or on-demand webinar",
+   "industries": "SaaS, B2B, education, healthcare CE",
+   "words": {
+    "min": 300,
+    "max": 800
+   },
+   "default_words": 550,
+   "schema": "Event or VideoObject",
+   "required_inputs": "speakers, agenda, date, replay",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "Event + VideoObject + BreadcrumbList"
+  },
+  {
+   "type_id": "video_page",
+   "family": "asset",
+   "label": "Video",
+   "definition": "Single video with transcript",
+   "industries": "media, SaaS, education, health",
+   "words": {
+    "min": 300,
+    "max": 1500
+   },
+   "default_words": 900,
+   "schema": "VideoObject, Article",
+   "required_inputs": "transcript, chapters",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "VideoObject + Article + BreadcrumbList"
+  },
+  {
+   "type_id": "podcast_episode_page",
+   "family": "asset",
+   "label": "Podcast episode",
+   "definition": "Episode page with show notes",
+   "industries": "media, B2B",
+   "words": {
+    "min": 400,
+    "max": 1200
+   },
+   "default_words": 800,
+   "schema": "PodcastEpisode",
+   "required_inputs": "transcript or notes, guests",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "PodcastEpisode + BreadcrumbList"
+  },
+  {
+   "type_id": "infographic_data_viz_page",
+   "family": "asset",
+   "label": "Infographic page",
+   "definition": "Infographic host page",
+   "industries": "marketing, health, finance, nonprofits",
+   "words": {
+    "min": 400,
+    "max": 1000
+   },
+   "default_words": 700,
+   "schema": "ImageObject, Article",
+   "required_inputs": "image, data sources",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "ImageObject + Article + BreadcrumbList"
+  },
+  {
+   "type_id": "original_dataset_page",
+   "family": "asset",
+   "label": "Original dataset",
+   "definition": "Public dataset or index page",
+   "industries": "fintech, HR, proptech, energy, logistics",
+   "words": {
+    "min": 800,
+    "max": 2500
+   },
+   "default_words": 1650,
+   "schema": "Dataset, Report",
+   "required_inputs": "data, methodology, update cadence",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "Dataset + Report + BreadcrumbList"
+  },
+  {
+   "type_id": "location_page",
+   "family": "local",
+   "label": "Location",
+   "definition": "Physical branch, office, clinic or store",
+   "industries": "healthcare, legal, retail, banks, dealerships, agencies",
+   "words": {
+    "min": 500,
+    "max": 1200
+   },
+   "default_words": 850,
+   "schema": "LocalBusiness subtype, Place, FAQPage",
+   "required_inputs": "NAP, hours, staff, services here, parking, reviews",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "LocalBusiness + Place + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "service_area_city_page",
+   "family": "local",
+   "label": "Service-area city page",
+   "definition": "Service delivered in a city without premises",
+   "industries": "trades, home services, cleaning, movers, IT support",
+   "words": {
+    "min": 500,
+    "max": 1200
+   },
+   "default_words": 850,
+   "schema": "Service with areaServed, LocalBusiness, FAQPage",
+   "required_inputs": "local proof, local facts (codes, climate, permits), response time",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "Service + LocalBusiness + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "service_plus_location_page",
+   "family": "local",
+   "label": "Service-in-location page",
+   "definition": "One service in one place",
+   "industries": "trades, legal, healthcare, staffing",
+   "words": {
+    "min": 600,
+    "max": 1200
+   },
+   "default_words": 900,
+   "schema": "Service, LocalBusiness, FAQPage",
+   "required_inputs": "as above plus service-specific local factors",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "Service + LocalBusiness + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "neighborhood_area_guide",
+   "family": "local",
+   "label": "Area guide",
+   "definition": "Area guide with market data",
+   "industries": "real estate, relocation, hospitality",
+   "words": {
+    "min": 1000,
+    "max": 2500
+   },
+   "default_words": 1750,
+   "schema": "Place, Article, FAQPage",
+   "required_inputs": "market stats, schools, amenities, listings",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "Place + Article + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "practice_location_legal",
+   "family": "local",
+   "label": "Practice area by location",
+   "definition": "Practice area in a jurisdiction",
+   "industries": "legal",
+   "words": {
+    "min": 800,
+    "max": 1500
+   },
+   "default_words": 1150,
+   "schema": "LegalService, Attorney, FAQPage",
+   "required_inputs": "local courts, statutes, deadlines, results, bar disclaimers",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "LegalService + Attorney + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "branch_page_staffing",
+   "family": "local",
+   "label": "Branch staffing",
+   "definition": "Recruiting branch or market page",
+   "industries": "staffing, banks, insurance",
+   "words": {
+    "min": 500,
+    "max": 1000
+   },
+   "default_words": 750,
+   "schema": "LocalBusiness, FAQPage",
+   "required_inputs": "local market data, roles, team",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "LocalBusiness + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "dealer_local_hub",
+   "family": "local",
+   "label": "Dealer local hub",
+   "definition": "City inventory hub for a dealership",
+   "industries": "automotive",
+   "words": {
+    "min": 300,
+    "max": 800
+   },
+   "default_words": 550,
+   "schema": "AutoDealer, ItemList",
+   "required_inputs": "inventory feed, local facts",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "AutoDealer + ItemList + BreadcrumbList"
+  },
+  {
+   "type_id": "regional_country_landing",
+   "family": "local",
+   "label": "Regional country landing",
+   "definition": "Country or region landing",
+   "industries": "SaaS, fintech, telecom, travel, logistics",
+   "words": {
+    "min": 500,
+    "max": 1200
+   },
+   "default_words": 850,
+   "schema": "WebPage, Organization",
+   "required_inputs": "local pricing, currency, compliance, support hours",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "WebPage + Organization + BreadcrumbList"
+  },
+  {
+   "type_id": "product_page",
+   "family": "catalogue",
+   "label": "Product",
+   "definition": "Single product",
+   "industries": "e-commerce, retail, industrial, food",
+   "words": {
+    "min": 300,
+    "max": 1200
+   },
+   "default_words": 750,
+   "schema": "Product, Offer, AggregateRating, BreadcrumbList",
+   "required_inputs": "specs, variants, price, stock, images, reviews, compliance labels",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "Product + Offer + AggregateRating + BreadcrumbList"
+  },
+  {
+   "type_id": "product_category_page",
+   "family": "catalogue",
+   "label": "Product category",
+   "definition": "Category with editorial copy",
+   "industries": "e-commerce, retail, distribution",
+   "words": {
+    "min": 200,
+    "max": 800
+   },
+   "default_words": 500,
+   "schema": "CollectionPage, ItemList",
+   "required_inputs": "product feed, subcategories, buying tips",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "CollectionPage + ItemList + BreadcrumbList"
+  },
+  {
+   "type_id": "collection_curated_page",
+   "family": "catalogue",
+   "label": "Collection curated",
+   "definition": "Themed collection",
+   "industries": "e-commerce, retail, travel",
+   "words": {
+    "min": 200,
+    "max": 600
+   },
+   "default_words": 400,
+   "schema": "CollectionPage, ItemList",
+   "required_inputs": "selection rule, theme",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "CollectionPage + ItemList + BreadcrumbList"
+  },
+  {
+   "type_id": "intermediary_category_page",
+   "family": "catalogue",
+   "label": "Intermediary category",
+   "definition": "Parent category routing to subcategories",
+   "industries": "e-commerce, industrial",
+   "words": {
+    "min": 200,
+    "max": 500
+   },
+   "default_words": 350,
+   "schema": "CollectionPage",
+   "required_inputs": "subcategory list",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "CollectionPage + BreadcrumbList"
+  },
+  {
+   "type_id": "listing_detail_page",
+   "family": "catalogue",
+   "label": "Listing detail",
+   "definition": "Single listing (property, vehicle, rental)",
+   "industries": "real estate, auto, marketplaces, travel",
+   "words": {
+    "min": 300,
+    "max": 900
+   },
+   "default_words": 600,
+   "schema": "RealEstateListing, Vehicle, Offer, Accommodation",
+   "required_inputs": "listing record, photos, features, price",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "RealEstateListing + Vehicle + Offer + Accommodation + BreadcrumbList"
+  },
+  {
+   "type_id": "search_results_listing_page",
+   "family": "catalogue",
+   "label": "Search results listing",
+   "definition": "Filtered listing grid",
+   "industries": "real estate, auto, marketplaces, jobs",
+   "words": {
+    "min": 100,
+    "max": 400
+   },
+   "default_words": 250,
+   "schema": "SearchResultsPage or CollectionPage",
+   "required_inputs": "filter definitions, feed",
+   "answer_paragraph": false,
+   "ai_writable": "N",
+   "default_schema": "SearchResultsPage + CollectionPage"
+  },
+  {
+   "type_id": "model_research_page",
+   "family": "catalogue",
+   "label": "Model research",
+   "definition": "Hand-written page for a vehicle model or product line",
+   "industries": "automotive, appliances, electronics",
+   "words": {
+    "min": 800,
+    "max": 1800
+   },
+   "default_words": 1300,
+   "schema": "Product or Vehicle, FAQPage",
+   "required_inputs": "trims, specs, pricing, inventory link",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "Product + Vehicle + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "job_posting_page",
+   "family": "catalogue",
+   "label": "Job posting",
+   "definition": "Single vacancy",
+   "industries": "recruiting, all employers",
+   "words": {
+    "min": 400,
+    "max": 900
+   },
+   "default_words": 650,
+   "schema": "JobPosting",
+   "required_inputs": "role, salary, location, employer, deadline",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "JobPosting + BreadcrumbList"
+  },
+  {
+   "type_id": "job_category_page",
+   "family": "catalogue",
+   "label": "Job category",
+   "definition": "Jobs by role, industry or location",
+   "industries": "recruiting, marketplaces",
+   "words": {
+    "min": 200,
+    "max": 600
+   },
+   "default_words": 400,
+   "schema": "CollectionPage, ItemList",
+   "required_inputs": "job feed, market notes",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "CollectionPage + ItemList + BreadcrumbList"
+  },
+  {
+   "type_id": "careers_page",
+   "family": "catalogue",
+   "label": "Careers",
+   "definition": "Employer branding and open roles",
+   "industries": "all employers",
+   "words": {
+    "min": 500,
+    "max": 1200
+   },
+   "default_words": 850,
+   "schema": "WebPage, Organization",
+   "required_inputs": "culture, benefits, hiring process",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "WebPage + Organization + BreadcrumbList"
+  },
+  {
+   "type_id": "event_page",
+   "family": "catalogue",
+   "label": "Event",
+   "definition": "Single event or class",
+   "industries": "education, nonprofits, hospitality, B2B, arts",
+   "words": {
+    "min": 300,
+    "max": 900
+   },
+   "default_words": 600,
+   "schema": "Event, Offer, Place",
+   "required_inputs": "date, venue, agenda, tickets, speakers",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "Event + Offer + Place + BreadcrumbList"
+  },
+  {
+   "type_id": "recipe_page",
+   "family": "catalogue",
+   "label": "Recipe",
+   "definition": "Recipe",
+   "industries": "food, media, hospitality, appliance brands",
+   "words": {
+    "min": 600,
+    "max": 1500
+   },
+   "default_words": 1050,
+   "schema": "Recipe, HowTo, VideoObject",
+   "required_inputs": "ingredients, steps, times, nutrition, yield",
+   "answer_paragraph": true,
+   "ai_writable": "Y",
+   "default_schema": "Recipe + HowTo + VideoObject + BreadcrumbList"
+  },
+  {
+   "type_id": "menu_page",
+   "family": "catalogue",
+   "label": "Menu",
+   "definition": "Restaurant menu as HTML",
+   "industries": "hospitality",
+   "words": {
+    "min": 200,
+    "max": 800
+   },
+   "default_words": 500,
+   "schema": "Menu, MenuSection, MenuItem",
+   "required_inputs": "menu data, allergens, prices",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "Menu + MenuSection + MenuItem + BreadcrumbList"
+  },
+  {
+   "type_id": "accommodation_room_page",
+   "family": "catalogue",
+   "label": "Accommodation room",
+   "definition": "Hotel room or property type",
+   "industries": "hospitality, travel",
+   "words": {
+    "min": 300,
+    "max": 800
+   },
+   "default_words": 550,
+   "schema": "Accommodation, HotelRoom, Offer",
+   "required_inputs": "room facts, amenities, rates",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "Accommodation + HotelRoom + Offer + BreadcrumbList"
+  },
+  {
+   "type_id": "tour_package_page",
+   "family": "catalogue",
+   "label": "Tour package",
+   "definition": "Tour or itinerary",
+   "industries": "travel",
+   "words": {
+    "min": 800,
+    "max": 2000
+   },
+   "default_words": 1400,
+   "schema": "TouristTrip, Offer, FAQPage",
+   "required_inputs": "itinerary, inclusions, price, dates",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "TouristTrip + Offer + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "app_marketplace_listing",
+   "family": "catalogue",
+   "label": "App marketplace listing",
+   "definition": "App or plugin listing",
+   "industries": "SaaS platforms, marketplaces",
+   "words": {
+    "min": 300,
+    "max": 800
+   },
+   "default_words": 550,
+   "schema": "SoftwareApplication, Offer",
+   "required_inputs": "app data, screenshots, pricing",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "SoftwareApplication + Offer + BreadcrumbList"
+  },
+  {
+   "type_id": "material_capability_page",
+   "family": "catalogue",
+   "label": "Capability or material page",
+   "definition": "Manufacturing capability or material",
+   "industries": "manufacturing, industrial, construction materials",
+   "words": {
+    "min": 800,
+    "max": 1800
+   },
+   "default_words": 1300,
+   "schema": "Service or Product, FAQPage",
+   "required_inputs": "tolerances, equipment, materials, certs, lead times, MOQ",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "Service + Product + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "application_page_industrial",
+   "family": "catalogue",
+   "label": "Industrial application page",
+   "definition": "Industrial use-case page",
+   "industries": "manufacturing, energy, telecom, logistics",
+   "words": {
+    "min": 700,
+    "max": 1500
+   },
+   "default_words": 1100,
+   "schema": "Service or Product, FAQPage",
+   "required_inputs": "application requirements, relevant products, compliance",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "Service + Product + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "condition_page",
+   "family": "catalogue",
+   "label": "Condition",
+   "definition": "Medical condition overview",
+   "industries": "healthcare, dental, veterinary, mental health",
+   "words": {
+    "min": 1000,
+    "max": 2500
+   },
+   "default_words": 1750,
+   "schema": "MedicalWebPage, MedicalCondition, FAQPage",
+   "required_inputs": "clinical facts with sources, reviewer, when to seek care",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "MedicalWebPage + MedicalCondition + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "treatment_procedure_page",
+   "family": "catalogue",
+   "label": "Treatment procedure",
+   "definition": "Treatment or procedure",
+   "industries": "healthcare, dental, cosmetic, physio, vet",
+   "words": {
+    "min": 1000,
+    "max": 2000
+   },
+   "default_words": 1500,
+   "schema": "MedicalWebPage, MedicalProcedure, FAQPage",
+   "required_inputs": "clinical facts, provider, costs, insurance, reviewer",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "MedicalWebPage + MedicalProcedure + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "drug_medication_page",
+   "family": "catalogue",
+   "label": "Drug medication",
+   "definition": "Medication reference",
+   "industries": "pharma, pharmacies, health publishers",
+   "words": {
+    "min": 1000,
+    "max": 2000
+   },
+   "default_words": 1500,
+   "schema": "MedicalWebPage, Drug",
+   "required_inputs": "dosage, interactions, sources, reviewer",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "MedicalWebPage + Drug + BreadcrumbList"
+  },
+  {
+   "type_id": "practice_area_page",
+   "family": "catalogue",
+   "label": "Practice area",
+   "definition": "Legal practice area",
+   "industries": "legal",
+   "words": {
+    "min": 1500,
+    "max": 2500
+   },
+   "default_words": 2000,
+   "schema": "LegalService, FAQPage, Attorney",
+   "required_inputs": "statutes, process, deadlines, results with disclaimer, attorneys",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "LegalService + FAQPage + Attorney + BreadcrumbList"
+  },
+  {
+   "type_id": "coverage_line_page",
+   "family": "catalogue",
+   "label": "Coverage line",
+   "definition": "Insurance line",
+   "industries": "insurance",
+   "words": {
+    "min": 800,
+    "max": 1800
+   },
+   "default_words": 1300,
+   "schema": "Service, InsuranceAgency, FAQPage",
+   "required_inputs": "coverage scope, exclusions, deductibles, state availability",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "Service + InsuranceAgency + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "financial_product_page",
+   "family": "catalogue",
+   "label": "Financial product",
+   "definition": "Loan, card, account or fund",
+   "industries": "banks, fintech, lenders, investment",
+   "words": {
+    "min": 600,
+    "max": 1500
+   },
+   "default_words": 1050,
+   "schema": "FinancialProduct subtypes, Offer, FAQPage",
+   "required_inputs": "rates, fees, eligibility, representative example, risk warnings",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "FinancialProduct + Offer + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "plan_tariff_page",
+   "family": "catalogue",
+   "label": "Plan tariff",
+   "definition": "Telecom, energy or utility plan",
+   "industries": "telecom, energy, utilities",
+   "words": {
+    "min": 500,
+    "max": 1200
+   },
+   "default_words": 850,
+   "schema": "Offer or Product, FAQPage",
+   "required_inputs": "tariff data, contract terms, regulated disclosures",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "Offer + Product + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "route_lane_page",
+   "family": "catalogue",
+   "label": "Route lane",
+   "definition": "Shipping route or corridor",
+   "industries": "logistics, freight, travel",
+   "words": {
+    "min": 500,
+    "max": 1200
+   },
+   "default_words": 850,
+   "schema": "Service, FAQPage",
+   "required_inputs": "transit times, ports, pricing factors, customs notes",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "Service + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "documentation_article",
+   "family": "ops",
+   "label": "Documentation article",
+   "definition": "Product docs page",
+   "industries": "SaaS, hardware, dev tools",
+   "words": {
+    "min": 300,
+    "max": 1500
+   },
+   "default_words": 900,
+   "schema": "TechArticle",
+   "required_inputs": "exact product behaviour, screenshots, versions",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "TechArticle + BreadcrumbList"
+  },
+  {
+   "type_id": "help_center_article",
+   "family": "ops",
+   "label": "Help center article",
+   "definition": "Support article",
+   "industries": "SaaS, e-commerce, telecom, banks",
+   "words": {
+    "min": 200,
+    "max": 800
+   },
+   "default_words": 500,
+   "schema": "TechArticle, FAQPage",
+   "required_inputs": "verified procedure",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "TechArticle + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "changelog_release_notes",
+   "family": "ops",
+   "label": "Changelog release notes",
+   "definition": "Dated product changes",
+   "industries": "SaaS, hardware, apps",
+   "words": {
+    "min": 100,
+    "max": 600
+   },
+   "default_words": 350,
+   "schema": "SoftwareApplication, Article",
+   "required_inputs": "change list from engineering",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "SoftwareApplication + Article + BreadcrumbList"
+  },
+  {
+   "type_id": "api_reference",
+   "family": "ops",
+   "label": "API reference",
+   "definition": "Endpoint or SDK reference",
+   "industries": "dev tools, fintech, SaaS",
+   "words": {
+    "min": 200,
+    "max": 1000
+   },
+   "default_words": 600,
+   "schema": "TechArticle",
+   "required_inputs": "generated from spec",
+   "answer_paragraph": false,
+   "ai_writable": "N",
+   "default_schema": "TechArticle"
+  },
+  {
+   "type_id": "community_forum_thread",
+   "family": "ops",
+   "label": "Community forum thread",
+   "definition": "User discussion",
+   "industries": "SaaS, hobbies, marketplaces",
+   "words": null,
+   "default_words": null,
+   "schema": "QAPage, DiscussionForumPosting",
+   "required_inputs": "UGC",
+   "answer_paragraph": false,
+   "ai_writable": "N",
+   "default_schema": "QAPage + DiscussionForumPosting"
+  },
+  {
+   "type_id": "contact_page",
+   "family": "ops",
+   "label": "Contact",
+   "definition": "Contact details and form",
+   "industries": "all",
+   "words": {
+    "min": 100,
+    "max": 400
+   },
+   "default_words": 250,
+   "schema": "ContactPage, Organization",
+   "required_inputs": "NAP, hours, channels",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "ContactPage + Organization + BreadcrumbList"
+  },
+  {
+   "type_id": "thank_you_page",
+   "family": "ops",
+   "label": "Thank you",
+   "definition": "Post-conversion confirmation",
+   "industries": "all",
+   "words": {
+    "min": 100,
+    "max": 300
+   },
+   "default_words": 200,
+   "schema": "WebPage",
+   "required_inputs": "next steps, secondary offer",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "WebPage + BreadcrumbList"
+  },
+  {
+   "type_id": "legal_policy_page",
+   "family": "ops",
+   "label": "Legal policy",
+   "definition": "Privacy, terms, cookies, accessibility",
+   "industries": "all",
+   "words": {
+    "min": 800,
+    "max": 3000
+   },
+   "default_words": 1900,
+   "schema": "WebPage",
+   "required_inputs": "legal review required",
+   "answer_paragraph": false,
+   "ai_writable": "N",
+   "default_schema": "WebPage"
+  },
+  {
+   "type_id": "claims_how_to_file_page",
+   "family": "ops",
+   "label": "Claims how to file",
+   "definition": "Claims process",
+   "industries": "insurance, warranties, logistics",
+   "words": {
+    "min": 500,
+    "max": 1200
+   },
+   "default_words": 850,
+   "schema": "HowTo, FAQPage",
+   "required_inputs": "process steps, contacts, timelines",
+   "answer_paragraph": true,
+   "ai_writable": "P",
+   "default_schema": "HowTo + FAQPage + BreadcrumbList"
+  },
+  {
+   "type_id": "patient_forms_prep_page",
+   "family": "ops",
+   "label": "Patient forms prep",
+   "definition": "Pre-visit instructions",
+   "industries": "healthcare, dental",
+   "words": {
+    "min": 300,
+    "max": 800
+   },
+   "default_words": 550,
+   "schema": "WebPage, HowTo",
+   "required_inputs": "form links, instructions",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "WebPage + HowTo + BreadcrumbList"
+  },
+  {
+   "type_id": "sitemap_html",
+   "family": "ops",
+   "label": "HTML sitemap",
+   "definition": "HTML sitemap",
+   "industries": "all",
+   "words": null,
+   "default_words": null,
+   "schema": "WebPage",
+   "required_inputs": "URL list",
+   "answer_paragraph": false,
+   "ai_writable": "N",
+   "default_schema": "WebPage"
+  },
+  {
+   "type_id": "login_account_cart_checkout",
+   "family": "ops",
+   "label": "Login, account, cart, checkout",
+   "definition": "Auth and transactional pages",
+   "industries": "e-commerce, SaaS",
+   "words": null,
+   "default_words": null,
+   "schema": "WebPage",
+   "required_inputs": "n/a",
+   "answer_paragraph": false,
+   "ai_writable": "N",
+   "default_schema": "WebPage"
+  },
+  {
+   "type_id": "search_results_internal",
+   "family": "ops",
+   "label": "Search results internal",
+   "definition": "Site search results",
+   "industries": "all",
+   "words": null,
+   "default_words": null,
+   "schema": "SearchResultsPage",
+   "required_inputs": "n/a",
+   "answer_paragraph": false,
+   "ai_writable": "N",
+   "default_schema": "SearchResultsPage"
+  },
+  {
+   "type_id": "error_404_page",
+   "family": "ops",
+   "label": "404 page",
+   "definition": "Not-found page",
+   "industries": "all",
+   "words": {
+    "min": 50,
+    "max": 150
+   },
+   "default_words": 100,
+   "schema": "WebPage",
+   "required_inputs": "top links",
+   "answer_paragraph": false,
+   "ai_writable": "Y",
+   "default_schema": "WebPage + BreadcrumbList"
+  },
+  {
+   "type_id": "homepage",
+   "family": "ops",
+   "label": "Homepage",
+   "definition": "Site home",
+   "industries": "all",
+   "words": {
+    "min": 300,
+    "max": 1000
+   },
+   "default_words": 650,
+   "schema": "WebSite, Organization",
+   "required_inputs": "positioning, key links, proof",
+   "answer_paragraph": false,
+   "ai_writable": "P",
+   "default_schema": "WebSite + Organization + BreadcrumbList"
+  }
+ ]
+}

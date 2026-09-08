@@ -1,0 +1,69 @@
+{
+  "sections": [
+    {"title": "1. WHAT THIS IS", "rows": [
+      ["The plan", "A complete content architecture to make <domain> the most authoritative site in <category>, in <languages>."],
+      ["Scale", "<n> pillars, <pages> <primary-language> pages, <localised> localised pages. <total> URLs."],
+      ["Scope", "The whole: service pages, industry pages, author pages, a <n>-term glossary, and more."]]},
+    {"title": "2. ARGUMENT", "rows": [
+      ["Demand is tiny and expensive (or: where the demand is)", "Three measured examples with volume and CPC from this run."],
+      ["Coverage plus citation", "Own several hundred qualified long-tail terms and be the source answer engines quote. State AI Overview presence found on the commercial queries checked."],
+      ["The category is undefended", "What the site audit and SERP pulls showed about competitors: who holds page one, what they cannot do."],
+      ["Set expectations early", "Traffic looks disappointing for three to six months. Keyword coverage, citation share and conversions are the metrics that matter."]]},
+    {"title": "3. RESEARCH", "rows": [
+      ["The rule", "Every pillar is anchored to something the client sells, qualified by the industry it sells into."],
+      ["Year-on-year trends", "The fastest-rising topics in the map with measured percentages."],
+      ["Rejected keywords", "High-volume terms rejected with the audience reason; note where a rejected term is used only as a glossary entry."],
+      ["The test applied", "The one-sentence test."],
+      ["Search volume", "Pulled per market for <markets>, in the local language and in English where relevant."],
+      ["Search intent", "Every core keyword classified with a confidence score; below 60 percent the page serves both readings."],
+      ["Result pages", "Checked directly; where measured intent and the result page disagree, the result page wins."],
+      ["People also ask", "Pulled per page (or per head term where deferred) and folded into the H2 outlines."]]},
+    {"title": "4. COMPETITIVE LANDSCAPE", "rows": [
+      ["Competitors", "Identified from the live result pages and the domain audit."],
+      ["<Group 1>", "Who they are and why they cannot occupy the client's angle."],
+      ["<Group 2>", "..."],
+      ["The opening", "The intersection nobody occupies."]]},
+    {"title": "5. SITE ARCHITECTURE", "rows": [
+      ["/services/", "What the practice sells."],
+      ["/industries/ (or segments)", "One page per target segment."],
+      ["/insights/ (or blog)", "All editorial, organised into pillar directories."],
+      ["/glossary/", "The definitional layer answer engines quote."],
+      ["/case-studies/", "Individually indexable URLs."],
+      ["/about/", "Company page plus one author page per named specialist."],
+      ["/<lang>/", "Localised mirrors (if languages in scope)."],
+      ["Existing pages", "Count of existing URLs by status: enhance, merge, redirect, unchanged."],
+      ["Migration", "301 every legacy URL to its directory-style path and keep the map permanently."],
+      ["Solutions and services", "Problem-led pages sit inside the topic pillars so every pillar ends in a conversion page."]]},
+    {"title": "6. LANGUAGE PLAN", "rows": [
+      ["Languages", "Which, which is primary, which were considered and not built and why (with measured evidence)."],
+      ["Structure", "Subdirectories on one domain; slug policy; regional hreflang annotations."],
+      ["What is localised", "All pages (or the subset) — translation via DeepL with the locked glossary; automated keyword-presence check."]]},
+    {"title": "7. PREPARATION WEEK 0", "rows": [
+      ["Website decision", "Publish on the current site or a new one; URL structure fixed now; legacy URLs 301-redirected."],
+      ["DNS connection", "Connect the domain to the Snoika system at DNS/CDN level and verify paths resolve before the first page is written."],
+      ["Terminology glossary", "Lock the per-page measured native keywords and the terms that stay English."],
+      ["Templates and schema", "Approve page template, author boxes, answer-block position, FAQ schema and hreflang setup."],
+      ["Review path", "Name the reviewer, confirm the three-working-day review service level, agree what approved means."]]},
+    {"title": "8. WEEKLY PUBLISHING CYCLE FROM WEEK 1", "rows": [
+      ["Monday", "This week's pod is drafted, edited by Snoika and sent for review."],
+      ["Tuesday to Thursday", "Client review, three working days; edits made within the window; English approved."],
+      ["Friday", "Hreflang built for the set; publication in every language in scope at once; Friday link pass."],
+      ["Cadence", "Month 1: <n>/week skeleton; month 2: <n>/week cluster hubs and first demand pages; months 3-4: <n>/week; month 5 onward: <n>/week."],
+      ["Timeline", "Total months to publish all pages at the cadence; deadline-driven pages pulled forward."]]},
+    {"title": "9. INTERNAL LINKING AND PUBLISHING PODS", "rows": [
+      ["Rule 1", "Every pillar hub links down to every cluster hub and page in its pillar."],
+      ["Rule 2", "Every cluster hub links to every page in its cluster."],
+      ["Rule 3", "Every page links up to its cluster hub and pillar hub within the first two screens."],
+      ["Rule 4", "Every page links horizontally to 3-5 siblings and 1-2 pages in another pillar."],
+      ["Rule 5", "Every informational page links to at least one service or industry page."],
+      ["Rule 6", "First use of a defined term on any page links to its glossary entry."],
+      ["Rule 7", "Every page links to its author page, and the author page links back to the article list."],
+      ["Rule 8", "Nothing deeper than three clicks from the homepage; pillar hubs reach 15-30 inbound links as the pillar fills."],
+      ["Rule 9", "A page in one language links only to pages in that language."],
+      ["Pods and links", "Pages ship in weekly groups so every internal link works on the day it goes live; no page links to a URL that does not exist yet; Friday link pass connects live pages to the new ones."],
+      ["As built", "<pages> pages, <links> internal links, zero orphans."]]},
+    {"title": "10. MEASUREMENT AND REPORTING", "rows": [
+      ["What we report and when", "Monthly: keyword coverage (top-20 per market), citation share (AI Overviews and answer engines), conversions (calls booked and enquiries as analytics events, attributed to page and pillar), traffic as context."],
+      ["Expectations", "Baseline in week 0; first movement expected on the demand pillar within three months, on the category terms within six."]]}
+  ]
+}
