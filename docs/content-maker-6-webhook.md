@@ -125,14 +125,19 @@ One row per page type, 145 rows seeded from `skills/content-map-builder/assets/p
 | `definition`, `industries` | help text |
 | `words_min`, `words_max`, `default_words` | length band; sections share `default_words` |
 | `answer_paragraph`, `answer_style`, `answer_max_words` | whether the page opens with a direct answer and in which style |
-| `tables_min`, `citations_min`, `research` | minimum tables and citations; Tavily depth: none, search, deep (with `none`, citations are not required) |
+| `tables_min`, `citations_min`, `research` | minimum tables and citations; how much the writer should use its Live Research tool (Tavily): none, search, deep (with `none`, citations are not required) |
 | `schema_types` | JSON-LD blocks, e.g. `Service + Organization + FAQPage + BreadcrumbList` |
 | `required_facts`, `optional_facts` | what the app's facts form asks for |
 | `constraints` | sector rules injected into the writer and the validator |
 | `opening`, `section_format_hints` | how the family opens and default section formats |
 | `ai_writable` | Y, P (facts must be supplied and checked) or N (never written) |
 
+## cm6_prompts data table (id `jUX1l2UGDdpKe9De`)
+
+Static prompt text the workflow loads at run time, one row per key. Row `writer_guidelines` holds the writer's persona, tone guidelines, writing rules, link rules and keyword rules ported from Content Maker 5.0 (mirrored in `docs/prompts/cm6_writer_guidelines.md`). The `Prep Writer` node appends the page brief for the requested type; `docs/prompts/` shows the brief for all 145 types. Edit the row to change the writer's voice without touching the workflow.
+
 ## Helper workflows (test only)
 
 - `CM6 Test Callback Receiver` (`aoPTgo0YDsIGLrRr`): `POST /webhook/pm-test-callback/page` and `/execution-started`, stores every callback in the `pm_test_callbacks` data table. Use `https://n8n-test.snoika.com/webhook/pm-test-callback` as `callback_url` when testing by hand.
 - `CM6 Spec Seeder` (`eeeDwSvQ8QW3TiXj`): loads the catalogue from the repo into `page_type_specs`. Run once; re-running duplicates rows.
+- `CM6 Prompt Loader` (`eXzLzVVBLtHcivrA`, published): `POST https://n8n-test.snoika.com/webhook/cm6-load-prompts` reads `docs/prompts/cm6_prompts.json` from the repo and upserts each key into `cm6_prompts`. Safe to re-run after editing the guidelines.

@@ -24,8 +24,8 @@ Pipeline for one run:
 
 ```
 Parse → Load spec (page_type_specs by pageType) → Check required facts (stop if missing)
-→ Research (Tavily, depth from spec, domains from payload)
-→ Write in English: H1 and H2 outline exactly as sent, answer paragraph per family,
+→ Write in English with live research (Tavily as a writer tool, depth from spec, domains from payload):
+  H1 and H2 outline exactly as sent, answer paragraph per family,
   AI prompts answered inside the sections, internal links placed as sent, facts only
 → 5 peelers → Style Updater → Validate (structure, links, facts, style) → Section Fixer → Revalidate
 → Answer-coverage check (every AI prompt answered somewhere; misses go back to the fixer once)
@@ -135,11 +135,11 @@ A missing required fact stops the run before any model call; the callback carrie
 
 **Internal links.** Exactly the list from the app: every URL placed once with its anchor (a natural variant of the anchor is allowed, never a bare URL), in body text only. The validator checks each URL appears exactly once and that no other internal-looking URL exists. There is no minimum or maximum; the count is whatever the app sent.
 
-**Facts and evidence.** Numbers, prices, results, certifications and capabilities come only from `facts` or from the research evidence, each statistic with a named source and a link from the evidence. The spec's `citations_min` sets how many external citations the page needs; `tables_min` how many tables.
+**Facts and evidence.** Numbers, prices, results, certifications and capabilities come only from `facts` or from a Live Research result the writer saw, each statistic with a named source and a link. The spec's `citations_min` sets how many external citations the page needs; `tables_min` how many tables.
 
 **Style.** The five peelers (participle pile-ups, series of three, hedging, negative parallelism, tailing negations) and the Style Updater stay as built, on the English text. Banned words, em dashes and semicolons stay in the validator. The validator no longer checks keyword density.
 
-**FAQ.** Always five questions and answers, AI prompts first, then People Also Ask questions from research, then generated ones. One answer mentions the client in the way `ctaRules` describes.
+**FAQ.** Always five questions and answers, AI prompts first, then generated ones. One answer mentions the client in the way `ctaRules` describes.
 
 **Constraints.** The spec's `constraints` column adds sector rules to the writer prompt and the validator: required disclaimers, claim limits, reviewer lines. General client rules come through `writingPreferences`.
 
@@ -186,7 +186,7 @@ Page Maker replaces it. Kept from 5.0: the callback contract above, the progress
 | Parse Request | fields from 3.1; `facts` object; `internalLinks[]`; `h2Outline[]`; `aiPrompts[]`; drop the removed fields |
 | Page Contract | replaced by a Data Table lookup of `page_type_specs`; sections come from `h2Outline`, budgets from the spec |
 | Load Page Registry, Link Plan | removed; the link plan is `internalLinks` as sent |
-| Research Queries | built from H1, core keyword, H2s and AI prompts; depth from the spec |
+| Research | no separate research nodes; the writer keeps the Live Research tool (Tavily) from 5.0 and the spec's `research` value tells it how much to search |
 | Prep Writer | outline verbatim, family opening, AI prompts as questions to answer in place, links as given, facts by kind, spec constraints |
 | Page Writer, Style Updater, Section Fixer | output between `START_ARTICLE` and `END_ARTICLE`, extracted by code |
 | Validate Draft | outline order and verbatim headings, link presence and placement, fact discipline, citations and tables from the spec, constraints, style; no density |
@@ -440,15 +440,18 @@ Seed content for `pm_industry_packs`. Each row: the page types that make up most
 | Media, publishers, marketplaces, directories | media: supporting article, pillar hub, best-of, review, author bio, video; marketplaces: product category, top-in-location, partner or vendor profile, listing detail, job category | category pages carry most traffic; vendor profiles need unique copy; affiliate disclosure on reviews and best-of; Review schema only for real reviews; UGC moderation |
 | Logistics and telecom | service, route or lane and plan or tariff, industry vertical, calculator, regional landing, migration or switch, help centre article, location | telecom: regulated price and contract disclosures, coverage claims match maps, "up to" speed rules, switching pages state early termination terms; logistics: customs and Incoterms content needs jurisdiction and date, transit times as ranges |
 
-## 11. As built (2026-09-08)
+## 11. As built (2026-09-08, revised 2026-09-14)
 
-Workflow `MZUUvWCdCXlHKllN` was rebuilt in place and renamed "Content Maker 6.0". 70 nodes; every node reachable from the webhook. The request and callback contract is in `docs/content-maker-6-webhook.md`.
+Workflow `MZUUvWCdCXlHKllN` was rebuilt in place and renamed "Content Maker 6.0". 65 nodes; every node reachable from the webhook. The request and callback contract is in `docs/content-maker-6-webhook.md`.
 
 Differences from the plan above, all small:
 
 - The Style Updater keeps Content Maker's 15,000-character editor prompt inside the `Prep Update` node unchanged. Its closing instruction to return JSON is rewritten at the Style Updater node's system-message expression to ask for the START_ARTICLE and END_ARTICLE markers, and the article is taken from `Extract Draft` rather than from the parser.
 - Section Fixer, Coverage Fixer and the writer return the page between markers; `Extract Draft`, `Extract Updated`, `Extract Fixed` and `Extract Coverage` are Code nodes that strip the markers and fall back to the previous version of the page when a model returns nothing usable.
-- When a spec's `research` is `none`, `citations_min` is forced to 0, because the validator only accepts citations that came from the research evidence.
+- Research runs inside the writer, as in Content Maker 5.0: the Page Writer agent has the Tavily `Live Research` tool with the request's whitelist and blacklist domains, and the page brief tells it how much to search from the spec's `research` value (none, search, deep). The upfront research chain from the first build (Research Queries, Tavily Research, Research Digest) was removed on 2026-09-14 because it made the prompt very large and the runs very long.
+- When a spec's `research` is `none`, `citations_min` is forced to 0.
+- The writer's system prompt is the Content Maker 5.0 writer guidelines (persona, tone, writing rules with wrong and right examples, link rules, keyword rules) followed by the page brief. The guidelines live in the `cm6_prompts` data table (row `writer_guidelines`), loaded by the `Load Prompts` node, and are mirrored in `docs/prompts/cm6_writer_guidelines.md`; the `CM6 Prompt Loader` helper upserts the table from the repo. The rendered brief for every page type is in `docs/prompts/`.
+- Workflow settings: execution timeout 60 minutes, execution progress saved, error workflow as before. The Page Writer agent allows 20 tool iterations and retries twice on failure.
 - A run without `facts` for the offer, proof, entity, local, catalogue, evaluation and tool families stops with `status: blocked` before any model is called.
 - Progress reporting calls the Content Plan Progress Reporter sub-workflow at `article_request_received`, `draft_written` and `final_assets_ready`.
 

@@ -26,7 +26,8 @@ Structure:
 - Preferred formats for this page type, where a section has no format of its own: prose (as prose), steps (as numbered steps), table (as a markdown table with a header row).
 - Total length: 2000 to 4000 words. Aim for about 2000.
 - Include at least 1 markdown table where a section suits one. Real pipe tables with a header row.
-- Include at least 4 external citations as markdown links to URLs that appear in the evidence section. Name the source and the year in the sentence.
+- Include at least 4 external citations as markdown links to sources you found with the Live Research tool. Name the source and the year in the sentence.
+- Research: Use the Live Research tool for the specific statistics, prices, study results and quotes the page needs, at most two searches per claim.
 - Every H2 section opens with a sentence that answers that section directly, then explains, then evidences.
 - Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
@@ -45,9 +46,10 @@ These are the only claims you may make about the client. Use them exactly and in
 - fact_key_2: ["list","of","values"]
 
 Hard rules for this page:
-- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts, the evidence or a Live Research result, do not write it.
+- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
+
 
 CTA:
 The final section closes with a call to action paragraph that follows this rule: CTA rule sent by the app. Link the action to https://example.com/contact/ with a plain anchor of two to four words. No button, no heading.
@@ -78,7 +80,8 @@ Structure:
 - Preferred formats for this page type, where a section has no format of its own: prose (as prose), steps (as numbered steps), table (as a markdown table with a header row).
 - Total length: 1000 to 2500 words. Aim for about 1750.
 - Include at least 1 markdown table where a section suits one. Real pipe tables with a header row.
-- Include at least 3 external citations as markdown links to URLs that appear in the evidence section. Name the source and the year in the sentence.
+- Include at least 3 external citations as markdown links to sources you found with the Live Research tool. Name the source and the year in the sentence.
+- Research: Use the Live Research tool for the specific statistics, prices, study results and quotes the page needs, at most two searches per claim.
 - Every H2 section opens with a sentence that answers that section directly, then explains, then evidences.
 - Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
@@ -97,9 +100,10 @@ These are the only claims you may make about the client. Use them exactly and in
 - fact_key_2: ["list","of","values"]
 
 Hard rules for this page:
-- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts, the evidence or a Live Research result, do not write it.
+- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
+
 
 CTA:
 The final section closes with a call to action paragraph that follows this rule: CTA rule sent by the app. Link the action to https://example.com/contact/ with a plain anchor of two to four words. No button, no heading.
@@ -130,7 +134,8 @@ Structure:
 - Preferred formats for this page type, where a section has no format of its own: prose (as prose), steps (as numbered steps), table (as a markdown table with a header row).
 - Total length: 800 to 1800 words. Aim for about 1400.
 - Include at least 1 markdown table where a section suits one. Real pipe tables with a header row.
-- Include at least 2 external citations as markdown links to URLs that appear in the evidence section. Name the source and the year in the sentence.
+- Include at least 2 external citations as markdown links to sources you found with the Live Research tool. Name the source and the year in the sentence.
+- Research: Use the Live Research tool for the specific statistics, prices, study results and quotes the page needs, at most two searches per claim.
 - Every H2 section opens with a sentence that answers that section directly, then explains, then evidences.
 - Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
@@ -149,9 +154,10 @@ These are the only claims you may make about the client. Use them exactly and in
 - fact_key_2: ["list","of","values"]
 
 Hard rules for this page:
-- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts, the evidence or a Live Research result, do not write it.
+- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
+
 
 CTA:
 The final section closes with a call to action paragraph that follows this rule: CTA rule sent by the app. Link the action to https://example.com/contact/ with a plain anchor of two to four words. No button, no heading.
@@ -182,7 +188,8 @@ Structure:
 - Preferred formats for this page type, where a section has no format of its own: prose (as prose), steps (as numbered steps), table (as a markdown table with a header row).
 - Total length: 1000 to 2000 words. Aim for about 1500.
 - Include at least 1 markdown table where a section suits one. Real pipe tables with a header row.
-- Include at least 3 external citations as markdown links to URLs that appear in the evidence section. Name the source and the year in the sentence.
+- Include at least 3 external citations as markdown links to sources you found with the Live Research tool. Name the source and the year in the sentence.
+- Research: Use the Live Research tool for the specific statistics, prices, study results and quotes the page needs, at most two searches per claim.
 - Every H2 section opens with a sentence that answers that section directly, then explains, then evidences.
 - Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
@@ -201,9 +208,10 @@ These are the only claims you may make about the client. Use them exactly and in
 - fact_key_2: ["list","of","values"]
 
 Hard rules for this page:
-- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts, the evidence or a Live Research result, do not write it.
+- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
+
 
 CTA:
 The final section closes with a call to action paragraph that follows this rule: CTA rule sent by the app. Link the action to https://example.com/contact/ with a plain anchor of two to four words. No button, no heading.
@@ -234,7 +242,8 @@ Structure:
 - Preferred formats for this page type, where a section has no format of its own: prose (as prose), steps (as numbered steps), table (as a markdown table with a header row).
 - Total length: 800 to 1800 words. Aim for about 1300.
 - Include at least 1 markdown table where a section suits one. Real pipe tables with a header row.
-- Include at least 3 external citations as markdown links to URLs that appear in the evidence section. Name the source and the year in the sentence.
+- Include at least 3 external citations as markdown links to sources you found with the Live Research tool. Name the source and the year in the sentence.
+- Research: Use the Live Research tool for the specific statistics, prices, study results and quotes the page needs, at most two searches per claim.
 - Every H2 section opens with a sentence that answers that section directly, then explains, then evidences.
 - Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
@@ -253,9 +262,10 @@ These are the only claims you may make about the client. Use them exactly and in
 - fact_key_2: ["list","of","values"]
 
 Hard rules for this page:
-- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts, the evidence or a Live Research result, do not write it.
+- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
+
 
 CTA:
 The final section closes with a call to action paragraph that follows this rule: CTA rule sent by the app. Link the action to https://example.com/contact/ with a plain anchor of two to four words. No button, no heading.
@@ -286,7 +296,8 @@ Structure:
 - Preferred formats for this page type, where a section has no format of its own: prose (as prose), steps (as numbered steps), table (as a markdown table with a header row).
 - Total length: 1500 to 3000 words. Aim for about 2250.
 - Include at least 1 markdown table where a section suits one. Real pipe tables with a header row.
-- Include at least 3 external citations as markdown links to URLs that appear in the evidence section. Name the source and the year in the sentence.
+- Include at least 3 external citations as markdown links to sources you found with the Live Research tool. Name the source and the year in the sentence.
+- Research: Use the Live Research tool for the specific statistics, prices, study results and quotes the page needs, at most two searches per claim.
 - Every H2 section opens with a sentence that answers that section directly, then explains, then evidences.
 - Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
@@ -305,7 +316,7 @@ These are the only claims you may make about the client. Use them exactly and in
 - fact_key_2: ["list","of","values"]
 
 Hard rules for this page:
-- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts, the evidence or a Live Research result, do not write it.
+- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
 - Page type constraints: Cite the official text; state jurisdiction and effective dates; not legal advice line.
@@ -339,7 +350,8 @@ Structure:
 - Preferred formats for this page type, where a section has no format of its own: prose (as prose), steps (as numbered steps), table (as a markdown table with a header row).
 - Total length: 700 to 1500 words. Aim for about 1100.
 - Include at least 1 markdown table where a section suits one. Real pipe tables with a header row.
-- Include at least 3 external citations as markdown links to URLs that appear in the evidence section. Name the source and the year in the sentence.
+- Include at least 3 external citations as markdown links to sources you found with the Live Research tool. Name the source and the year in the sentence.
+- Research: Use the Live Research tool for the specific statistics, prices, study results and quotes the page needs, at most two searches per claim.
 - Every H2 section opens with a sentence that answers that section directly, then explains, then evidences.
 - Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
@@ -358,9 +370,10 @@ These are the only claims you may make about the client. Use them exactly and in
 - fact_key_2: ["list","of","values"]
 
 Hard rules for this page:
-- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts, the evidence or a Live Research result, do not write it.
+- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
+
 
 CTA:
 The final section closes with a call to action paragraph that follows this rule: CTA rule sent by the app. Link the action to https://example.com/contact/ with a plain anchor of two to four words. No button, no heading.
@@ -391,7 +404,8 @@ Structure:
 - Preferred formats for this page type, where a section has no format of its own: prose (as prose), steps (as numbered steps), table (as a markdown table with a header row).
 - Total length: 1000 to 2000 words. Aim for about 1500.
 - Include at least 1 markdown table where a section suits one. Real pipe tables with a header row.
-- Include at least 3 external citations as markdown links to URLs that appear in the evidence section. Name the source and the year in the sentence.
+- Include at least 3 external citations as markdown links to sources you found with the Live Research tool. Name the source and the year in the sentence.
+- Research: Use the Live Research tool for the specific statistics, prices, study results and quotes the page needs, at most two searches per claim.
 - Every H2 section opens with a sentence that answers that section directly, then explains, then evidences.
 - Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
@@ -410,9 +424,10 @@ These are the only claims you may make about the client. Use them exactly and in
 - fact_key_2: ["list","of","values"]
 
 Hard rules for this page:
-- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts, the evidence or a Live Research result, do not write it.
+- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
+
 
 CTA:
 The final section closes with a call to action paragraph that follows this rule: CTA rule sent by the app. Link the action to https://example.com/contact/ with a plain anchor of two to four words. No button, no heading.
@@ -443,7 +458,8 @@ Structure:
 - Preferred formats for this page type, where a section has no format of its own: prose (as prose), steps (as numbered steps), table (as a markdown table with a header row).
 - Total length: 1500 to 3000 words. Aim for about 2250.
 - Include at least 1 markdown table where a section suits one. Real pipe tables with a header row.
-- Include at least 3 external citations as markdown links to URLs that appear in the evidence section. Name the source and the year in the sentence.
+- Include at least 3 external citations as markdown links to sources you found with the Live Research tool. Name the source and the year in the sentence.
+- Research: Use the Live Research tool for the specific statistics, prices, study results and quotes the page needs, at most two searches per claim.
 - Every H2 section opens with a sentence that answers that section directly, then explains, then evidences.
 - Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
@@ -462,9 +478,10 @@ These are the only claims you may make about the client. Use them exactly and in
 - fact_key_2: ["list","of","values"]
 
 Hard rules for this page:
-- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts, the evidence or a Live Research result, do not write it.
+- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
+
 
 CTA:
 The final section closes with a call to action paragraph that follows this rule: CTA rule sent by the app. Link the action to https://example.com/contact/ with a plain anchor of two to four words. No button, no heading.
@@ -495,7 +512,8 @@ Structure:
 - Preferred formats for this page type, where a section has no format of its own: prose (as prose), steps (as numbered steps), table (as a markdown table with a header row).
 - Total length: 1000 to 2000 words. Aim for about 1500.
 - Include at least 1 markdown table where a section suits one. Real pipe tables with a header row.
-- Include at least 3 external citations as markdown links to URLs that appear in the evidence section. Name the source and the year in the sentence.
+- Include at least 3 external citations as markdown links to sources you found with the Live Research tool. Name the source and the year in the sentence.
+- Research: Use the Live Research tool for the specific statistics, prices, study results and quotes the page needs, at most two searches per claim.
 - Every H2 section opens with a sentence that answers that section directly, then explains, then evidences.
 - Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
@@ -514,7 +532,7 @@ These are the only claims you may make about the client. Use them exactly and in
 - fact_key_2: ["list","of","values"]
 
 Hard rules for this page:
-- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts, the evidence or a Live Research result, do not write it.
+- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
 - Page type constraints: Diagnostic content: state severity thresholds and when to call a professional; no diagnosis; reviewer named where the vertical is medical.
@@ -548,7 +566,8 @@ Structure:
 - Preferred formats for this page type, where a section has no format of its own: prose (as prose), steps (as numbered steps), table (as a markdown table with a header row).
 - Total length: 1500 to 3500 words. Aim for about 2500.
 - Include at least 1 markdown table where a section suits one. Real pipe tables with a header row.
-- Include at least 3 external citations as markdown links to URLs that appear in the evidence section. Name the source and the year in the sentence.
+- Include at least 3 external citations as markdown links to sources you found with the Live Research tool. Name the source and the year in the sentence.
+- Research: Use the Live Research tool for the specific statistics, prices, study results and quotes the page needs, at most two searches per claim.
 - Every H2 section opens with a sentence that answers that section directly, then explains, then evidences.
 - Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
@@ -567,9 +586,10 @@ These are the only claims you may make about the client. Use them exactly and in
 - fact_key_2: ["list","of","values"]
 
 Hard rules for this page:
-- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts, the evidence or a Live Research result, do not write it.
+- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
+
 
 CTA:
 The final section closes with a call to action paragraph that follows this rule: CTA rule sent by the app. Link the action to https://example.com/contact/ with a plain anchor of two to four words. No button, no heading.
@@ -600,7 +620,8 @@ Structure:
 - Preferred formats for this page type, where a section has no format of its own: prose (as prose), steps (as numbered steps), table (as a markdown table with a header row).
 - Total length: 1500 to 2500 words. Aim for about 2000.
 - Include at least 1 markdown table where a section suits one. Real pipe tables with a header row.
-- Include at least 3 external citations as markdown links to URLs that appear in the evidence section. Name the source and the year in the sentence.
+- Include at least 3 external citations as markdown links to sources you found with the Live Research tool. Name the source and the year in the sentence.
+- Research: Use the Live Research tool for the specific statistics, prices, study results and quotes the page needs, at most two searches per claim.
 - Every H2 section opens with a sentence that answers that section directly, then explains, then evidences.
 - Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
@@ -619,7 +640,7 @@ These are the only claims you may make about the client. Use them exactly and in
 - fact_key_2: ["list","of","values"]
 
 Hard rules for this page:
-- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts, the evidence or a Live Research result, do not write it.
+- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
 - Page type constraints: Salary and requirement figures carry source and year.
