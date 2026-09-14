@@ -28,16 +28,12 @@ One request writes one page in one language. Everything about the page comes fro
   "h2Outline": [
     "Director-to-VP sales leadership search",
     "Why device specialists matter",
-    { "h2": "From intake to offer", "format": "table" }
+    "From intake to offer"
   ],
   "aiPrompts": [
     "Which recruiting firms specialize in placing VP of Sales leaders at medical device companies?",
     "What should a growth-stage medtech company expect to pay for a retained sales leadership search?"
   ],
-  "internalLinks": [
-    { "url": "https://trualignpartners.com/medtech-executive-search/", "anchor": "MedTech executive search" }
-  ],
-
   "ctaRules": "Explain how TruAlign Partners helps medical device companies hire sales leaders and ask the reader to schedule a strategy call.",
   "ctaUrl": "https://trualignpartners.com/contact/",
   "writingPreferences": "US spelling. Never promise placement outcomes.",
@@ -62,19 +58,20 @@ One request writes one page in one language. Everything about the page comes fro
 | `targetLanguage` | yes | language name; default English; one run per language |
 | `clientName` | yes | `clientDescription` optional but strongly recommended (`productDescription` also accepted) |
 | `h1` | yes | used verbatim |
-| `slugPath` | yes | the page's own path; echoed as `slug` and used for canonical and breadcrumb |
-| `siteRootUrl` | recommended | absolute URLs in JSON-LD; also used to detect invented internal links |
+| `slugPath` | no | the page's own path; echoed as `slug` and used for canonical and breadcrumb; derived from the H1 when empty |
+| `siteRootUrl` | recommended | absolute URLs in JSON-LD; any link to this host other than `ctaUrl` is rejected by the validator, because internal links are placed by a separate process |
 | `coreKeyword` | per type | placed in the first 60 words and used lightly in the body; never density-checked |
 | `secondaryKeywords` | no | array or comma string |
-| `h2Outline` | yes | array of strings or `{h2, format}`; followed verbatim, in order; `format` is prose, table, steps, bullets or cards |
+| `h2Outline` | yes | array of heading strings (a `\|` separated string also works); followed verbatim, in order. No per-heading format: the spec's `format_rules` decide where tables, steps, bullets and prose go. When the last heading already reads as a closing section (next steps, how to get started, contact, book) it is used as the closing section; otherwise the flow appends one closing H2 per the spec |
 | `aiPrompts` | no | answered inside the sections, then used as the first FAQ questions |
-| `internalLinks` | no | `{url, anchor}`; each placed exactly once in body text; empty list means none |
-| `ctaRules`, `ctaUrl` | no | closing call to action; omitted when `ctaRules` is empty |
+| `ctaRules`, `ctaUrl` | no | the action the closing section asks for and its link. The spec's `cta_mode` decides whether the page has a CTA at all: `required` types get one even when these are empty (the action is named in words, without a link), `optional` types get one only when `ctaRules` or `ctaUrl` is sent, `none` types never get one. The CTA appears in the closing section only, never in the body or the FAQ |
 | `writingPreferences`, `whitelistDomains`, `blacklistDomains` | no | as in Content Maker |
 | `metaTitle` | no | used as sent; generated when empty |
 | `facts` | per type | free-form object keyed by the spec's `required_facts`; the writer may only claim about the client what is in here |
 
 Families `offer`, `proof`, `entity`, `local`, `catalogue`, `evaluation` and `tool` stop with `status: blocked` when `facts` is empty. The other families run without facts.
+
+The smallest valid request is `pageType`, `clientName`, `callback_url`, `h1` and `h2Outline` (plus `facts` for the families above). Fields that were accepted earlier and are now ignored: `internalLinks`, per-heading `format`. Nothing else is required from the user.
 
 ## Callbacks
 
@@ -102,7 +99,7 @@ Families `offer`, `proof`, `entity`, `local`, `catalogue`, `evaluation` and `too
   "schemaTypes": ["Service", "Organization", "FAQPage", "BreadcrumbList"],
   "schemaWarnings": [],
   "promptCoverage": [ { "prompt": "...", "answered": true, "addedByFixer": false } ],
-  "quality": { "totalWords": 1060, "h2Count": 8, "tableRows": 14, "internalLinks": 3, "externalCitations": 1, "remainingIssues": [], "patternsFixed": { "ingPileups": 0, "parallelSeries": 0, "hedging": 1, "negativeParallelisms": 0, "tailingNegations": 0 } },
+  "quality": { "totalWords": 1060, "h2Count": 9, "h3Count": 4, "tableRows": 14, "ctaLinks": 1, "externalCitations": 1, "remainingIssues": [], "patternsFixed": { "ingPileups": 0, "parallelSeries": 0, "hedging": 1, "negativeParallelisms": 0, "tailingNegations": 0, "aiPhrasing": 3 } },
   "generatedAt": "2026-09-08T13:48:23.387Z"
 }
 ```
@@ -130,11 +127,16 @@ One row per page type, 145 rows seeded from `skills/content-map-builder/assets/p
 | `required_facts`, `optional_facts` | what the app's facts form asks for |
 | `constraints` | sector rules injected into the writer and the validator |
 | `opening`, `section_format_hints` | how the family opens and default section formats |
+| `closing_mode`, `closing_heading`, `closing_content` | whether the flow appends a closing H2 after the outline, the heading patterns it follows and what it says |
+| `cta_mode`, `cta_guidance` | required, optional or none, and how the CTA is written for this type (closing section only) |
+| `format_rules` | when this type uses tables, numbered steps, bullets and prose; replaces per-heading formats in the request |
+| `h3_policy` | required, optional or none, with the rule for H3 subheadings (validated) |
+| `meta_description_pattern` | what the meta description of this type must contain (120 to 155 characters, factual, front loaded) |
 | `ai_writable` | Y, P (facts must be supplied and checked) or N (never written) |
 
 ## cm6_prompts data table (id `jUX1l2UGDdpKe9De`)
 
-Static prompt text the workflow loads at run time, one row per key. Row `writer_guidelines` holds the writer's persona, tone guidelines, writing rules, link rules and keyword rules ported from Content Maker 5.0 (mirrored in `docs/prompts/cm6_writer_guidelines.md`). The `Prep Writer` node appends the page brief for the requested type; `docs/prompts/` shows the brief for all 145 types. Edit the row to change the writer's voice without touching the workflow.
+Static prompt text the workflow loads at run time, one row per key. Row `writer_guidelines` holds the writer's persona, the plain style frame (sentence, word, paragraph and flow rules with examples), the tone guidelines, the pattern rules with wrong and right examples, the link rules and the keyword rules (mirrored in `docs/prompts/cm6_writer_guidelines.md`). Row `style_editor` holds the Style Updater prompt with the six pattern fix sections (mirrored in `docs/prompts/cm6_style_editor.md`); `Prep Update` fills its placeholders with the flagged sentences. The `Prep Writer` node appends the page brief for the requested type; `docs/prompts/` shows the brief for all 145 types and `docs/page-type-writing-rules.md` lists the closing, CTA, format, H3 and meta rules per type. Edit the row to change the writer's voice without touching the workflow.
 
 ## Helper workflows (test only)
 
