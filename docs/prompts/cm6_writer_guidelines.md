@@ -104,7 +104,7 @@ This section explains how to build plain sentences, arguments, and word choices 
 
 **Problem:** Phrases like "experts say" or "studies show" signal AI because they are used without naming a specific source.
 
-**Solution:** Name the specific source (person, publication, date) or remove the attribution entirely. Use the evidence in the page brief or, within the Live Research budget the brief states, the Live Research tool to find a source and specific data.
+**Solution:** Name the specific source (person, publication, date) or remove the attribution entirely. Use the Live Research tool to find a source and specific data.
 
 > **Wrong:** "Due to its unique characteristics, the Haolai River is of interest to researchers and conservationists. Experts believe it plays a crucial role in the regional ecosystem."
 
@@ -114,7 +114,7 @@ This section explains how to build plain sentences, arguments, and word choices 
 
 **Problem:** AI defaults to generic descriptors like "many companies," "several experts," and "some improvements" instead of concrete names and numbers.
 
-**Solution:** Replace every generic quantifier with specific names, dates, places, or numbers. Never use "many," "several," "various," or "some" and similar as standalone descriptors. Use the evidence in the page brief or, within the Live Research budget the brief states, the Live Research tool to find a source and specific data. 
+**Solution:** Replace every generic quantifier with specific names, dates, places, or numbers. Never use "many," "several," "various," or "some" and similar as standalone descriptors. Use the Live Research tool to find a source and specific data. 
 
 > **Wrong:** "Some users would interact with different sites mainly via notifications, pokes, or looking up friends’ profiles. With the launch of the new feature, many users got a constantly updating stream of posts and status changes."
 
@@ -301,7 +301,7 @@ Did Dorothy have a strategy? Yes, she did. The moment she saw IBM computers, she
 
 **Problem:** AI paraphrases what someone said instead of quoting them directly or even avoids quoting at all, which removes the voice and turns a statement into reported speech.
 
-**Solution:** Quote whenever you feel like a quote could fit the context. Within the Live Research budget the brief states, use the Live Research tool to find a quote in the interviews, public discussions, speeches, podcasts, etc. or find publications that use quotes in the interviews, public discussions, speeches, podcasts, etc. so you can then reuse them yourself. Whenever you introduce the expert or a person who said something, you must always mention either who they are, or where they come from, or what is their relation to the subject discussed so readers have context on who that person is.
+**Solution:** Quote whenever you feel like a quote could fit the context. Use the Live Research tool to find a quote in the interviews, public discussions, speeches, podcasts, etc. or find publications that use quotes in the interviews, public discussions, speeches, podcasts, etc. so you can then reuse them yourself. Whenever you introduce the expert or a person who said something, you must always mention either who they are, or where they come from, or what is their relation to the subject discussed so readers have context on who that person is.
 
 > **Wrong:** CEO of a big company expressed concern about the pace of AI development and suggested that companies need to move more carefully.
 
@@ -311,7 +311,7 @@ Did Dorothy have a strategy? Yes, she did. The moment she saw IBM computers, she
 
 **Problem:** AI fabricates percentages, dollar figures, and study results that sound plausible but don't exist, because they fit the rhetorical pattern the writing needs.
 
-**Solution:** Only cite numbers you can link to a real source. If you don't have a source in the evidence, either use the Live Research tool within the budget the brief states or remove the claim entirely. When the budget is zero, remove the claim. Never invent a statistic to strengthen a point.
+**Solution:** Only cite numbers you can link to a real source. If you don't have a source, either use the Live Research tool to find one or remove the claim entirely. Never invent a statistic to strengthen a point.
 
 > **Wrong:** "Studies show that 73% of companies see improved productivity after implementing AI tools."
 
@@ -321,8 +321,8 @@ Did Dorothy have a strategy? Yes, she did. The moment she saw IBM computers, she
 <link_rules>
 Apply the following linking rules:
 
-- Every statistic, price, study result, quote and dated fact carries a markdown link to the source it came from, and that source must appear in the evidence section of the page brief or come from the Live Research tool. Never link to a URL you have not seen.
-- The number of external citations the page needs is stated in the page brief. Use as many as the claims require beyond that minimum, and never add a citation for its own sake.
+- Every statistic, price, study result, quote and dated fact carries a markdown link to the source it came from, found with the Live Research tool. Never link to a URL you have not seen in a search result.
+- The minimum number of external citations the page needs is stated in the page brief. Use as many as the claims require beyond that minimum, and never add a citation for its own sake.
 - Keep linking anchor text between 2-5 words
 - Make linking anchor specific to the data point you want to present. For example, "According to Ben Johnson from Statista, the AI in healthcare market is projected to skyrocket to nearly [$187 billion by 2030](link)."
 - The anchor with data point must contain the data point itself and the word or phrase it relates to. For example, "15% of population", "people from 85 countries," etc.
