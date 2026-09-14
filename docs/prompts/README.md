@@ -1,0 +1,71 @@
+# Content Maker 6.0 writer prompts, all 145 page types
+
+The writer's system prompt is assembled at run time from two parts:
+
+1. **Static guidelines**, identical for every page type: persona, tone guidelines, the writing rules with wrong and right examples, link rules and keyword rules, ported from Content Maker 5.0. Stored in the `cm6_prompts` data table (row `writer_guidelines`) and mirrored in [`cm6_writer_guidelines.md`](cm6_writer_guidelines.md). Edit the table row to change the writer's voice without touching the workflow.
+2. **The page brief**, built by the `Prep Writer` node from the `page_type_specs` row and the request, followed by the custom rules block (writing preferences), the evidence block (research results), the action plan and the expected page items. This is the only part that differs between page types.
+
+The files below show the page brief for every type, rendered with one identical sample request so that only the type-driven lines differ: page type line, opening paragraph rule, preferred formats, length band, table and citation minimums, evidence expectation (research none, search or deep) and page type constraints. The blocks that follow the brief in the real prompt (custom rules, evidence, action plan, expected page items) are the same for every type and are shown once at the end of this page.
+
+| Family | Types | File |
+|---|---|---|
+| `hub` | 11 | [hub.md](hub.md) |
+| `guide` | 12 | [guide.md](guide.md) |
+| `reference` | 8 | [reference.md](reference.md) |
+| `evaluation` | 12 | [evaluation.md](evaluation.md) |
+| `offer` | 22 | [offer.md](offer.md) |
+| `proof` | 7 | [proof.md](proof.md) |
+| `entity` | 11 | [entity.md](entity.md) |
+| `tool` | 5 | [tool.md](tool.md) |
+| `asset` | 8 | [asset.md](asset.md) |
+| `local` | 8 | [local.md](local.md) |
+| `catalogue` | 26 | [catalogue.md](catalogue.md) |
+| `ops` | 15 | [ops.md](ops.md) |
+
+## Blocks after the page brief (same for every type)
+
+```text
+<custom_rules>
+Custom rules provided for this specific page are as follows:
+
+{writingPreferences or None.}
+
+Rules for handling custom rules:
+- Custom rules override all writing guidelines, link rules, keyword rules and tone guidelines listed above when they conflict
+- Custom rules never override the page brief: the H1, the H2 outline, the internal links and the client facts stand
+- If two custom rules contradict each other, follow the one listed first
+</custom_rules>
+
+<evidence>
+{research evidence lines, up to 40, each: - title (url): first 400 characters | or: No research was run. Cite nothing you cannot support from the client facts or a Live Research result.}
+</evidence>
+
+<action_plan>
+Follow these steps in order before writing any part of the page:
+
+**Step 1. Read the page brief carefully:** the page type and its family, the H1, every H2 in order, the questions the page must answer, the internal links, the client facts and the CTA rule. Understand what each section needs to cover.
+**Step 2. Determine the tone:** apply the tone guidelines for the person who typed this search.
+**Step 3. Read the custom rules:** note any that override the writing guidelines, link rules or tone guidelines.
+**Step 4. Plan the page:** decide which section answers each listed question, where each internal link sits, where each client fact belongs, and where a table or list helps.
+**Step 5. Write the page:** the H1 verbatim, the opening paragraph as the brief describes, then every H2 section in the given order with the given heading, within the word budgets.
+**Step 6. Apply the writing guidelines while writing:** as you write each paragraph, sentence and word, check against the writing guidelines.
+**Step 7. Apply the link rules and keyword rules while writing.**
+**Step 8. Use the Live Research tool while writing** when you need a citation URL for a concrete factual claim, data point or direct quote. Be specific in your query. At most two searches per section.
+**Step 9. Review before outputting:** check the output against the page brief, the custom rules, the writing guidelines, the link rules and the keyword rules.
+**Step 10. Provide the final output as plain Markdown**, not JSON. The very first line of your reply must be START_ARTICLE. Then output the entire page in Markdown, starting with the H1 and ending with the last section. The very last line of your reply must be END_ARTICLE.
+</action_plan>
+
+<expected_page_items>
+START_ARTICLE
+# {H1} // Do not modify the H1 above. Use it exactly as provided!
+[opening paragraph as the brief describes]
+
+## {first H2}
+[section content, about N words]
+
+## {next H2} ...
+END_ARTICLE
+</expected_page_items>
+```
+
+User message: `Write the page now. Follow the page brief: the section order, the exact headings and the word budgets. Return it between START_ARTICLE and END_ARTICLE.`
