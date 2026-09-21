@@ -269,7 +269,7 @@ One call to action, in the closing section only (section 5). Direct: one or two 
 
 ## `provider_profile` (Provider profile)
 
-Spec: {"words_min": 400, "words_max": 1000, "default_words": 700, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words.", "schema_types": "ProfilePage + Physician + MedicalOrganization + BreadcrumbList"}
+Spec: {"words_min": 400, "words_max": 1000, "default_words": 700, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words.", "schema_types": "ProfilePage + Person + Organization + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -322,7 +322,7 @@ One call to action, in the closing section only (section 5). Direct: one or two 
 
 ## `agent_profile` (Agent profile)
 
-Spec: {"words_min": 400, "words_max": 900, "default_words": 650, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words.", "schema_types": "ProfilePage + RealEstateAgent + BreadcrumbList"}
+Spec: {"words_min": 400, "words_max": 900, "default_words": 650, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words.", "schema_types": "ProfilePage + Person + BreadcrumbList"}
 
 ```text
 <page_brief>

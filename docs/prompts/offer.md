@@ -1,4 +1,4 @@
-# Writer page briefs: `offer` family (22 types)
+# Writer page briefs: `offer` family (21 types)
 
 Rendered with the standard sample request described in [README.md](README.md). Lines that come from the spec row are the ones to review.
 
@@ -269,7 +269,7 @@ One call to action, in the closing section only (section 5). Direct: two or thre
 
 ## `feature_page` (Feature)
 
-Spec: {"words_min": 600, "words_max": 1500, "default_words": 1050, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one.", "schema_types": "SoftwareApplication + Product + FAQPage + BreadcrumbList"}
+Spec: {"words_min": 600, "words_max": 1500, "default_words": 1050, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one.", "schema_types": "SoftwareApplication + FAQPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -428,7 +428,7 @@ One call to action, in the closing section only (section 5). Direct: two or thre
 
 ## `pricing_page` (Pricing)
 
-Spec: {"words_min": 400, "words_max": 1200, "default_words": 800, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "required: one H3 per plan or tier.", "schema_types": "Product + Offer + PriceSpecification + FAQPage + BreadcrumbList"}
+Spec: {"words_min": 400, "words_max": 1200, "default_words": 800, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "required: one H3 per plan or tier.", "schema_types": "FAQPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -481,7 +481,7 @@ One call to action, in the closing section only (section 5). Direct: two or thre
 
 ## `product_landing_page` (Product landing)
 
-Spec: {"words_min": 800, "words_max": 2500, "default_words": 1650, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one.", "schema_types": "Product + Offer + FAQPage + BreadcrumbList"}
+Spec: {"words_min": 800, "words_max": 2500, "default_words": 1650, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one.", "schema_types": "FAQPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -587,7 +587,7 @@ One call to action, in the closing section only (section 4). The page is the CTA
 
 ## `brand_page` (Brand)
 
-Spec: {"words_min": 400, "words_max": 1000, "default_words": 700, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one.", "schema_types": "Brand + CollectionPage + BreadcrumbList"}
+Spec: {"words_min": 400, "words_max": 1000, "default_words": 700, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one.", "schema_types": "Organization + CollectionPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -640,7 +640,7 @@ One call to action, in the closing section only (section 5). Direct: two or thre
 
 ## `partnership_program_page` (Partnership program)
 
-Spec: {"words_min": 600, "words_max": 1200, "default_words": 900, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one.", "schema_types": "WebPage + Offer + BreadcrumbList"}
+Spec: {"words_min": 600, "words_max": 1200, "default_words": 900, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one.", "schema_types": "WebPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -691,62 +691,9 @@ One call to action, in the closing section only (section 5). Direct: two or thre
 </page_brief>
 ```
 
-## `course_program_page` (Course program)
-
-Spec: {"words_min": 800, "words_max": 2000, "default_words": 1400, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "required: one H3 per module or week inside the curriculum section.", "schema_types": "Course + CourseInstance + Offer + FAQPage + BreadcrumbList"}
-
-```text
-<page_brief>
-Page type: Course program (offer family). Course, degree or bootcamp
-Client: Example Client
-What the client does: What the client does, as sent by the app.
-H1 (use verbatim): Sample H1 sent by the app
-Core keyword: sample core keyword
-Secondary keywords: secondary one, secondary two
-Language: write in English.
-
-Structure:
-- Opening paragraph: A value proposition that names the outcome and the one action to take. Not a definitional answer paragraph. Then begin the first H2.
-- Then these H2 sections, in this exact order, with these exact headings. Do not add, merge, rename or reorder them.
-  1. First H2 from the app [310 words]
-  2. Second H2 from the app [310 words]
-  3. Third H2 from the app [310 words]
-  4. Fourth H2 from the app [310 words]
-  5. A closing H2 that you write yourself [about 100 words]. Heading: follow one of these patterns, filling any <...> from the H1 or the facts, in sentence case: How to enrol. Never head it "Conclusion", "Summary", "Final thoughts" or "Key takeaways". Content: What the first step is, what happens next and how long it takes, taken from the client facts, in 60 to 120 words, then the CTA sentence. No recap.
-- Formats for this page type: Curriculum as one H3 per module with two or three prose sentences. Dates, prices and formats in a table. Outcomes as bullets. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
-- Include at least 1 markdown table where a section suits one. Real pipe tables with a header row.
-- H3 subheadings are required: one H3 per module or week inside the curriculum section. When you use H3s in a section, use at least two, phrase each as the specific sub-question or item it covers (that is what answer engines quote), keep them in sentence case, and never put an H3 in a section under 150 words. Never use H4.
-- Total length: 800 to 2000 words. Aim for about 1400.
-- External citations are optional. Any you use must come from the Live Research tool.
-- Research: This page type is written from the client facts and general professional knowledge. Use the Live Research tool only when a sentence needs a specific external figure or quote, and drop the sentence if nothing reliable comes back.
-- Every H2 section opens with a sentence that answers that heading directly, then explains, then gives what varies, then what to check.
-- Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
-
-Questions this page must answer:
-Readers and answer engines ask these questions. Answer each one once, inside the section where it fits best, with a direct answering sentence first and the evidence after it. Never insert a question as text, never add a question and answer block, never restate the question. The reader must not notice the question was planted.
-  1. First AI prompt sent by the app?
-  2. Second AI prompt sent by the app?
-
-Client facts:
-These are the only claims you may make about the client. Use them exactly and invent nothing about the client beyond them. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
-- fact_key_1: fact value from the app
-- fact_key_2: ["list","of","values"]
-
-Hard rules for this page:
-- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
-- Never link to the client's own website (https://example.com) and never invent an internal link. Links between the client's pages are placed by a separate process after this page is written. The only client link allowed is the CTA link described below, when there is one.
-- Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
-- No exclamation marks.
-- Page type constraints: Accreditation, duration, price and outcomes only from the facts; placement or salary claims need a stated methodology.
-
-CTA:
-One call to action, in the closing section only (section 5). Direct: two or three plain sentences at the end of the closing section that say what the client does on this subject (facts only) and ask for the one action named in the CTA rule, linked to the CTA URL with a two to four word anchor. One CTA on the page, in the closing section only. No urgency, no "imagine", no superlative. The action: CTA rule sent by the app.. Link the action to https://example.com/contact/ with a plain anchor of two to four words. That is the only link to the client's site on the page. Outside the closing section, never ask the reader to contact, book, call, schedule, sign up or get in touch, and never write "we" as the client.
-</page_brief>
-```
-
 ## `membership_plan_page` (Membership plan)
 
-Spec: {"words_min": 500, "words_max": 1200, "default_words": 850, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "required: one H3 per plan or tier.", "schema_types": "Offer + Product + BreadcrumbList"}
+Spec: {"words_min": 500, "words_max": 1200, "default_words": 850, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "required: one H3 per plan or tier.", "schema_types": "BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -799,7 +746,7 @@ One call to action, in the closing section only (section 5). Direct: two or thre
 
 ## `financing_page` (Financing)
 
-Spec: {"words_min": 500, "words_max": 1000, "default_words": 750, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one.", "schema_types": "WebPage + LoanOrCredit + FAQPage + BreadcrumbList"}
+Spec: {"words_min": 500, "words_max": 1000, "default_words": 750, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one.", "schema_types": "WebPage + FAQPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -1011,7 +958,7 @@ One call to action, in the closing section only (section 4). The last outline se
 
 ## `donate_page` (Donate)
 
-Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one.", "schema_types": "DonateAction + NGO + BreadcrumbList"}
+Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one.", "schema_types": "Organization + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -1064,7 +1011,7 @@ One call to action, in the closing section only (section 5). Direct: one plain s
 
 ## `program_page` (Program)
 
-Spec: {"words_min": 600, "words_max": 1500, "default_words": 1050, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one.", "schema_types": "WebPage + Service + NGO + BreadcrumbList"}
+Spec: {"words_min": 600, "words_max": 1500, "default_words": 1050, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one.", "schema_types": "WebPage + Service + Organization + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -1117,7 +1064,7 @@ One call to action, in the closing section only (section 5). Direct: two or thre
 
 ## `specials_offers_page` (Specials offers)
 
-Spec: {"words_min": 200, "words_max": 600, "default_words": 400, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "none.", "schema_types": "Offer + SpecialAnnouncement + BreadcrumbList"}
+Spec: {"words_min": 200, "words_max": 600, "default_words": 400, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "none.", "schema_types": "BreadcrumbList"}
 
 ```text
 <page_brief>

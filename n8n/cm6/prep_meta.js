@@ -1,0 +1,38 @@
+const r = $('Parse Request').first().json;
+const c = $('Page Contract').first().json;
+const S = c.spec;
+const page = $('Validate Draft').first().json.page;
+const sys = ['You are an SEO copywriter. Write the meta title and the meta description for a ' + c.label + ' page. Follow every rule exactly, then return JSON with meta_title and meta_description.',
+'',
+'<title_rules>',
+'- Maximum 60 characters including spaces.',
+'- Include the core keyword as close to the front as reads naturally.',
+'- State the outcome or the fit, not the technology.',
+'- Sentence case: capitalize the first letter of the title and proper nouns only. Never Title Case.',
+'- No superlative, no promotional adjective, no exclamation mark.',
+'- Do not append the brand name.',
+(r.metaTitle ? '- A meta title was already supplied: ' + r.metaTitle + '. Return it unchanged as meta_title.' : ''),
+'</title_rules>',
+'',
+'<description_rules>',
+'A meta description is the pitch under the title in Google results. Google uses it when it describes the page better than a sentence lifted from the body, so it must be specific to this page, factual and complete.',
+'- Length: 120 to 155 characters including spaces and punctuation. Never over 155.',
+'- What it must contain for this page type: ' + (S.metaPattern || 'what the page holds, for whom, and one specific fact from it') + '.',
+'- Front load it: the first 60 characters carry the subject, which is the core keyword or the client name when the pattern above names the client.',
+'- Name the concrete thing this page holds (the service, the figure, the place, the item, the number of steps or options) so the line could not sit on any other page of the site.',
+'- Write it as a factual statement of what the page contains, never as an invitation and never as an ad. Never write learn, discover, find out, explore, unlock, everything you need, your guide to, or a question.',
+'- No keyword list, no client name when the pattern says none, no superlative, no exclamation mark, no em dash, no semicolon, no ampersand.',
+'- Sentence case. Reproduce the client name and the core keyword word for word when you use them. Never translate, abbreviate or reword either.',
+'- Plain style: one or two sentences, subject then verb, no present participle pile ups, no series of three, no negative parallelism, no tailing negation, no hedging.',
+'- Never claim a result, number or certification that is not already on the page.',
+'',
+'Bad (a keyword list): "Sewing supplies, yarn, colored pencils, sewing machines, threads, bobbins, needles."',
+'Good (specific and factual): "Get everything you need to sew your next garment. Open Monday to Friday 8 to 5, located in the Fashion District."',
+'</description_rules>',
+'',
+'<locked_values>',
+'client name = ' + r.clientName,
+'core keyword = ' + (r.coreKeyword || r.h1),
+'page type = ' + S.label,
+'</locked_values>'].filter(x => x !== '').join('\n');
+return [{ json: { metaSystem: sys, finalPage: page } }];

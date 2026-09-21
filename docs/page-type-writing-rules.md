@@ -742,19 +742,6 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `h3_policy` | optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one. |
 | `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
 
-### `course_program_page` (Course program)
-
-| Rule | Value |
-|---|---|
-| `closing_mode` | append |
-| `closing_heading` | How to enrol |
-| `closing_content` | What the first step is, what happens next and how long it takes, taken from the client facts, in 60 to 120 words, then the CTA sentence. No recap. |
-| `cta_mode` | required |
-| `cta_guidance` | Direct: two or three plain sentences at the end of the closing section that say what the client does on this subject (facts only) and ask for the one action named in the CTA rule, linked to the CTA URL with a two to four word anchor. One CTA on the page, in the closing section only. No urgency, no "imagine", no superlative. |
-| `format_rules` | Curriculum as one H3 per module with two or three prose sentences. Dates, prices and formats in a table. Outcomes as bullets. |
-| `h3_policy` | required: one H3 per module or week inside the curriculum section. |
-| `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
-
 ### `membership_plan_page` (Membership plan)
 
 | Rule | Value |
@@ -1205,71 +1192,6 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `h3_policy` | optional: use H3s inside a section that walks through several findings or chapters. |
 | `meta_description_pattern` | What the asset is, what it contains (number of findings, minutes, pages or records), who published it and when. |
 
-### `webinar_page` (Webinar)
-
-| Rule | Value |
-|---|---|
-| `closing_mode` | append |
-| `closing_heading` | How to register \| How to watch the recording |
-| `closing_content` | Date, length, format and what the reader gets after registering, from the facts, in 40 to 80 words, then the register sentence. |
-| `cta_mode` | required |
-| `cta_guidance` | Direct: one plain sentence asking the reader to register or watch, linked to the CTA URL. |
-| `format_rules` | Key findings as a numbered list. Data in tables. Timestamps or chapters as a table. Everything else in prose. |
-| `h3_policy` | none. |
-| `meta_description_pattern` | What the asset is, what it contains (number of findings, minutes, pages or records), who published it and when. |
-
-### `video_page` (Video)
-
-| Rule | Value |
-|---|---|
-| `closing_mode` | append |
-| `closing_heading` | Where to go next |
-| `closing_content` | The one decision or action the reader should take now and why, in one paragraph of 60 to 120 words. It adds a last useful point instead of summarising the sections. Never open with "In conclusion", "In summary", "Overall" or "Ultimately". |
-| `cta_mode` | optional |
-| `cta_guidance` | Soft: one plain sentence naming the action that fits the asset (download, register, listen, watch), linked to the CTA URL when one is given. |
-| `format_rules` | Chapters or timestamps as a table. The summary in prose. Key points as a numbered list. |
-| `h3_policy` | optional: use H3s inside a section that walks through several findings or chapters. |
-| `meta_description_pattern` | What the asset is, what it contains (number of findings, minutes, pages or records), who published it and when. |
-
-### `podcast_episode_page` (Podcast episode)
-
-| Rule | Value |
-|---|---|
-| `closing_mode` | append |
-| `closing_heading` | Where to go next |
-| `closing_content` | The one decision or action the reader should take now and why, in one paragraph of 60 to 120 words. It adds a last useful point instead of summarising the sections. Never open with "In conclusion", "In summary", "Overall" or "Ultimately". |
-| `cta_mode` | optional |
-| `cta_guidance` | Soft: one plain sentence naming the action that fits the asset (download, register, listen, watch), linked to the CTA URL when one is given. |
-| `format_rules` | Timestamps as a table. The summary and the guest intro in prose. Key points as a numbered list. |
-| `h3_policy` | optional: use H3s inside a section that walks through several findings or chapters. |
-| `meta_description_pattern` | What the asset is, what it contains (number of findings, minutes, pages or records), who published it and when. |
-
-### `infographic_data_viz_page` (Infographic page)
-
-| Rule | Value |
-|---|---|
-| `closing_mode` | append |
-| `closing_heading` | How to share or embed this |
-| `closing_content` | The embed and attribution rule and the source line, in 40 to 80 words. |
-| `cta_mode` | none |
-| `cta_guidance` | (none) |
-| `format_rules` | Key findings as a numbered list. Data in tables. Timestamps or chapters as a table. Everything else in prose. |
-| `h3_policy` | optional: use H3s inside a section that walks through several findings or chapters. |
-| `meta_description_pattern` | What the asset is, what it contains (number of findings, minutes, pages or records), who published it and when. |
-
-### `original_dataset_page` (Original dataset)
-
-| Rule | Value |
-|---|---|
-| `closing_mode` | append |
-| `closing_heading` | How to cite and download the data |
-| `closing_content` | Licence, citation line, format and update cadence, from the facts, in 50 to 100 words. |
-| `cta_mode` | optional |
-| `cta_guidance` | Soft: one plain sentence naming the action that fits the asset (download, register, listen, watch), linked to the CTA URL when one is given. |
-| `format_rules` | Key findings as a numbered list. Data in tables. Timestamps or chapters as a table. Everything else in prose. |
-| `h3_policy` | required: one H3 per field group or per finding. |
-| `meta_description_pattern` | What the asset is, what it contains (number of findings, minutes, pages or records), who published it and when. |
-
 ## `local` family
 
 ### `location_page` (Location)
@@ -1378,19 +1300,6 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 
 ## `catalogue` family
 
-### `product_page` (Product)
-
-| Rule | Value |
-|---|---|
-| `closing_mode` | none |
-| `closing_heading` | (none) |
-| `closing_content` | (none) |
-| `cta_mode` | optional |
-| `cta_guidance` | Soft: one plain sentence in the last outline section naming how to order or ask for a quote, linked to the CTA URL. The buy button is UI and is not written. |
-| `format_rules` | Specifications, prices, sizes, doses, coverage and comparisons in tables. Sequences as numbered steps. Inclusions and options as bullets. Descriptions and reasoning in prose. |
-| `h3_policy` | optional: one H3 per variant inside a section that covers several. |
-| `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
-
 ### `product_category_page` (Product category)
 
 | Rule | Value |
@@ -1430,19 +1339,6 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `h3_policy` | none. |
 | `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
 
-### `listing_detail_page` (Listing detail)
-
-| Rule | Value |
-|---|---|
-| `closing_mode` | append |
-| `closing_heading` | Book a viewing \| Contact the seller |
-| `closing_content` | The first step to get the item, what happens next and how long it takes, from the facts, in 40 to 90 words, then the CTA sentence. |
-| `cta_mode` | required |
-| `cta_guidance` | Direct: one or two plain sentences asking for the one action in the CTA rule, linked to the CTA URL with a two to four word anchor. |
-| `format_rules` | Specifications, prices, sizes, doses, coverage and comparisons in tables. Sequences as numbered steps. Inclusions and options as bullets. Descriptions and reasoning in prose. |
-| `h3_policy` | optional: use H3s inside a section over 250 words that covers several variants, options or stages. |
-| `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
-
 ### `search_results_listing_page` (Search results listing) (not written by the flow)
 
 | Rule | Value |
@@ -1456,45 +1352,6 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `h3_policy` | none. |
 | `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
 
-### `model_research_page` (Model research)
-
-| Rule | Value |
-|---|---|
-| `closing_mode` | append |
-| `closing_heading` | See it in person \| Book a test drive |
-| `closing_content` | The first step to get the item, what happens next and how long it takes, from the facts, in 40 to 90 words, then the CTA sentence. |
-| `cta_mode` | required |
-| `cta_guidance` | Direct: one or two plain sentences asking for the one action in the CTA rule, linked to the CTA URL with a two to four word anchor. |
-| `format_rules` | Specifications, prices, sizes, doses, coverage and comparisons in tables. Sequences as numbered steps. Inclusions and options as bullets. Descriptions and reasoning in prose. |
-| `h3_policy` | required: one H3 per trim or variant inside the section that goes through them. |
-| `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
-
-### `job_posting_page` (Job posting)
-
-| Rule | Value |
-|---|---|
-| `closing_mode` | append |
-| `closing_heading` | How to apply |
-| `closing_content` | The application steps, the deadline and what happens after applying, from the facts, in 40 to 80 words, then the apply sentence. |
-| `cta_mode` | required |
-| `cta_guidance` | Direct: one or two plain sentences asking for the one action in the CTA rule, linked to the CTA URL with a two to four word anchor. |
-| `format_rules` | Responsibilities and requirements as bullets. Salary, location and hours in a two column table. Prose for the team and the role context. |
-| `h3_policy` | none. |
-| `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
-
-### `job_category_page` (Job category)
-
-| Rule | Value |
-|---|---|
-| `closing_mode` | append |
-| `closing_heading` | How to apply |
-| `closing_content` | The first step to get the item, what happens next and how long it takes, from the facts, in 40 to 90 words, then the CTA sentence. |
-| `cta_mode` | required |
-| `cta_guidance` | Direct: one or two plain sentences asking for the one action in the CTA rule, linked to the CTA URL with a two to four word anchor. |
-| `format_rules` | Specifications, prices, sizes, doses, coverage and comparisons in tables. Sequences as numbered steps. Inclusions and options as bullets. Descriptions and reasoning in prose. |
-| `h3_policy` | optional: one H3 per role family. |
-| `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
-
 ### `careers_page` (Careers)
 
 | Rule | Value |
@@ -1506,84 +1363,6 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `cta_guidance` | Direct: one plain sentence pointing to the open roles, linked to the CTA URL. |
 | `format_rules` | Specifications, prices, sizes, doses, coverage and comparisons in tables. Sequences as numbered steps. Inclusions and options as bullets. Descriptions and reasoning in prose. |
 | `h3_policy` | optional: use H3s inside a section over 250 words that covers several variants, options or stages. |
-| `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
-
-### `event_page` (Event)
-
-| Rule | Value |
-|---|---|
-| `closing_mode` | append |
-| `closing_heading` | How to register \| How to attend |
-| `closing_content` | Date, venue, price and the registration steps, from the facts, in 40 to 80 words, then the register sentence. |
-| `cta_mode` | required |
-| `cta_guidance` | Direct: one or two plain sentences asking for the one action in the CTA rule, linked to the CTA URL with a two to four word anchor. |
-| `format_rules` | Agenda as a table (time, session, speaker). Practical facts as bullets. Prose for why to attend. |
-| `h3_policy` | optional: one H3 per session or per day. |
-| `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
-
-### `recipe_page` (Recipe)
-
-| Rule | Value |
-|---|---|
-| `closing_mode` | none |
-| `closing_heading` | (none) |
-| `closing_content` | (none) |
-| `cta_mode` | none |
-| `cta_guidance` | (none) |
-| `format_rules` | Ingredients as a bulleted list with quantities. Method as numbered steps. Prep, cook and total time in a table. Prose for the intro and the notes. |
-| `h3_policy` | optional: H3s for variations or components when there are several. |
-| `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
-
-### `menu_page` (Menu)
-
-| Rule | Value |
-|---|---|
-| `closing_mode` | none |
-| `closing_heading` | (none) |
-| `closing_content` | (none) |
-| `cta_mode` | optional |
-| `cta_guidance` | Soft: one plain sentence in the last outline section on how to book a table or order, linked to the CTA URL. |
-| `format_rules` | Dishes as a table per course (dish, description, price). Prose for the intro only. |
-| `h3_policy` | required: one H3 per course or menu section. |
-| `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
-
-### `accommodation_room_page` (Accommodation room)
-
-| Rule | Value |
-|---|---|
-| `closing_mode` | append |
-| `closing_heading` | Check availability \| How to book |
-| `closing_content` | The first step to get the item, what happens next and how long it takes, from the facts, in 40 to 90 words, then the CTA sentence. |
-| `cta_mode` | required |
-| `cta_guidance` | Direct: one or two plain sentences asking for the one action in the CTA rule, linked to the CTA URL with a two to four word anchor. |
-| `format_rules` | Room facts (size, beds, view, occupancy) in a table. Amenities as bullets. Prose for the description. |
-| `h3_policy` | none. |
-| `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
-
-### `tour_package_page` (Tour package)
-
-| Rule | Value |
-|---|---|
-| `closing_mode` | append |
-| `closing_heading` | How to book this tour |
-| `closing_content` | The first step to get the item, what happens next and how long it takes, from the facts, in 40 to 90 words, then the CTA sentence. |
-| `cta_mode` | required |
-| `cta_guidance` | Direct: one or two plain sentences asking for the one action in the CTA rule, linked to the CTA URL with a two to four word anchor. |
-| `format_rules` | Itinerary as one H3 per day with prose. Inclusions and exclusions as two bullet lists. Dates and prices in a table. |
-| `h3_policy` | required: one H3 per day inside the itinerary section. |
-| `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
-
-### `app_marketplace_listing` (App marketplace listing)
-
-| Rule | Value |
-|---|---|
-| `closing_mode` | append |
-| `closing_heading` | How to install |
-| `closing_content` | The first step to get the item, what happens next and how long it takes, from the facts, in 40 to 90 words, then the CTA sentence. |
-| `cta_mode` | optional |
-| `cta_guidance` | Soft: one plain sentence on how to install or start the trial, linked to the CTA URL. |
-| `format_rules` | Specifications, prices, sizes, doses, coverage and comparisons in tables. Sequences as numbered steps. Inclusions and options as bullets. Descriptions and reasoning in prose. |
-| `h3_policy` | none. |
 | `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
 
 ### `material_capability_page` (Capability or material page)

@@ -110,7 +110,7 @@ There is no call to action on this page. Nowhere on the page do you ask the read
 
 ## `statistics_page` (Statistics page)
 
-Spec: {"words_min": 1500, "words_max": 3000, "default_words": 2250, "answer_paragraph": true, "answer_style": "definition", "tables_min": 0, "citations_min": 1, "research": "search", "closing_mode": "append", "cta_mode": "none", "h3_policy": "required: one H3 per statistic group, phrased as the figure it holds.", "schema_types": "Article + Dataset + ItemList + BreadcrumbList"}
+Spec: {"words_min": 1500, "words_max": 3000, "default_words": 2250, "answer_paragraph": true, "answer_style": "definition", "tables_min": 0, "citations_min": 1, "research": "search", "closing_mode": "append", "cta_mode": "none", "h3_policy": "required: one H3 per statistic group, phrased as the figure it holds.", "schema_types": "Article + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -163,7 +163,7 @@ There is no call to action on this page. Nowhere on the page do you ask the read
 
 ## `spec_sheet` (Spec sheet)
 
-Spec: {"words_min": 300, "words_max": 1000, "default_words": 650, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 1, "research": "search", "closing_mode": "none", "cta_mode": "none", "h3_policy": "none: the table carries the structure.", "schema_types": "Product + PropertyValue + TechArticle + BreadcrumbList"}
+Spec: {"words_min": 300, "words_max": 1000, "default_words": 650, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 1, "research": "search", "closing_mode": "none", "cta_mode": "none", "h3_policy": "none: the table carries the structure.", "schema_types": "TechArticle + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -269,7 +269,7 @@ There is no call to action on this page. Nowhere on the page do you ask the read
 
 ## `entity_lookup` (Entity lookup)
 
-Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": true, "answer_style": "definition", "tables_min": 0, "citations_min": 1, "research": "search", "closing_mode": "none", "cta_mode": "none", "h3_policy": "none.", "schema_types": "Article + Dataset + BreadcrumbList"}
+Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": true, "answer_style": "definition", "tables_min": 0, "citations_min": 1, "research": "search", "closing_mode": "none", "cta_mode": "none", "h3_policy": "none.", "schema_types": "Article + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -375,7 +375,7 @@ One call to action, in the closing section only (section 5). Soft: one plain sen
 
 ## `salary_guide` (Salary guide)
 
-Spec: {"words_min": 1000, "words_max": 2500, "default_words": 1750, "answer_paragraph": true, "answer_style": "definition", "tables_min": 0, "citations_min": 1, "research": "search", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "required: one H3 per role, level or region inside the sections that list them.", "schema_types": "Article + Dataset + FAQPage + BreadcrumbList"}
+Spec: {"words_min": 1000, "words_max": 2500, "default_words": 1750, "answer_paragraph": true, "answer_style": "definition", "tables_min": 0, "citations_min": 1, "research": "search", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "required: one H3 per role, level or region inside the sections that list them.", "schema_types": "Article + FAQPage + BreadcrumbList"}
 
 ```text
 <page_brief>

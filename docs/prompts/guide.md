@@ -216,7 +216,7 @@ One call to action, in the closing section only (section 5). Soft: one plain sen
 
 ## `checklist` (Checklist)
 
-Spec: {"words_min": 800, "words_max": 1800, "default_words": 1300, "answer_paragraph": true, "answer_style": "definition", "tables_min": 1, "citations_min": 3, "research": "search", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "none: the numbered list carries the structure.", "schema_types": "HowTo + Article + ItemList + BreadcrumbList"}
+Spec: {"words_min": 800, "words_max": 1800, "default_words": 1300, "answer_paragraph": true, "answer_style": "definition", "tables_min": 1, "citations_min": 3, "research": "search", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "none: the numbered list carries the structure.", "schema_types": "HowTo + Article + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -534,7 +534,7 @@ One call to action, in the closing section only (section 5). Direct but calm: on
 
 ## `destination_guide` (Destination guide)
 
-Spec: {"words_min": 1500, "words_max": 3500, "default_words": 2500, "answer_paragraph": true, "answer_style": "definition", "tables_min": 1, "citations_min": 3, "research": "search", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "required: one H3 per place, season or activity inside the sections that list them.", "schema_types": "Article + TouristDestination + FAQPage + BreadcrumbList"}
+Spec: {"words_min": 1500, "words_max": 3500, "default_words": 2500, "answer_paragraph": true, "answer_style": "definition", "tables_min": 1, "citations_min": 3, "research": "search", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "required: one H3 per place, season or activity inside the sections that list them.", "schema_types": "Article + WebPage + FAQPage + BreadcrumbList"}
 
 ```text
 <page_brief>

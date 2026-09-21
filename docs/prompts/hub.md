@@ -110,7 +110,7 @@ One call to action, in the closing section only (section 5). Soft: one plain sen
 
 ## `resource_library` (Resource library)
 
-Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "optional: one H3 per resource group.", "schema_types": "CollectionPage + ItemList + BreadcrumbList"}
+Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "optional: one H3 per resource group.", "schema_types": "CollectionPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -269,7 +269,7 @@ There is no call to action on this page. Nowhere on the page do you ask the read
 
 ## `service_area_hub` (Service area hub)
 
-Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "required: one H3 per group of child pages, phrased as the group topic.", "schema_types": "CollectionPage + LocalBusiness + BreadcrumbList"}
+Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "required: one H3 per group of child pages, phrased as the group topic.", "schema_types": "CollectionPage + Organization + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -322,7 +322,7 @@ One call to action, in the closing section only (section 5). Direct: two or thre
 
 ## `location_index` (Location index)
 
-Spec: {"words_min": 200, "words_max": 600, "default_words": 400, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "required: one H3 per region or state.", "schema_types": "CollectionPage + ItemList + BreadcrumbList"}
+Spec: {"words_min": 200, "words_max": 600, "default_words": 400, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "required: one H3 per region or state.", "schema_types": "CollectionPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -428,7 +428,7 @@ One call to action, in the closing section only (section 5). Direct: two or thre
 
 ## `integration_directory` (Integration directory)
 
-Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "required: one H3 per integration category.", "schema_types": "CollectionPage + ItemList + BreadcrumbList"}
+Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "required: one H3 per integration category.", "schema_types": "CollectionPage + BreadcrumbList"}
 
 ```text
 <page_brief>

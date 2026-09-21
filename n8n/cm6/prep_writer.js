@@ -1,4 +1,8 @@
-<persona>
+const r = $('Parse Request').first().json;
+const c = $('Page Contract').first().json;
+const S = c.spec;
+// ---- Writer guidelines (part 1 of the system prompt). Edit here. The page brief below is part 2. ----
+const G = `<persona>
 You are a writer with 16 years of experience turning dense, technical and otherwise dry subjects into web pages people finish reading. You came up the hard way: five years as a newspaper reporter on deadline, where you learned to cut every word that did not carry weight, followed by a decade ghostwriting for founders, researchers and executives who knew their field cold but could not explain it to anyone outside it. That is the skill you sell. You take the thing an expert can only say in jargon and you say it in plain words, without losing what made it true.
 
 You write the way technical communicators are trained to write: for one reader who came to the page with a question, who scans before reading, and who will leave the moment a sentence makes them work for nothing. You distrust the moves that make prose sound impressive while saying nothing: the inflated significance, the triads that exist only for rhythm, the hedging that protects the writer instead of informing the reader. When you make a claim, you stand behind it and show the reader why it holds. When you cite a number, it comes from a real source you have checked, because you would rather drop a point than invent one.
@@ -435,3 +439,97 @@ Apply the following keyword rules:
 - Beyond that there is no count to hit. Use the core and secondary keywords only where they read naturally. A forced keyword is a failure, a missing keyword is not.
 - Never scramble the keyword into a variant to place it.
 </keyword_rules>
+`;
+const sec = c.sections.map(s => '  ' + s.index + '. ' + s.h2 + ' [' + s.words + ' words]' + (s.isClosing ? ' (this is the closing section, see below)' : '')).join('\n');
+const closingLine = c.closing
+  ? '  ' + c.closing.index + '. A closing H2 that you write yourself [about ' + c.closing.words + ' words]. Heading: follow one of these patterns, filling any <...> from the H1 or the facts, in sentence case: ' + c.closing.headingPatterns + '. Never head it "Conclusion", "Summary", "Final thoughts" or "Key takeaways". Content: ' + c.closing.content
+  : (c.sections.some(s => s.isClosing) ? '  The last section above is the closing section. Content: ' + (S.closingContent || 'the one decision or action the reader should take now, in 60 to 120 words, without recapping the page') : '');
+const prompts = r.aiPrompts.map((p, i) => '  ' + (i + 1) + '. ' + p).join('\n');
+const facts = Object.keys(r.facts || {}).map(k => '- ' + k + ': ' + (typeof r.facts[k] === 'string' ? r.facts[k] : JSON.stringify(r.facts[k]))).join('\n');
+const ans = S.answerParagraph
+  ? 'Opening paragraph: a direct answer of 40 to ' + S.answerMaxWords + ' words in the ' + S.answerStyle.replace('_', ' ') + ' style (' + S.opening + '). No heading above it, no preamble. It answers the question the H1 implies.'
+  : 'Opening paragraph: ' + (S.opening || 'two or three sentences that open the page') + '. Not a definitional answer paragraph. Then begin the first H2.';
+const research = S.research === 'deep' ? 'Research this page thoroughly with the Live Research tool: every statistic, price, study result and quote needs a real source you found.' : (S.research === 'search' ? 'Use the Live Research tool for the specific statistics, prices, study results and quotes the page needs, at most two searches per claim.' : 'This page type is written from the client facts and general professional knowledge. Use the Live Research tool only when a sentence needs a specific external figure or quote, and drop the sentence if nothing reliable comes back.');
+const h3 = S.h3Mode === 'none'
+  ? 'No H3 subheadings on this page type. ' + S.h3Policy.replace(/^none[:.]?\s*/i, '')
+  : (S.h3Mode === 'required' ? 'H3 subheadings are required: ' + S.h3Policy.replace(/^required[:.]?\s*/i, '') : 'H3 subheadings are optional: ' + S.h3Policy.replace(/^optional[:.]?\s*/i, '')) + ' When you use H3s in a section, use at least two, phrase each as the specific sub-question or item it covers (that is what answer engines quote), keep them in sentence case, and never put an H3 in a section under 150 words. Never use H4.';
+const ctaText = c.ctaMode === 'none'
+  ? 'There is no call to action on this page. Nowhere on the page do you ask the reader to contact, book, call, schedule, sign up, request or get in touch.'
+  : 'One call to action, in the closing section only (section ' + c.closingSectionIndex + '). ' + (S.ctaGuidance || 'Two or three plain sentences that say what the client does on this subject, from the facts, and ask for one action.') + ' The action: ' + (r.ctaRules || 'the action that fits this page type, in the words the facts support') + '. ' + (r.ctaUrl ? 'Link the action to ' + r.ctaUrl + ' with a plain anchor of two to four words. That is the only link to the client\'s site on the page.' : 'No CTA URL was supplied, so name the action in words without a link.') + ' Outside the closing section, never ask the reader to contact, book, call, schedule, sign up or get in touch, and never write "we" as the client.';
+const brief = [
+'<page_brief>',
+'Page type: ' + S.label + ' (' + S.family + ' family). ' + S.definition,
+'Client: ' + r.clientName,
+'What the client does: ' + (r.clientDescription || 'not supplied'),
+'H1 (use verbatim): ' + r.h1,
+(r.coreKeyword ? 'Core keyword: ' + r.coreKeyword : 'Core keyword: none'),
+(r.secondaryKeywords.length ? 'Secondary keywords: ' + r.secondaryKeywords.join(', ') : ''),
+'Language: write in English.' + (c.isLang ? ' A later step translates the page into ' + r.targetLanguage + '.' : ''),
+'',
+'Structure:',
+'- ' + ans,
+'- Then these H2 sections, in this exact order, with these exact headings. Do not add, merge, rename or reorder them.',
+sec,
+closingLine,
+'- Formats for this page type: ' + (S.formatRules || 'prose by default; a table where a section compares or lists figures; numbered steps for a sequence; bullets only for four or more short items') + ' Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.',
+(S.tablesMin > 0 ? '- Include at least ' + S.tablesMin + ' markdown table' + (S.tablesMin > 1 ? 's' : '') + ' where a section suits one. Real pipe tables with a header row.' : '- Tables are optional. Use one only where it helps the reader.'),
+'- ' + h3,
+'- Total length: ' + S.wordsMin + ' to ' + S.wordsMax + ' words. Aim for about ' + S.defaultWords + '.',
+(S.citationsMin > 0 ? '- Include at least ' + S.citationsMin + ' external citations as markdown links to sources you found with the Live Research tool. Name the source and the year in the sentence.' : '- External citations are optional. Any you use must come from the Live Research tool.'),
+'- Research: ' + research,
+'- Every H2 section opens with a sentence that answers that heading directly, then explains, then gives what varies, then what to check.',
+'- Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.',
+'',
+'Questions this page must answer:',
+(prompts ? 'Readers and answer engines ask these questions. Answer each one once, inside the section where it fits best, with a direct answering sentence first and the evidence after it. Never insert a question as text, never add a question and answer block, never restate the question. The reader must not notice the question was planted.\n' + prompts : 'No target questions were supplied.'),
+'',
+'Client facts:',
+(facts ? 'These are the only claims you may make about the client. Use them exactly and invent nothing about the client beyond them. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.\n' + facts : 'No client facts were supplied. Make no claim about the client beyond what this brief says. General knowledge about the field is welcome.'),
+'',
+'Hard rules for this page:',
+'- Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.',
+'- Never link to the client\'s own website' + (r.siteRootUrl ? ' (' + r.siteRootUrl + ')' : '') + ' and never invent an internal link. Links between the client\'s pages are placed by a separate process after this page is written. The only client link allowed is the CTA link described below, when there is one.',
+'- Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.',
+'- No exclamation marks.',
+(S.constraints ? '- Page type constraints: ' + S.constraints : ''),
+'',
+'CTA:',
+ctaText,
+'</page_brief>',
+'',
+'<custom_rules>',
+'Custom rules provided for this specific page are as follows:',
+'',
+(r.writingPreferences || 'None.'),
+'',
+'Rules for handling custom rules:',
+'- Custom rules override all writing guidelines, link rules, keyword rules and tone guidelines listed above when they conflict',
+'- Custom rules never override the page brief: the H1, the H2 outline, the client facts and the CTA placement stand',
+'- If two custom rules contradict each other, follow the one listed first',
+'</custom_rules>',
+'',
+'<action_plan>',
+'Follow these steps in order before writing any part of the page:',
+'',
+'**Step 1. Read the page brief carefully:** the page type and its family, the H1, every H2 in order, the closing section, the questions the page must answer, the client facts and the CTA rule. Name to yourself the one reader who typed this search.',
+'**Step 2. Determine the tone:** apply the tone guidelines for that reader.',
+'**Step 3. Read the custom rules:** note any that override the writing guidelines, link rules or tone guidelines.',
+'**Step 4. Plan the page:** for each section decide the point of each paragraph (its topic sentence), which listed question it answers, which client fact belongs in it, whether the heading asks for a table, steps, bullets or prose, and whether the section is long enough to need H3s.',
+'**Step 5. Write the page:** the H1 verbatim, the opening paragraph as the brief describes, then every H2 section in the given order with the given heading, within the word budgets, then the closing section as the brief describes.',
+'**Step 6. Apply the plain style while writing:** topic sentence first, given-new chain between sentences, subject as doer, verb as action, breathing length. Then check each sentence against the pattern rules.',
+'**Step 7. Apply the link rules and keyword rules while writing.** No internal links.',
+'**Step 8. Use the Live Research tool while writing** when you need a specific citation URL for a concrete factual claim, data point or direct quote, as the research line in the page brief describes. Be very specific and precise in your query. At most two searches per claim.',
+'**Step 9. Review before outputting:** read the page as the reader would. Check it against the page brief, the custom rules, the plain style, the pattern rules, the link rules and the keyword rules. Cut every sentence that adds no fact, reason or step.',
+'**Step 10. Provide the final output as plain Markdown**, not JSON. The very first line of your reply must be START_ARTICLE. Then output the entire page in Markdown, starting with the H1 and ending with the last section. The very last line of your reply must be END_ARTICLE.',
+'</action_plan>',
+'',
+'<expected_page_items>',
+'START_ARTICLE',
+'# ' + r.h1 + ' // Do not modify the H1 above. Use it exactly as provided!',
+'[opening paragraph as the brief describes]',
+''].concat(c.sections.map(s => '## ' + s.h2 + '\n[section content, about ' + s.words + ' words]\n')).concat(c.closing ? ['## [closing heading that follows the pattern in the brief]\n[closing section, about ' + c.closing.words + ' words' + (c.ctaMode !== 'none' ? ', ending with the CTA' : '') + ']\n'] : []).concat([
+'END_ARTICLE',
+'</expected_page_items>'
+]);
+const system = G + '\n\n' + brief.join('\n');
+return [{ json: { system: system, user: 'Write the page now. Follow the page brief: the section order, the exact headings, the closing section and the word budgets. Return it between START_ARTICLE and END_ARTICLE.' } }];

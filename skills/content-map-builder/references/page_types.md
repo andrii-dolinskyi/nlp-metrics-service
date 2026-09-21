@@ -123,7 +123,6 @@ Columns: default words (allowed range), default schema, what the client must sup
 | `quote_request_page` | Quote request | Quote or estimate page with form | insurance, trades, logistics, manufacturing, printing | 500 (300–700) | ContactPage + Service + BreadcrumbList | form fields, turnaround, what affects the quote | N | Y |
 | `brand_page` | Brand | Brand or manufacturer page within a retailer | e-commerce, distribution, auto, industrial | 700 (400–1,000) | Brand + CollectionPage + BreadcrumbList | brand facts, product lines, authorised status | N | Y |
 | `partnership_program_page` | Partnership program | Partner, affiliate or reseller program | SaaS, telecom, fintech, manufacturing | 900 (600–1,200) | WebPage + Offer + BreadcrumbList | program terms, tiers, benefits | N | Y |
-| `course_program_page` | Course program | Course, degree or bootcamp | education, edtech, training | 1,400 (800–2,000) | Course + CourseInstance + Offer + FAQPage + BreadcrumbList | curriculum, duration, outcomes, prerequisites, price, accreditation | N | Y |
 | `membership_plan_page` | Membership plan | Gym, club or subscription plan | fitness, media, associations, coworking | 850 (500–1,200) | Offer + Product + BreadcrumbList | plan details, terms | N | Y |
 | `financing_page` | Financing | Payment plans and financing | auto, trades, dental, furniture, education | 750 (500–1,000) | WebPage + LoanOrCredit + FAQPage + BreadcrumbList | lender terms, APR ranges, eligibility, disclosures | N | P |
 | `ad_landing_page` | Ad landing | Campaign page, usually noindex, single CTA | all | 650 (300–1,000) | WebPage + BreadcrumbList | offer, audience, message match, form | N | Y |
@@ -178,11 +177,6 @@ Columns: default words (allowed range), default schema, what the client must sup
 | `research_report` | Research report | Original research findings | B2B, SaaS, agencies, HR, fintech, industry bodies | 2,200 (2,000–6,000) | Article + Dataset + FAQPage + BreadcrumbList | methodology, sample, findings, charts, author | Y | P |
 | `whitepaper_ebook_gate` | Whitepaper or ebook gate | Gated asset landing page | B2B, SaaS, finance, industrial | 550 (300–800) | DigitalDocument + WebPage + BreadcrumbList | asset outline, takeaways, form | N | Y |
 | `template_example_page` | Template example | Downloadable or copyable template | SaaS, HR, legal-tech, finance, agencies | 1,050 (600–1,500) | CreativeWork + HowTo + BreadcrumbList | template file, fields explained | Y | Y |
-| `webinar_page` | Webinar | Registration or on-demand webinar | SaaS, B2B, education, healthcare CE | 550 (300–800) | Event + VideoObject + BreadcrumbList | speakers, agenda, date, replay | N | Y |
-| `video_page` | Video | Single video with transcript | media, SaaS, education, health | 900 (300–1,500) | VideoObject + Article + BreadcrumbList | transcript, chapters | Y | P |
-| `podcast_episode_page` | Podcast episode | Episode page with show notes | media, B2B | 800 (400–1,200) | PodcastEpisode + BreadcrumbList | transcript or notes, guests | N | P |
-| `infographic_data_viz_page` | Infographic page | Infographic host page | marketing, health, finance, nonprofits | 700 (400–1,000) | ImageObject + Article + BreadcrumbList | image, data sources | Y | P |
-| `original_dataset_page` | Original dataset | Public dataset or index page | fintech, HR, proptech, energy, logistics | 1,650 (800–2,500) | Dataset + Report + BreadcrumbList | data, methodology, update cadence | Y | P |
 
 ### local (8)
 
@@ -201,22 +195,11 @@ Columns: default words (allowed range), default schema, what the client must sup
 
 | type_id | Label | What it is | Common industries | Words | Schema | Client must supply | AP | AI |
 |---|---|---|---|---|---|---|---|---|
-| `product_page` | Product | Single product | e-commerce, retail, industrial, food | 750 (300–1,200) | Product + Offer + AggregateRating + BreadcrumbList | specs, variants, price, stock, images, reviews, compliance labels | N | P |
 | `product_category_page` | Product category | Category with editorial copy | e-commerce, retail, distribution | 500 (200–800) | CollectionPage + ItemList + BreadcrumbList | product feed, subcategories, buying tips | N | Y |
 | `collection_curated_page` | Collection curated | Themed collection | e-commerce, retail, travel | 400 (200–600) | CollectionPage + ItemList + BreadcrumbList | selection rule, theme | N | Y |
 | `intermediary_category_page` | Intermediary category | Parent category routing to subcategories | e-commerce, industrial | 350 (200–500) | CollectionPage + BreadcrumbList | subcategory list | N | Y |
-| `listing_detail_page` | Listing detail | Single listing (property, vehicle, rental) | real estate, auto, marketplaces, travel | 600 (300–900) | RealEstateListing + Vehicle + Offer + Accommodation + BreadcrumbList | listing record, photos, features, price | N | P |
 | `search_results_listing_page` | Search results listing | Filtered listing grid | real estate, auto, marketplaces, jobs | 250 (100–400) | SearchResultsPage + CollectionPage | filter definitions, feed | N | N |
-| `model_research_page` | Model research | Hand-written page for a vehicle model or product line | automotive, appliances, electronics | 1,300 (800–1,800) | Product + Vehicle + FAQPage + BreadcrumbList | trims, specs, pricing, inventory link | Y | P |
-| `job_posting_page` | Job posting | Single vacancy | recruiting, all employers | 650 (400–900) | JobPosting + BreadcrumbList | role, salary, location, employer, deadline | N | P |
-| `job_category_page` | Job category | Jobs by role, industry or location | recruiting, marketplaces | 400 (200–600) | CollectionPage + ItemList + BreadcrumbList | job feed, market notes | N | P |
 | `careers_page` | Careers | Employer branding and open roles | all employers | 850 (500–1,200) | WebPage + Organization + BreadcrumbList | culture, benefits, hiring process | N | Y |
-| `event_page` | Event | Single event or class | education, nonprofits, hospitality, B2B, arts | 600 (300–900) | Event + Offer + Place + BreadcrumbList | date, venue, agenda, tickets, speakers | N | Y |
-| `recipe_page` | Recipe | Recipe | food, media, hospitality, appliance brands | 1,050 (600–1,500) | Recipe + HowTo + VideoObject + BreadcrumbList | ingredients, steps, times, nutrition, yield | Y | Y |
-| `menu_page` | Menu | Restaurant menu as HTML | hospitality | 500 (200–800) | Menu + MenuSection + MenuItem + BreadcrumbList | menu data, allergens, prices | N | P |
-| `accommodation_room_page` | Accommodation room | Hotel room or property type | hospitality, travel | 550 (300–800) | Accommodation + HotelRoom + Offer + BreadcrumbList | room facts, amenities, rates | N | P |
-| `tour_package_page` | Tour package | Tour or itinerary | travel | 1,400 (800–2,000) | TouristTrip + Offer + FAQPage + BreadcrumbList | itinerary, inclusions, price, dates | N | Y |
-| `app_marketplace_listing` | App marketplace listing | App or plugin listing | SaaS platforms, marketplaces | 550 (300–800) | SoftwareApplication + Offer + BreadcrumbList | app data, screenshots, pricing | N | P |
 | `material_capability_page` | Capability or material page | Manufacturing capability or material | manufacturing, industrial, construction materials | 1,300 (800–1,800) | Service + Product + FAQPage + BreadcrumbList | tolerances, equipment, materials, certs, lead times, MOQ | N | P |
 | `application_page_industrial` | Industrial application page | Industrial use-case page | manufacturing, energy, telecom, logistics | 1,100 (700–1,500) | Service + Product + FAQPage + BreadcrumbList | application requirements, relevant products, compliance | N | Y |
 | `condition_page` | Condition | Medical condition overview | healthcare, dental, veterinary, mental health | 1,750 (1,000–2,500) | MedicalWebPage + MedicalCondition + FAQPage + BreadcrumbList | clinical facts with sources, reviewer, when to seek care | Y | P |

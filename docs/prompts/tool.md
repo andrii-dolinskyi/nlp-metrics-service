@@ -57,7 +57,7 @@ One call to action, in the closing section only (section 5). Soft: one plain sen
 
 ## `quiz_assessment_page` (Quiz assessment)
 
-Spec: {"words_min": 300, "words_max": 1000, "default_words": 650, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 1, "research": "none", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "optional: use H3s inside a section that explains several inputs or several result ranges.", "schema_types": "WebApplication + Quiz + BreadcrumbList"}
+Spec: {"words_min": 300, "words_max": 1000, "default_words": 650, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 1, "research": "none", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "optional: use H3s inside a section that explains several inputs or several result ranges.", "schema_types": "WebApplication + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -110,7 +110,7 @@ One call to action, in the closing section only (section 5). Soft: one plain sen
 
 ## `configurator_estimator` (Configurator estimator)
 
-Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 1, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s inside a section that explains several inputs or several result ranges.", "schema_types": "WebApplication + Product + BreadcrumbList"}
+Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 1, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s inside a section that explains several inputs or several result ranges.", "schema_types": "WebApplication + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -216,7 +216,7 @@ One call to action, in the closing section only (section 5). Soft: one plain sen
 
 ## `interactive_map_finder` (Locator page) — not written by the flow (ai_writable = N), shown for completeness
 
-Spec: {"words_min": 100, "words_max": 400, "default_words": 250, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 1, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "none.", "schema_types": "WebApplication + ItemList"}
+Spec: {"words_min": 100, "words_max": 400, "default_words": 250, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 1, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "none.", "schema_types": "WebApplication + BreadcrumbList"}
 
 ```text
 <page_brief>

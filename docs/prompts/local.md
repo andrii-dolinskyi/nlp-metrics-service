@@ -4,7 +4,7 @@ Rendered with the standard sample request described in [README.md](README.md). L
 
 ## `location_page` (Location)
 
-Spec: {"words_min": 500, "words_max": 1200, "default_words": 850, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: one H3 per service or per area inside a section that lists several.", "schema_types": "LocalBusiness + Place + FAQPage + BreadcrumbList"}
+Spec: {"words_min": 500, "words_max": 1200, "default_words": 850, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: one H3 per service or per area inside a section that lists several.", "schema_types": "Organization + WebPage + FAQPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -57,7 +57,7 @@ One call to action, in the closing section only (section 5). Direct: one or two 
 
 ## `service_area_city_page` (Service-area city page)
 
-Spec: {"words_min": 500, "words_max": 1200, "default_words": 850, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: one H3 per service or per area inside a section that lists several.", "schema_types": "Service + LocalBusiness + FAQPage + BreadcrumbList"}
+Spec: {"words_min": 500, "words_max": 1200, "default_words": 850, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: one H3 per service or per area inside a section that lists several.", "schema_types": "Service + Organization + FAQPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -110,7 +110,7 @@ One call to action, in the closing section only (section 5). Direct: one or two 
 
 ## `service_plus_location_page` (Service-in-location page)
 
-Spec: {"words_min": 600, "words_max": 1200, "default_words": 900, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: one H3 per service variant inside a section that lists several.", "schema_types": "Service + LocalBusiness + FAQPage + BreadcrumbList"}
+Spec: {"words_min": 600, "words_max": 1200, "default_words": 900, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: one H3 per service variant inside a section that lists several.", "schema_types": "Service + Organization + FAQPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -163,7 +163,7 @@ One call to action, in the closing section only (section 5). Direct: one or two 
 
 ## `neighborhood_area_guide` (Area guide)
 
-Spec: {"words_min": 1000, "words_max": 2500, "default_words": 1750, "answer_paragraph": true, "answer_style": "key_facts", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "required: one H3 per neighbourhood, school, transport link or topic inside the sections that list them.", "schema_types": "Place + Article + FAQPage + BreadcrumbList"}
+Spec: {"words_min": 1000, "words_max": 2500, "default_words": 1750, "answer_paragraph": true, "answer_style": "key_facts", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "required: one H3 per neighbourhood, school, transport link or topic inside the sections that list them.", "schema_types": "WebPage + Article + FAQPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -216,7 +216,7 @@ One call to action, in the closing section only (section 5). Soft: one plain sen
 
 ## `practice_location_legal` (Practice area by location)
 
-Spec: {"words_min": 800, "words_max": 1500, "default_words": 1150, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: one H3 per service or per area inside a section that lists several.", "schema_types": "LegalService + Attorney + FAQPage + BreadcrumbList"}
+Spec: {"words_min": 800, "words_max": 1500, "default_words": 1150, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: one H3 per service or per area inside a section that lists several.", "schema_types": "LegalService + Person + FAQPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -269,7 +269,7 @@ One call to action, in the closing section only (section 5). Direct: one or two 
 
 ## `branch_page_staffing` (Branch staffing)
 
-Spec: {"words_min": 500, "words_max": 1000, "default_words": 750, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: one H3 per service or per area inside a section that lists several.", "schema_types": "LocalBusiness + FAQPage + BreadcrumbList"}
+Spec: {"words_min": 500, "words_max": 1000, "default_words": 750, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: one H3 per service or per area inside a section that lists several.", "schema_types": "Organization + FAQPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -322,7 +322,7 @@ One call to action, in the closing section only (section 5). Direct: one or two 
 
 ## `dealer_local_hub` (Dealer local hub)
 
-Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: one H3 per service or per area inside a section that lists several.", "schema_types": "AutoDealer + ItemList + BreadcrumbList"}
+Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: one H3 per service or per area inside a section that lists several.", "schema_types": "Organization + BreadcrumbList"}
 
 ```text
 <page_brief>

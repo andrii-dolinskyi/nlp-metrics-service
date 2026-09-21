@@ -4,7 +4,7 @@ Rendered with the standard sample request described in [README.md](README.md). L
 
 ## `listicle_best_of` (Best-of list)
 
-Spec: {"words_min": 1500, "words_max": 3500, "default_words": 2500, "answer_paragraph": true, "answer_style": "verdict", "tables_min": 1, "citations_min": 3, "research": "deep", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "required: one H3 per listed item, in ranked order, with the item name as the heading.", "schema_types": "Article + ItemList + BreadcrumbList"}
+Spec: {"words_min": 1500, "words_max": 3500, "default_words": 2500, "answer_paragraph": true, "answer_style": "verdict", "tables_min": 1, "citations_min": 3, "research": "deep", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "required: one H3 per listed item, in ranked order, with the item name as the heading.", "schema_types": "Article + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -57,7 +57,7 @@ One call to action, in the closing section only (section 5). Soft: one plain sen
 
 ## `head_to_head_vs` (Head-to-head comparison)
 
-Spec: {"words_min": 1500, "words_max": 3000, "default_words": 1800, "answer_paragraph": true, "answer_style": "verdict", "tables_min": 2, "citations_min": 2, "research": "search", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "optional: one H3 per criterion inside the comparison section when it runs over 250 words.", "schema_types": "Article + FAQPage + ItemList + BreadcrumbList"}
+Spec: {"words_min": 1500, "words_max": 3000, "default_words": 1800, "answer_paragraph": true, "answer_style": "verdict", "tables_min": 2, "citations_min": 2, "research": "search", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "optional: one H3 per criterion inside the comparison section when it runs over 250 words.", "schema_types": "Article + FAQPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -110,7 +110,7 @@ One call to action, in the closing section only (section 5). Soft: one plain sen
 
 ## `alternatives_page` (Alternatives page)
 
-Spec: {"words_min": 1500, "words_max": 3000, "default_words": 1600, "answer_paragraph": true, "answer_style": "verdict", "tables_min": 1, "citations_min": 2, "research": "deep", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "required: one H3 per alternative with its name as the heading.", "schema_types": "Article + ItemList + BreadcrumbList"}
+Spec: {"words_min": 1500, "words_max": 3000, "default_words": 1600, "answer_paragraph": true, "answer_style": "verdict", "tables_min": 1, "citations_min": 2, "research": "deep", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "required: one H3 per alternative with its name as the heading.", "schema_types": "Article + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -216,7 +216,7 @@ One call to action, in the closing section only (section 5). Direct: two or thre
 
 ## `review_page` (Review)
 
-Spec: {"words_min": 1500, "words_max": 3000, "default_words": 2250, "answer_paragraph": true, "answer_style": "verdict", "tables_min": 1, "citations_min": 2, "research": "deep", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "optional: one H3 per aspect reviewed inside a section over 250 words.", "schema_types": "Review + Product + BreadcrumbList"}
+Spec: {"words_min": 1500, "words_max": 3000, "default_words": 2250, "answer_paragraph": true, "answer_style": "verdict", "tables_min": 1, "citations_min": 2, "research": "deep", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "optional: one H3 per aspect reviewed inside a section over 250 words.", "schema_types": "BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -428,7 +428,7 @@ One call to action, in the closing section only (section 5). Soft: one plain sen
 
 ## `category_comparison` (Category comparison)
 
-Spec: {"words_min": 1200, "words_max": 2500, "default_words": 1850, "answer_paragraph": true, "answer_style": "verdict", "tables_min": 1, "citations_min": 2, "research": "deep", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "required: one H3 per category compared.", "schema_types": "Article + ItemList + BreadcrumbList"}
+Spec: {"words_min": 1200, "words_max": 2500, "default_words": 1850, "answer_paragraph": true, "answer_style": "verdict", "tables_min": 1, "citations_min": 2, "research": "deep", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "required: one H3 per category compared.", "schema_types": "Article + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -481,7 +481,7 @@ One call to action, in the closing section only (section 5). Soft: one plain sen
 
 ## `buying_guide` (Buying guide)
 
-Spec: {"words_min": 1500, "words_max": 3000, "default_words": 2250, "answer_paragraph": true, "answer_style": "verdict", "tables_min": 1, "citations_min": 2, "research": "deep", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "required: one H3 per buying criterion.", "schema_types": "Article + ItemList + FAQPage + BreadcrumbList"}
+Spec: {"words_min": 1500, "words_max": 3000, "default_words": 2250, "answer_paragraph": true, "answer_style": "verdict", "tables_min": 1, "citations_min": 2, "research": "deep", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "required: one H3 per buying criterion.", "schema_types": "Article + FAQPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -534,7 +534,7 @@ One call to action, in the closing section only (section 5). Soft: one plain sen
 
 ## `top_in_location` (Best-in-location list)
 
-Spec: {"words_min": 1000, "words_max": 2500, "default_words": 1750, "answer_paragraph": true, "answer_style": "verdict", "tables_min": 1, "citations_min": 2, "research": "deep", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "required: one H3 per listed provider with its name as the heading.", "schema_types": "ItemList + LocalBusiness + BreadcrumbList"}
+Spec: {"words_min": 1000, "words_max": 2500, "default_words": 1750, "answer_paragraph": true, "answer_style": "verdict", "tables_min": 1, "citations_min": 2, "research": "deep", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "required: one H3 per listed provider with its name as the heading.", "schema_types": "Organization + BreadcrumbList"}
 
 ```text
 <page_brief>

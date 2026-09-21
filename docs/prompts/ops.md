@@ -163,7 +163,7 @@ There is no call to action on this page. Nowhere on the page do you ask the read
 
 ## `api_reference` (API reference) — not written by the flow (ai_writable = N), shown for completeness
 
-Spec: {"words_min": 200, "words_max": 1000, "default_words": 600, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "required: one H3 per endpoint.", "schema_types": "TechArticle"}
+Spec: {"words_min": 200, "words_max": 1000, "default_words": 600, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "required: one H3 per endpoint.", "schema_types": "TechArticle + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -216,7 +216,7 @@ There is no call to action on this page. Nowhere on the page do you ask the read
 
 ## `community_forum_thread` (Community forum thread) — not written by the flow (ai_writable = N), shown for completeness
 
-Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "optional: one H3 per stage inside a long procedure.", "schema_types": "QAPage + DiscussionForumPosting"}
+Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "optional: one H3 per stage inside a long procedure.", "schema_types": "QAPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -375,7 +375,7 @@ There is no call to action on this page. Nowhere on the page do you ask the read
 
 ## `legal_policy_page` (Legal policy) — not written by the flow (ai_writable = N), shown for completeness
 
-Spec: {"words_min": 800, "words_max": 3000, "default_words": 1900, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "required: one H3 per clause.", "schema_types": "WebPage"}
+Spec: {"words_min": 800, "words_max": 3000, "default_words": 1900, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "required: one H3 per clause.", "schema_types": "WebPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -534,7 +534,7 @@ One call to action, in the closing section only (section 5). Soft: one plain sen
 
 ## `sitemap_html` (HTML sitemap) — not written by the flow (ai_writable = N), shown for completeness
 
-Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "optional: one H3 per stage inside a long procedure.", "schema_types": "WebPage"}
+Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "optional: one H3 per stage inside a long procedure.", "schema_types": "WebPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -587,7 +587,7 @@ There is no call to action on this page. Nowhere on the page do you ask the read
 
 ## `login_account_cart_checkout` (Login, account, cart, checkout) — not written by the flow (ai_writable = N), shown for completeness
 
-Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "optional: one H3 per stage inside a long procedure.", "schema_types": "WebPage"}
+Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "optional: one H3 per stage inside a long procedure.", "schema_types": "WebPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -640,7 +640,7 @@ There is no call to action on this page. Nowhere on the page do you ask the read
 
 ## `search_results_internal` (Search results internal) — not written by the flow (ai_writable = N), shown for completeness
 
-Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "optional: one H3 per stage inside a long procedure.", "schema_types": "SearchResultsPage"}
+Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "optional: one H3 per stage inside a long procedure.", "schema_types": "WebPage + BreadcrumbList"}
 
 ```text
 <page_brief>

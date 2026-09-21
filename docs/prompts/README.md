@@ -1,4 +1,4 @@
-# Content Maker 6.0 writer prompts, all 145 page types
+# Content Maker 6.0 writer prompts, all 128 page types
 
 The writer's system prompt is assembled at run time from two parts:
 

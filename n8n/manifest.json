@@ -1,0 +1,92 @@
+[
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "Parse Request",
+  "param": "jsCode",
+  "file": "n8n/cm6/parse_request.js"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "Page Contract",
+  "param": "jsCode",
+  "file": "n8n/cm6/page_contract.js"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "Prep Writer",
+  "param": "jsCode",
+  "file": "n8n/cm6/prep_writer.js"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "Validate Draft",
+  "param": "jsCode",
+  "file": "n8n/cm6/validate_draft.js"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "Prep Meta",
+  "param": "jsCode",
+  "file": "n8n/cm6/prep_meta.js"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "Assemble Meta",
+  "param": "jsCode",
+  "file": "n8n/cm6/assemble_meta.js"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "Collect FAQ",
+  "param": "jsCode",
+  "file": "n8n/cm6/collect_faq.js"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "Stabilizer",
+  "param": "jsCode",
+  "file": "n8n/cm6/stabilizer.js"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "Prep Update",
+  "param": "jsCode",
+  "file": "n8n/cm6/prep_update.js"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "Build JSON-LD",
+  "param": "jsCode",
+  "file": "n8n/cm6/build_jsonld.js"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "Build Payload",
+  "param": "jsCode",
+  "file": "n8n/cm6/build_payload.js"
+ },
+ {
+  "workflowId": "7pGY0fAQ2bysqR3H",
+  "node": "Calculate Metrics",
+  "param": "jsCode",
+  "file": "n8n/money/calculate_metrics.js"
+ },
+ {
+  "workflowId": "7pGY0fAQ2bysqR3H",
+  "node": "Calculate SEO Metrics",
+  "param": "jsCode",
+  "file": "n8n/money/calculate_seo_metrics.js"
+ },
+ {
+  "workflowId": "7pGY0fAQ2bysqR3H",
+  "node": "Final Calculations",
+  "param": "jsCode",
+  "file": "n8n/money/final_calculations.js"
+ },
+ {
+  "workflowId": "7pGY0fAQ2bysqR3H",
+  "node": "Rules Compliance Evaluation",
+  "param": "options.systemMessage",
+  "file": "n8n/money/rules_compliance_system.txt"
+ }
+]

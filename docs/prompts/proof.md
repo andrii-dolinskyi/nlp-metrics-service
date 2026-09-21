@@ -4,7 +4,7 @@ Rendered with the standard sample request described in [README.md](README.md). L
 
 ## `case_study` (Case study)
 
-Spec: {"words_min": 800, "words_max": 1800, "default_words": 900, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 2, "research": "deep", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words.", "schema_types": "Article + CaseStudy + BreadcrumbList"}
+Spec: {"words_min": 800, "words_max": 1800, "default_words": 900, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 2, "research": "deep", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words.", "schema_types": "Article + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -57,7 +57,7 @@ One call to action, in the closing section only (section 5). Direct: one or two 
 
 ## `case_results_page` (Case results)
 
-Spec: {"words_min": 400, "words_max": 1200, "default_words": 800, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words.", "schema_types": "ItemList + WebPage + BreadcrumbList"}
+Spec: {"words_min": 400, "words_max": 1200, "default_words": 800, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words.", "schema_types": "WebPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -110,7 +110,7 @@ One call to action, in the closing section only (section 5). Direct: one or two 
 
 ## `testimonials_reviews_page` (Testimonials reviews)
 
-Spec: {"words_min": 400, "words_max": 1200, "default_words": 800, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "optional: use H3s only inside a section over 250 words.", "schema_types": "Review + AggregateRating + Organization + BreadcrumbList"}
+Spec: {"words_min": 400, "words_max": 1200, "default_words": 800, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "optional: use H3s only inside a section over 250 words.", "schema_types": "Organization + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -163,7 +163,7 @@ One call to action, in the closing section only (section 5). Direct: one or two 
 
 ## `portfolio_project_page` (Portfolio project)
 
-Spec: {"words_min": 400, "words_max": 1000, "default_words": 700, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words.", "schema_types": "CreativeWork + Article + Place + BreadcrumbList"}
+Spec: {"words_min": 400, "words_max": 1000, "default_words": 700, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words.", "schema_types": "Article + WebPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -269,7 +269,7 @@ One call to action, in the closing section only (section 5). Soft: one plain sen
 
 ## `awards_certifications_page` (Awards certifications)
 
-Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "optional: one H3 per certification body when there are several.", "schema_types": "Organization + ItemList + BreadcrumbList"}
+Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "optional: one H3 per certification body when there are several.", "schema_types": "Organization + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -322,7 +322,7 @@ There is no call to action on this page. Nowhere on the page do you ask the read
 
 ## `customer_logos_wall` (Customer logos wall) — not written by the flow (ai_writable = N), shown for completeness
 
-Spec: {"words_min": 100, "words_max": 400, "default_words": 250, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "none.", "schema_types": "Organization"}
+Spec: {"words_min": 100, "words_max": 400, "default_words": 250, "answer_paragraph": false, "answer_style": "none", "tables_min": 1, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "none.", "schema_types": "Organization + BreadcrumbList"}
 
 ```text
 <page_brief>
