@@ -41,6 +41,15 @@ One request writes one page in one language. Everything about the page comes fro
   "blacklistDomains": ["wikipedia.org", "reddit.com"],
   "metaTitle": "",
 
+  "author": {
+    "name": "Jane Doe",
+    "jobTitle": "Managing Partner, TruAlign Partners",
+    "url": "https://trualignpartners.com/team/jane-doe/",
+    "linkedin": "https://www.linkedin.com/in/janedoe/",
+    "description": "Executive search consultant who led medical device sales teams before moving into recruiting."
+  },
+  "reviewer": { "name": "Dr. John Roe", "jobTitle": "MD, FACS", "url": "https://example.com/reviewers/john-roe/" },
+
   "facts": {
     "deliverables": ["Role definition workshop and written role scorecard", "Shortlist of three to five vetted candidates"],
     "process": "Intake in week one, shortlist within four weeks, offer by week ten on a typical search",
@@ -67,11 +76,13 @@ One request writes one page in one language. Everything about the page comes fro
 | `ctaRules`, `ctaUrl` | no | the action the closing section asks for and its link. The spec's `cta_mode` decides whether the page has a CTA at all: `required` types get one even when these are empty (the action is named in words, without a link), `optional` types get one only when `ctaRules` or `ctaUrl` is sent, `none` types never get one. The CTA appears in the closing section only, never in the body or the FAQ |
 | `writingPreferences`, `whitelistDomains`, `blacklistDomains` | no | as in Content Maker |
 | `metaTitle` | no | used as sent; generated when empty |
+| `author` | yes | the page's author, stored once in the app's article settings: `name` (required), `jobTitle`, `url` (author page), `linkedin` or `sameAs[]`, `image`, `description`. Fills the Person and author blocks of the JSON-LD and the ProfilePage of bio pages (for a bio page send the person the page is about as the author) |
+| `reviewer` | no | optional expert reviewer for medical, legal and financial pages: `name`, `jobTitle` or `credentials`, `url`. Fills `reviewedBy` in the JSON-LD |
 | `facts` | per type | free-form object keyed by the spec's `required_facts`; the writer may only claim about the client what is in here |
 
 Families `offer`, `proof`, `entity`, `local`, `catalogue`, `evaluation` and `tool` stop with `status: blocked` when `facts` is empty. The other families run without facts.
 
-The smallest valid request is `pageType`, `clientName`, `callback_url`, `h1` and `h2Outline` (plus `facts` for the families above). Fields that were accepted earlier and are now ignored: `internalLinks`, per-heading `format`. Nothing else is required from the user.
+The smallest valid request is `pageType`, `clientName`, `callback_url`, `h1`, `h2Outline` and `author.name` (plus `facts` for the families above). No page type needs structured data for its schema beyond the author: every JSON-LD block is built from the request, the page, the FAQ and the author or reviewer objects. Page types whose schema needed client data (events, jobs, products, listings, vehicles, recipes, videos, podcasts, courses, datasets, infographics, rooms, tours, menus, app listings) were removed from the catalogue on 2026-09-21; it now has 128 types. Fields that were accepted earlier and are now ignored: `internalLinks`, per-heading `format`. Nothing else is required from the user.
 
 ## Callbacks
 
@@ -98,7 +109,8 @@ The smallest valid request is `pageType`, `clientName`, `callback_url`, `h1` and
   "jsonLd": [ { "@context": "https://schema.org", "@type": "Service", "...": "..." }, { "@type": "Organization" }, { "@type": "FAQPage" }, { "@type": "BreadcrumbList" } ],
   "schemaTypes": ["Service", "Organization", "FAQPage", "BreadcrumbList"],
   "schemaWarnings": [],
-  "promptCoverage": [ { "prompt": "...", "answered": true, "addedByFixer": false } ],
+  "author": { "name": "Jane Doe", "jobTitle": "Managing Partner, TruAlign Partners", "url": "https://trualignpartners.com/team/jane-doe/", "sameAs": ["https://www.linkedin.com/in/janedoe/"], "kind": "author" },
+  "reviewer": null,
   "quality": { "totalWords": 1060, "h2Count": 9, "h3Count": 4, "tableRows": 14, "ctaLinks": 1, "externalCitations": 1, "remainingIssues": [], "patternsFixed": { "ingPileups": 0, "parallelSeries": 0, "hedging": 1, "negativeParallelisms": 0, "tailingNegations": 0, "aiPhrasing": 3 } },
   "generatedAt": "2026-09-08T13:48:23.387Z"
 }
@@ -114,7 +126,7 @@ Progress: the Content Plan Progress Reporter sub-workflow is called with `articl
 
 ## page_type_specs data table (id `2ErETiHi4MCy5LOc`)
 
-One row per page type, 145 rows seeded from `skills/content-map-builder/assets/page_type_specs.json`. Add a row to add a type; the dropdown in the app should list rows where `ai_writable` is not `N`.
+One row per page type, 128 rows seeded from `skills/content-map-builder/assets/page_type_specs.json`. Add a row to add a type; the dropdown in the app should list rows where `ai_writable` is not `N`.
 
 | Column | Meaning |
 |---|---|
@@ -134,12 +146,20 @@ One row per page type, 145 rows seeded from `skills/content-map-builder/assets/p
 | `meta_description_pattern` | what the meta description of this type must contain (120 to 155 characters, factual, front loaded) |
 | `ai_writable` | Y, P (facts must be supplied and checked) or N (never written) |
 
-## cm6_prompts data table (id `jUX1l2UGDdpKe9De`)
+## Prompts and node code
 
-Static prompt text the workflow loads at run time, one row per key. Row `writer_guidelines` holds the writer's persona, the plain style frame (sentence, word, paragraph and flow rules with examples), the tone guidelines, the pattern rules with wrong and right examples, the link rules and the keyword rules (mirrored in `docs/prompts/cm6_writer_guidelines.md`). Row `style_editor` holds the Style Updater prompt with the six pattern fix sections (mirrored in `docs/prompts/cm6_style_editor.md`); `Prep Update` fills its placeholders with the flagged sentences. The `Prep Writer` node appends the page brief for the requested type; `docs/prompts/` shows the brief for all 145 types and `docs/page-type-writing-rules.md` lists the closing, CTA, format, H3 and meta rules per type. Edit the row to change the writer's voice without touching the workflow.
+The writer guidelines and the Style Updater prompt live inside the `Prep Writer` and `Prep Update` Code nodes, so they can be reviewed in the editor. Their source of truth is the repo: `docs/prompts/cm6_writer_guidelines.md` and `docs/prompts/cm6_style_editor.md`, embedded into `n8n/cm6/prep_writer.js` and `n8n/cm6/prep_update.js` by `tools/build_n8n_code.py`. The `CM6 Code Loader` helper writes every file listed in `n8n/manifest.json` into the named node through the n8n API. The `cm6_prompts` data table is no longer read.
+
+## Progress reporting
+
+The Generation - Report Progress sub-workflow is called inline on the main chain (wait for completion off, so the page data passes through unchanged) at seven stages: `article_request_received` (5%), `outline_ready` (15%, brief built), `draft_written` (25%), `editorial_scan_running` (35%, peelers done), `style_cleanup_done` (50%), `quality_scores_ready` (88%, validation report ready), `final_assets_ready` (95%, before the callback).
+
+## Evaluation
+
+The Money Calculator sub-workflow, called after the callback, sums tokens and cost for every flow. For executions whose workflow name is exactly `Content Maker 6.0` it also runs the Content Maker 5.0 evaluator unchanged (text metrics, SEO metrics, rules compliance on GPT 5.6 Luna, final calculations) and appends the scores to the EVALUATOR sheet with Flow Version "Content Maker 6.0".
 
 ## Helper workflows (test only)
 
 - `CM6 Test Callback Receiver` (`aoPTgo0YDsIGLrRr`): `POST /webhook/pm-test-callback/page` and `/execution-started`, stores every callback in the `pm_test_callbacks` data table. Use `https://n8n-test.snoika.com/webhook/pm-test-callback` as `callback_url` when testing by hand.
-- `CM6 Spec Seeder` (`eeeDwSvQ8QW3TiXj`): loads the catalogue from the repo into `page_type_specs`. Run once; re-running duplicates rows.
-- `CM6 Prompt Loader` (`eXzLzVVBLtHcivrA`, published): `POST https://n8n-test.snoika.com/webhook/cm6-load-prompts` reads `docs/prompts/cm6_prompts.json` from the repo and upserts each key into `cm6_prompts`. Safe to re-run after editing the guidelines.
+- `CM6 Spec Seeder` (`eeeDwSvQ8QW3TiXj`): upserts the catalogue from the repo into `page_type_specs` by type id and deletes the rows listed in `n8n/removed_page_types.json`. Safe to re-run.
+- `CM6 Code Loader` (`eXzLzVVBLtHcivrA`): `POST https://n8n-test.snoika.com/webhook/cm6-load-code` (optional body `{"workflowId": "..."}`) writes the repo node code and prompts into Content Maker 6.0 and Money Calculator through the n8n API. Publish the target workflow afterwards.

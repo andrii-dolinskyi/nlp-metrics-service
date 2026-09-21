@@ -440,9 +440,9 @@ Seed content for `pm_industry_packs`. Each row: the page types that make up most
 | Media, publishers, marketplaces, directories | media: supporting article, pillar hub, best-of, review, author bio, video; marketplaces: product category, top-in-location, partner or vendor profile, listing detail, job category | category pages carry most traffic; vendor profiles need unique copy; affiliate disclosure on reviews and best-of; Review schema only for real reviews; UGC moderation |
 | Logistics and telecom | service, route or lane and plan or tariff, industry vertical, calculator, regional landing, migration or switch, help centre article, location | telecom: regulated price and contract disclosures, coverage claims match maps, "up to" speed rules, switching pages state early termination terms; logistics: customs and Incoterms content needs jurisdiction and date, transit times as ranges |
 
-## 11. As built (2026-09-08, revised 2026-09-14 and 2026-09-15)
+## 11. As built (2026-09-08, revised 2026-09-14, 2026-09-15 and 2026-09-21)
 
-Workflow `MZUUvWCdCXlHKllN` was rebuilt in place and renamed "Content Maker 6.0". 67 nodes; every node reachable from the webhook. The request and callback contract is in `docs/content-maker-6-webhook.md`.
+Workflow `MZUUvWCdCXlHKllN` was rebuilt in place and renamed "Content Maker 6.0". 58 nodes; every node reachable from the webhook. The request and callback contract is in `docs/content-maker-6-webhook.md`.
 
 Differences from the plan above, all small:
 
@@ -466,6 +466,15 @@ Revision of 2026-09-15 (after the first production review):
 - **Plain style writer prompt.** The `writer_guidelines` row now opens with a plain style frame drawn from the technical communication literature (Johnson-Sheehan's eight sentence guidelines, the given-new paragraph chain, the federal plain language rules on words and positive form), followed by the tone guidelines and the Content Maker 5.0 pattern rules unchanged plus two new patterns (the reveal and setup, the pairing tic).
 - **Six peelers on GPT 5.6 Sol.** The five peelers, Answer Coverage and EEAT run on Sol with Luna as fallback; Gemini was removed. A sixth peeler (Phrasing Peeler) flags setup sentences, colon reveals, rhetorical questions, sentence-opening connectives, signposts, copula substitutes, significance inflation, scope flourishes, mirrored pairs and empty closers; the Style Updater prompt (now the `style_editor` row of `cm6_prompts`) has a matching fix section.
 - **Meta description per type.** Prep Meta builds the description rules from `meta_description_pattern` and Google's snippet guidance (unique, specific, factual, front loaded, 120 to 155 characters); Assemble Meta clamps the length at a sentence boundary.
+
+Revision of 2026-09-21:
+
+- **Catalogue trimmed to 128 types.** Seventeen types whose schema needed structured data from the client were removed (event, webinar, job posting, job category, product, listing detail, model research, recipe, video, podcast, course, dataset, infographic, accommodation room, tour package, menu, app listing). Every remaining `schema_types` value is self-filling: built from the request, the page, the FAQ and the new `author` field (required, stored once in the app) or the optional `reviewer` field. No page type asks the client for schema data.
+- **Progress inline.** The seven progress calls sit on the main chain with wait-for-completion off, so no branch can fail to fire.
+- **Prompts inside the nodes.** The writer guidelines and the Style Updater prompt are template strings inside `Prep Writer` and `Prep Update`; the repo (`n8n/cm6/`) is the source and `CM6 Code Loader` writes it into the nodes through the n8n API. The `cm6_prompts` table is unused.
+- **No fixer or coverage chain.** Section Fixer, Revalidate, Answer Coverage and Coverage Fixer are gone; Validate Draft only reports (`quality.remainingIssues` in the callback). The writer prompt carries the keyword rule instead: core keyword in the first 100 and the last 100 words, headings as supplied.
+- **Assets in parallel.** FAQ Writer, Metadata Generator and EEAT Analysis start together after validation and meet in Assets Merger before Assemble Meta, translation, JSON-LD and the callback.
+- **Evaluator restored.** The Money Calculator runs the Content Maker 5.0 evaluator (metrics, SEO metrics, rules compliance, final calculations, EVALUATOR sheet) only for executions named exactly "Content Maker 6.0".
 
 Tests run against the draft, callbacks captured by the `CM6 Test Callback Receiver` helper:
 
