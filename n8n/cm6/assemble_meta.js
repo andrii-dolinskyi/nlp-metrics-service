@@ -1,7 +1,7 @@
 let m = {}; try { m = $('Metadata Generator').first().json.output || {}; } catch (e) { m = {}; }
 const r = $('Parse Request').first().json;
 let cf = { faq: [] }; try { cf = $('Collect FAQ').first().json; } catch (e) { cf = { faq: [] }; }
-const page = $('Validate Draft').first().json.page;
+const page = $('Extract Updated').first().json.page;
 const slug = r.slugPath.split('/').filter(Boolean).pop() || '';
 const cap = s => { s = String(s || '').trim(); return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; };
 const clamp = (s, max) => {

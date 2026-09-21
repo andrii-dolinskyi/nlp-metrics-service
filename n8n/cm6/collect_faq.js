@@ -11,4 +11,4 @@ const clean = t => {
   return (kept.length ? kept : sentences.slice(0, 1)).join(' ').replace(/\s+/g, ' ').trim();
 };
 faq = faq.filter(f => f && f.question && f.answer).map(f => ({ question: clean(f.question) || String(f.question).trim(), answer: clean(f.answer) })).filter(f => f.answer.length > 20).slice(0, 5);
-return [{ json: { finalPage: $('Validate Draft').first().json.page, faq } }];
+return [{ json: { finalPage: $('Extract Updated').first().json.page, faq } }];

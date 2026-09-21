@@ -1,7 +1,7 @@
 const r = $('Parse Request').first().json;
 const c = $('Page Contract').first().json;
 const S = c.spec;
-const page = $('Validate Draft').first().json.page;
+const page = $('Extract Updated').first().json.page;
 const sys = ['You are an SEO copywriter. Write the meta title and the meta description for a ' + c.label + ' page. Follow every rule exactly, then return JSON with meta_title and meta_description.',
 '',
 '<title_rules>',

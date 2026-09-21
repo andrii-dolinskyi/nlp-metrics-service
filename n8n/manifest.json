@@ -19,12 +19,6 @@
  },
  {
   "workflowId": "MZUUvWCdCXlHKllN",
-  "node": "Validate Draft",
-  "param": "jsCode",
-  "file": "n8n/cm6/validate_draft.js"
- },
- {
-  "workflowId": "MZUUvWCdCXlHKllN",
   "node": "Prep Meta",
   "param": "jsCode",
   "file": "n8n/cm6/prep_meta.js"

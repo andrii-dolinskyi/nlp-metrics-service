@@ -111,7 +111,7 @@ The smallest valid request is `pageType`, `clientName`, `callback_url`, `h1`, `h
   "schemaWarnings": [],
   "author": { "name": "Jane Doe", "jobTitle": "Managing Partner, TruAlign Partners", "url": "https://trualignpartners.com/team/jane-doe/", "sameAs": ["https://www.linkedin.com/in/janedoe/"], "kind": "author" },
   "reviewer": null,
-  "quality": { "totalWords": 1060, "h2Count": 9, "h3Count": 4, "tableRows": 14, "ctaLinks": 1, "externalCitations": 1, "remainingIssues": [], "patternsFixed": { "ingPileups": 0, "parallelSeries": 0, "hedging": 1, "negativeParallelisms": 0, "tailingNegations": 0, "aiPhrasing": 3 } },
+  "quality": { "totalWords": 1060, "h2Count": 9, "h3Count": 4, "tableRows": 14, "ctaLinks": 1, "externalCitations": 1, "patternsFixed": { "ingPileups": 0, "parallelSeries": 0, "hedging": 1, "negativeParallelisms": 0, "tailingNegations": 0, "aiPhrasing": 3 } },
   "generatedAt": "2026-09-08T13:48:23.387Z"
 }
 ```
@@ -148,11 +148,11 @@ One row per page type, 128 rows seeded from `skills/content-map-builder/assets/p
 
 ## Prompts and node code
 
-The writer guidelines and the Style Updater prompt live inside the `Prep Writer` and `Prep Update` Code nodes, so they can be reviewed in the editor. Their source of truth is the repo: `docs/prompts/cm6_writer_guidelines.md` and `docs/prompts/cm6_style_editor.md`, embedded into `n8n/cm6/prep_writer.js` and `n8n/cm6/prep_update.js` by `tools/build_n8n_code.py`. The `CM6 Code Loader` helper writes every file listed in `n8n/manifest.json` into the named node through the n8n API. The `cm6_prompts` data table is no longer read.
+The writer guidelines and the Style Updater prompt live inside the `Prep Writer` and `Prep Update` Code nodes, so they can be reviewed and edited in the n8n editor. The repo mirrors them: `n8n/cm6/prep_writer.js` and `n8n/cm6/prep_update.js` hold the node code, and `docs/prompts/cm6_writer_guidelines.md` and `docs/prompts/cm6_style_editor.md` hold the two prompt texts on their own. `tools/build_n8n_code.py` embeds the markdown into the JS, and `tools/build_n8n_code.py --extract` goes the other way after a prompt was edited in the editor and the node code copied back into the repo. The `CM6 Code Loader` helper writes every file listed in `n8n/manifest.json` into the named node through the n8n API, so the repo copy must be brought up to date before the loader runs. The `cm6_prompts` data table is no longer read.
 
 ## Progress reporting
 
-The Generation - Report Progress sub-workflow is called inline on the main chain (wait for completion off, so the page data passes through unchanged) at seven stages: `article_request_received` (5%), `outline_ready` (15%, brief built), `draft_written` (25%), `editorial_scan_running` (35%, peelers done), `style_cleanup_done` (50%), `quality_scores_ready` (88%, validation report ready), `final_assets_ready` (95%, before the callback).
+The Generation - Report Progress sub-workflow is called inline on the main chain (wait for completion off, so the page data passes through unchanged) at six stages: `article_request_received` (5%), `outline_ready` (15%, brief built), `draft_written` (25%), `editorial_scan_running` (35%, peelers done), `style_cleanup_done` (50%, FAQ, meta and E-E-A-T start), `final_assets_ready` (95%, before the callback).
 
 ## Evaluation
 
