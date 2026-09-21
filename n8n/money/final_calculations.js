@@ -1,7 +1,8 @@
-const items = $input.all();
-
-const metrics = items.find(i => i.json.burstinessScore !== undefined)?.json || {};
-const rules = items.find(i => i.json.output?.negativeParallelisms !== undefined)?.json?.output || {};
+// Read both evaluator outputs by node name so a partial merge run can never write a half-empty row.
+let metrics = null, rules = null;
+try { metrics = $('Calculate Metrics').first().json; } catch (e) { metrics = null; }
+try { rules = $('Rules Compliance Evaluation').first().json.output; } catch (e) { rules = null; }
+if (!metrics || metrics.burstinessScore === undefined || !rules || rules.negativeParallelisms === undefined) return [];
 
 const inRange = (val, min, max) => val >= min && val <= max;
 const v = (violated) => violated ? 1 : 0;
