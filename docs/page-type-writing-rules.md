@@ -173,8 +173,8 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `closing_content` | What the reader should check once the steps are done and the one thing that goes wrong most often, in 60 to 120 words. No recap of the steps. |
 | `cta_mode` | optional |
 | `cta_guidance` | Soft: one plain sentence at the end of the closing paragraph offering the client's related service as a way to get the task done, only when a client fact supports it. No urgency, no "imagine", no superlative. |
-| `format_rules` | Numbered steps for any section that describes a sequence. A table for any section that compares two or more options, sets criteria against options, or shows costs, timelines or thresholds. Bullets only for checklists or lists of requirements with four or more items. Prose everywhere else, including the opening and the closing. |
-| `h3_policy` | required: one H3 per step or per step group inside the section that walks through the procedure, phrased as the action (verb first). |
+| `format_rules` | This page is a procedure and always carries a numbered step list. When the supplied H2s are the steps themselves, the first section ends with a numbered list of all the steps, one short line each, and every step H2 then gives the detail. When the procedure sits inside one H2, that section is written as numbered steps. A table for any section that compares options or shows costs or timelines. Bullets only for checklists of four or more items. Prose elsewhere. |
+| `h3_policy` | optional: when a step section runs over 250 words, split it with two or more H3s phrased as the sub-actions (verb first). |
 | `meta_description_pattern` | The question the page answers and the specific answer or scope (number of steps, options, years, or the key figure). No client name. Factual, no "learn how". |
 
 ### `supporting_article` (Supporting article)
@@ -238,8 +238,8 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `closing_content` | The one decision or action the reader should take now and why, in one paragraph of 60 to 120 words. It adds a last useful point instead of summarising the sections. Never open with "In conclusion", "In summary", "Overall" or "Ultimately". |
 | `cta_mode` | optional |
 | `cta_guidance` | Soft: one plain sentence at the end of the closing paragraph offering the client's related service as a way to get the task done, only when a client fact supports it. No urgency, no "imagine", no superlative. |
-| `format_rules` | Numbered steps for any section that describes a sequence. A table for any section that compares two or more options, sets criteria against options, or shows costs, timelines or thresholds. Bullets only for checklists or lists of requirements with four or more items. Prose everywhere else, including the opening and the closing. |
-| `h3_policy` | required: one H3 per stage inside the section that walks through the process. |
+| `format_rules` | This page is a procedure and always carries a numbered step list. When the supplied H2s are the steps themselves, the first section ends with a numbered list of all the steps, one short line each, and every step H2 then gives the detail. When the procedure sits inside one H2, that section is written as numbered steps. A table for any section that compares options or shows costs or timelines. Bullets only for checklists of four or more items. Prose elsewhere. |
+| `h3_policy` | optional: when a stage section runs over 250 words, split it with two or more H3s. |
 | `meta_description_pattern` | The question the page answers and the specific answer or scope (number of steps, options, years, or the key figure). No client name. Factual, no "learn how". |
 
 ### `mistakes_pitfalls` (Mistakes pitfalls)
@@ -1506,8 +1506,8 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `closing_content` | The two or three checks to make when the steps fail and how to contact support, in 40 to 90 words. |
 | `cta_mode` | optional |
 | `cta_guidance` | Soft: one plain sentence on how to contact support, linked to the CTA URL when one is given. |
-| `format_rules` | Numbered steps for procedures. Tables for parameters, versions and settings. Bullets for prerequisites. Short prose between them. |
-| `h3_policy` | required: one H3 per stage inside the procedure section. |
+| `format_rules` | This page is a procedure and always carries a numbered step list. When the supplied H2s are the steps themselves, the first section ends with a numbered list of all the steps, one short line each, and every step H2 then gives the detail. When the procedure sits inside one H2, that section is written as numbered steps. A table for any section that compares options or shows costs or timelines. Bullets only for checklists of four or more items. Prose elsewhere. |
+| `h3_policy` | optional: when a stage section runs over 250 words, split it with two or more H3s. |
 | `meta_description_pattern` | What the page helps the reader do, naming the product and the version where relevant. No marketing. |
 
 ### `help_center_article` (Help center article)
@@ -1519,7 +1519,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `closing_content` | The two or three checks to make when the steps fail and how to contact support, in 40 to 80 words. |
 | `cta_mode` | optional |
 | `cta_guidance` | Soft: one plain sentence on how to contact support, linked to the CTA URL when one is given. |
-| `format_rules` | Numbered steps for procedures. Tables for parameters, versions and settings. Bullets for prerequisites. Short prose between them. |
+| `format_rules` | This page is a procedure and always carries a numbered step list. When the supplied H2s are the steps themselves, the first section ends with a numbered list of all the steps, one short line each, and every step H2 then gives the detail. When the procedure sits inside one H2, that section is written as numbered steps. A table for any section that compares options or shows costs or timelines. Bullets only for checklists of four or more items. Prose elsewhere. |
 | `h3_policy` | optional: one H3 per stage inside a long procedure. |
 | `meta_description_pattern` | What the page helps the reader do, naming the product and the version where relevant. No marketing. |
 
@@ -1610,8 +1610,8 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `closing_content` | What happens after the claim is filed, the timeline and who to contact, from the facts, in 50 to 100 words. |
 | `cta_mode` | optional |
 | `cta_guidance` | Soft: one plain sentence on how to start the claim, linked to the CTA URL when one is given. |
-| `format_rules` | Numbered steps for procedures. Tables for parameters, versions and settings. Bullets for prerequisites. Short prose between them. |
-| `h3_policy` | required: one H3 per filing step. |
+| `format_rules` | This page is a procedure and always carries a numbered step list. When the supplied H2s are the steps themselves, the first section ends with a numbered list of all the steps, one short line each, and every step H2 then gives the detail. When the procedure sits inside one H2, that section is written as numbered steps. A table for any section that compares options or shows costs or timelines. Bullets only for checklists of four or more items. Prose elsewhere. |
+| `h3_policy` | optional: when a step section runs over 250 words, split it with two or more H3s. |
 | `meta_description_pattern` | What the page helps the reader do, naming the product and the version where relevant. No marketing. |
 
 ### `patient_forms_prep_page` (Patient forms prep)
@@ -1623,7 +1623,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `closing_content` | The checklist of what to bring and when to arrive, as a short numbered list, then the contact line from the facts. |
 | `cta_mode` | optional |
 | `cta_guidance` | Soft: one plain sentence on how to reach the practice with questions. |
-| `format_rules` | Numbered steps for procedures. Tables for parameters, versions and settings. Bullets for prerequisites. Short prose between them. |
+| `format_rules` | This page is a procedure and always carries a numbered step list. When the supplied H2s are the steps themselves, the first section ends with a numbered list of all the steps, one short line each, and every step H2 then gives the detail. When the procedure sits inside one H2, that section is written as numbered steps. A table for any section that compares options or shows costs or timelines. Bullets only for checklists of four or more items. Prose elsewhere. |
 | `h3_policy` | optional: one H3 per stage inside a long procedure. |
 | `meta_description_pattern` | What the page helps the reader do, naming the product and the version where relevant. No marketing. |
 

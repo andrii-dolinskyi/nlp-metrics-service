@@ -4,7 +4,7 @@ Rendered with the standard sample request described in [README.md](README.md). L
 
 ## `documentation_article` (Documentation article)
 
-Spec: {"words_min": 300, "words_max": 1500, "default_words": 900, "answer_paragraph": true, "answer_style": "definition", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "required: one H3 per stage inside the procedure section.", "schema_types": "TechArticle + BreadcrumbList"}
+Spec: {"words_min": 300, "words_max": 1500, "default_words": 900, "answer_paragraph": true, "answer_style": "definition", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "optional: when a stage section runs over 250 words, split it with two or more H3s.", "schema_types": "TechArticle + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -24,9 +24,9 @@ Structure:
   3. Third H2 from the app [180 words]
   4. Fourth H2 from the app [180 words]
   5. A closing H2 that you write yourself [about 100 words]. Heading: follow one of these patterns, filling any <...> from the H1 or the facts, in sentence case: If it still does not work. Never head it "Conclusion", "Summary", "Final thoughts" or "Key takeaways". Content: The two or three checks to make when the steps fail and how to contact support, in 40 to 90 words.
-- Formats for this page type: Numbered steps for procedures. Tables for parameters, versions and settings. Bullets for prerequisites. Short prose between them. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
+- Formats for this page type: This page is a procedure and always carries a numbered step list. When the supplied H2s are the steps themselves, the first section ends with a numbered list of all the steps, one short line each, and every step H2 then gives the detail. When the procedure sits inside one H2, that section is written as numbered steps. A table for any section that compares options or shows costs or timelines. Bullets only for checklists of four or more items. Prose elsewhere. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
 - Tables are optional. Use one only where it helps the reader.
-- H3 subheadings are required: one H3 per stage inside the procedure section. When you use H3s in a section, use at least two, phrase each as the specific sub-question or item it covers (that is what answer engines quote), keep them in sentence case, and never put an H3 in a section under 150 words. Never use H4.
+- H3 subheadings are optional: when a stage section runs over 250 words, split it with two or more H3s. When you use H3s in a section, use at least two, phrase each as the specific sub-question or item it covers (that is what answer engines quote), keep them in sentence case, and never put an H3 in a section under 150 words. Never use H4.
 - Total length: 300 to 1500 words. Aim for about 900.
 - External citations are optional. Any you use must come from the Live Research tool.
 - Research: This page type is written from the client facts and general professional knowledge. Use the Live Research tool only when a sentence needs a specific external figure or quote, and drop the sentence if nothing reliable comes back.
@@ -77,7 +77,7 @@ Structure:
   3. Third H2 from the app [90 words]
   4. Fourth H2 from the app [90 words]
   5. A closing H2 that you write yourself [about 100 words]. Heading: follow one of these patterns, filling any <...> from the H1 or the facts, in sentence case: If it still does not work. Never head it "Conclusion", "Summary", "Final thoughts" or "Key takeaways". Content: The two or three checks to make when the steps fail and how to contact support, in 40 to 80 words.
-- Formats for this page type: Numbered steps for procedures. Tables for parameters, versions and settings. Bullets for prerequisites. Short prose between them. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
+- Formats for this page type: This page is a procedure and always carries a numbered step list. When the supplied H2s are the steps themselves, the first section ends with a numbered list of all the steps, one short line each, and every step H2 then gives the detail. When the procedure sits inside one H2, that section is written as numbered steps. A table for any section that compares options or shows costs or timelines. Bullets only for checklists of four or more items. Prose elsewhere. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
 - Tables are optional. Use one only where it helps the reader.
 - H3 subheadings are optional: one H3 per stage inside a long procedure. When you use H3s in a section, use at least two, phrase each as the specific sub-question or item it covers (that is what answer engines quote), keep them in sentence case, and never put an H3 in a section under 150 words. Never use H4.
 - Total length: 200 to 800 words. Aim for about 500.
@@ -428,7 +428,7 @@ There is no call to action on this page. Nowhere on the page do you ask the read
 
 ## `claims_how_to_file_page` (Claims how to file)
 
-Spec: {"words_min": 500, "words_max": 1200, "default_words": 850, "answer_paragraph": true, "answer_style": "definition", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "required: one H3 per filing step.", "schema_types": "HowTo + FAQPage + BreadcrumbList"}
+Spec: {"words_min": 500, "words_max": 1200, "default_words": 850, "answer_paragraph": true, "answer_style": "definition", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "optional: when a step section runs over 250 words, split it with two or more H3s.", "schema_types": "HowTo + FAQPage + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -448,9 +448,9 @@ Structure:
   3. Third H2 from the app [168 words]
   4. Fourth H2 from the app [168 words]
   5. A closing H2 that you write yourself [about 100 words]. Heading: follow one of these patterns, filling any <...> from the H1 or the facts, in sentence case: After you file. Never head it "Conclusion", "Summary", "Final thoughts" or "Key takeaways". Content: What happens after the claim is filed, the timeline and who to contact, from the facts, in 50 to 100 words.
-- Formats for this page type: Numbered steps for procedures. Tables for parameters, versions and settings. Bullets for prerequisites. Short prose between them. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
+- Formats for this page type: This page is a procedure and always carries a numbered step list. When the supplied H2s are the steps themselves, the first section ends with a numbered list of all the steps, one short line each, and every step H2 then gives the detail. When the procedure sits inside one H2, that section is written as numbered steps. A table for any section that compares options or shows costs or timelines. Bullets only for checklists of four or more items. Prose elsewhere. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
 - Tables are optional. Use one only where it helps the reader.
-- H3 subheadings are required: one H3 per filing step. When you use H3s in a section, use at least two, phrase each as the specific sub-question or item it covers (that is what answer engines quote), keep them in sentence case, and never put an H3 in a section under 150 words. Never use H4.
+- H3 subheadings are optional: when a step section runs over 250 words, split it with two or more H3s. When you use H3s in a section, use at least two, phrase each as the specific sub-question or item it covers (that is what answer engines quote), keep them in sentence case, and never put an H3 in a section under 150 words. Never use H4.
 - Total length: 500 to 1200 words. Aim for about 850.
 - External citations are optional. Any you use must come from the Live Research tool.
 - Research: This page type is written from the client facts and general professional knowledge. Use the Live Research tool only when a sentence needs a specific external figure or quote, and drop the sentence if nothing reliable comes back.
@@ -501,7 +501,7 @@ Structure:
   3. Third H2 from the app [98 words]
   4. Fourth H2 from the app [98 words]
   5. A closing H2 that you write yourself [about 100 words]. Heading: follow one of these patterns, filling any <...> from the H1 or the facts, in sentence case: Before your visit. Never head it "Conclusion", "Summary", "Final thoughts" or "Key takeaways". Content: The checklist of what to bring and when to arrive, as a short numbered list, then the contact line from the facts.
-- Formats for this page type: Numbered steps for procedures. Tables for parameters, versions and settings. Bullets for prerequisites. Short prose between them. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
+- Formats for this page type: This page is a procedure and always carries a numbered step list. When the supplied H2s are the steps themselves, the first section ends with a numbered list of all the steps, one short line each, and every step H2 then gives the detail. When the procedure sits inside one H2, that section is written as numbered steps. A table for any section that compares options or shows costs or timelines. Bullets only for checklists of four or more items. Prose elsewhere. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
 - Tables are optional. Use one only where it helps the reader.
 - H3 subheadings are optional: one H3 per stage inside a long procedure. When you use H3s in a section, use at least two, phrase each as the specific sub-question or item it covers (that is what answer engines quote), keep them in sentence case, and never put an H3 in a section under 150 words. Never use H4.
 - Total length: 300 to 800 words. Aim for about 550.

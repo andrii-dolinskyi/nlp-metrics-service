@@ -37,6 +37,8 @@ if (kw) {
   if (words.slice(-100).join(' ').toLowerCase().indexOf(kw) === -1) issues.push('The core keyword "' + r.coreKeyword + '" is missing from the last 100 words.');
 }
 const tableRows = (md.match(/^\|.+\|$/gm) || []).length;
+const numbered = (md.match(/^\s*\d+\.\s+\S/gm) || []).length;
+if (/always carries a numbered step list/i.test(S.formatRules || '') && numbered < 2) issues.push('This page type is a procedure and must carry a numbered step list: either the procedure section as numbered steps, or a numbered list of the steps at the end of the first section when the H2s are the steps.');
 if (S.tablesMin > 0 && tableRows < 3) issues.push('At least ' + S.tablesMin + ' markdown table is required. None was found.');
 const urls = (md.match(/\]\((https?:[^\)\s]+)\)/g) || []).map(x => x.slice(2, -1));
 const nu = u => String(u || '').replace(/\/$/, '').toLowerCase();

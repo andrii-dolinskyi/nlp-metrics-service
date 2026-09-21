@@ -37,7 +37,16 @@ const B = {
   WebApplication: () => Object.assign({}, common, { '@type': 'WebApplication', applicationCategory: 'BusinessApplication', publisher: org }),
   DefinedTerm: () => Object.assign({}, common, { '@type': 'DefinedTerm', termCode: r.coreKeyword, inDefinedTermSet: base + '/glossary/' }),
   DefinedTermSet: () => ({ '@context': 'https://schema.org', '@type': 'DefinedTermSet', name: r.clientName + ' glossary', url: base + '/glossary/' }),
-  HowTo: () => { const st = steps(); return st.length >= 2 ? Object.assign({}, common, { '@type': 'HowTo', step: st.map((s, i) => ({ '@type': 'HowToStep', position: i + 1, text: s.replace(/^\d+\.\s+/, '') })) }) : null; },
+  HowTo: () => {
+    let st = steps().map(s => ({ name: s.replace(/^\d+\.\s+/, '').replace(/[.:]\s*$/, '').slice(0, 120), text: s.replace(/^\d+\.\s+/, '') }));
+    if (st.length < 2) {
+      // The outline H2s are the steps: one HowToStep per supplied section, its first sentence as the text.
+      const parts = f.finalPage.split(/^##\s+/m).slice(1);
+      const n = (c.sections || []).length;
+      st = parts.slice(0, n).map(p => { const lines = p.split('\n'); const name = (lines[0] || '').trim(); const body = lines.slice(1).join(' ').replace(/[#*|]/g, ' ').replace(/\[([^\]]+)\]\([^\)]*\)/g, '$1').replace(/\s+/g, ' ').trim(); const first = (body.match(/^[^.!?]+[.!?]/) || [body.slice(0, 200)])[0]; return { name, text: first.trim() }; }).filter(s => s.name && s.text);
+    }
+    return st.length >= 2 ? Object.assign({}, common, { '@type': 'HowTo', step: st.map((s, i) => ({ '@type': 'HowToStep', position: i + 1, name: s.name, text: s.text })) }) : null;
+  },
   FAQPage: () => (f.faq || []).length ? { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: f.faq.map(q => ({ '@type': 'Question', name: q.question, acceptedAnswer: { '@type': 'Answer', text: q.answer } })) } : null,
   BreadcrumbList: () => { const segs = r.slugPath.split('/').filter(Boolean); return segs.length ? { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: segs.map((s, i) => ({ '@type': 'ListItem', position: i + 1, name: s.replace(/-/g, ' '), item: base + '/' + segs.slice(0, i + 1).join('/') + '/' })) } : null; }
 };

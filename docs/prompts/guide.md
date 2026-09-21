@@ -57,7 +57,7 @@ One call to action, in the closing section only (section 5). Soft: one plain sen
 
 ## `how_to` (How-to guide)
 
-Spec: {"words_min": 1000, "words_max": 2500, "default_words": 1750, "answer_paragraph": true, "answer_style": "definition", "tables_min": 1, "citations_min": 3, "research": "search", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "required: one H3 per step or per step group inside the section that walks through the procedure, phrased as the action (verb first).", "schema_types": "HowTo + Article + BreadcrumbList"}
+Spec: {"words_min": 1000, "words_max": 2500, "default_words": 1750, "answer_paragraph": true, "answer_style": "definition", "tables_min": 1, "citations_min": 3, "research": "search", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "optional: when a step section runs over 250 words, split it with two or more H3s phrased as the sub-actions (verb first).", "schema_types": "HowTo + Article + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -77,9 +77,9 @@ Structure:
   3. Third H2 from the app [392 words]
   4. Fourth H2 from the app [392 words]
   5. A closing H2 that you write yourself [about 100 words]. Heading: follow one of these patterns, filling any <...> from the H1 or the facts, in sentence case: After you finish | What to do next. Never head it "Conclusion", "Summary", "Final thoughts" or "Key takeaways". Content: What the reader should check once the steps are done and the one thing that goes wrong most often, in 60 to 120 words. No recap of the steps.
-- Formats for this page type: Numbered steps for any section that describes a sequence. A table for any section that compares two or more options, sets criteria against options, or shows costs, timelines or thresholds. Bullets only for checklists or lists of requirements with four or more items. Prose everywhere else, including the opening and the closing. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
+- Formats for this page type: This page is a procedure and always carries a numbered step list. When the supplied H2s are the steps themselves, the first section ends with a numbered list of all the steps, one short line each, and every step H2 then gives the detail. When the procedure sits inside one H2, that section is written as numbered steps. A table for any section that compares options or shows costs or timelines. Bullets only for checklists of four or more items. Prose elsewhere. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
 - Include at least 1 markdown table where a section suits one. Real pipe tables with a header row.
-- H3 subheadings are required: one H3 per step or per step group inside the section that walks through the procedure, phrased as the action (verb first). When you use H3s in a section, use at least two, phrase each as the specific sub-question or item it covers (that is what answer engines quote), keep them in sentence case, and never put an H3 in a section under 150 words. Never use H4.
+- H3 subheadings are optional: when a step section runs over 250 words, split it with two or more H3s phrased as the sub-actions (verb first). When you use H3s in a section, use at least two, phrase each as the specific sub-question or item it covers (that is what answer engines quote), keep them in sentence case, and never put an H3 in a section under 150 words. Never use H4.
 - Total length: 1000 to 2500 words. Aim for about 1750.
 - Include at least 3 external citations as markdown links to sources you found with the Live Research tool. Name the source and the year in the sentence.
 - Research: Use the Live Research tool for the specific statistics, prices, study results and quotes the page needs, at most two searches per claim.
@@ -322,7 +322,7 @@ One call to action, in the closing section only (section 5). Soft: one plain sen
 
 ## `process_page` (Process)
 
-Spec: {"words_min": 700, "words_max": 1500, "default_words": 1100, "answer_paragraph": true, "answer_style": "definition", "tables_min": 1, "citations_min": 3, "research": "search", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "required: one H3 per stage inside the section that walks through the process.", "schema_types": "Article + Service + BreadcrumbList"}
+Spec: {"words_min": 700, "words_max": 1500, "default_words": 1100, "answer_paragraph": true, "answer_style": "definition", "tables_min": 1, "citations_min": 3, "research": "search", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "optional: when a stage section runs over 250 words, split it with two or more H3s.", "schema_types": "Article + Service + BreadcrumbList"}
 
 ```text
 <page_brief>
@@ -342,9 +342,9 @@ Structure:
   3. Third H2 from the app [230 words]
   4. Fourth H2 from the app [230 words]
   5. A closing H2 that you write yourself [about 100 words]. Heading: follow one of these patterns, filling any <...> from the H1 or the facts, in sentence case: After the process ends | What to do next. Never head it "Conclusion", "Summary", "Final thoughts" or "Key takeaways". Content: The one decision or action the reader should take now and why, in one paragraph of 60 to 120 words. It adds a last useful point instead of summarising the sections. Never open with "In conclusion", "In summary", "Overall" or "Ultimately".
-- Formats for this page type: Numbered steps for any section that describes a sequence. A table for any section that compares two or more options, sets criteria against options, or shows costs, timelines or thresholds. Bullets only for checklists or lists of requirements with four or more items. Prose everywhere else, including the opening and the closing. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
+- Formats for this page type: This page is a procedure and always carries a numbered step list. When the supplied H2s are the steps themselves, the first section ends with a numbered list of all the steps, one short line each, and every step H2 then gives the detail. When the procedure sits inside one H2, that section is written as numbered steps. A table for any section that compares options or shows costs or timelines. Bullets only for checklists of four or more items. Prose elsewhere. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
 - Include at least 1 markdown table where a section suits one. Real pipe tables with a header row.
-- H3 subheadings are required: one H3 per stage inside the section that walks through the process. When you use H3s in a section, use at least two, phrase each as the specific sub-question or item it covers (that is what answer engines quote), keep them in sentence case, and never put an H3 in a section under 150 words. Never use H4.
+- H3 subheadings are optional: when a stage section runs over 250 words, split it with two or more H3s. When you use H3s in a section, use at least two, phrase each as the specific sub-question or item it covers (that is what answer engines quote), keep them in sentence case, and never put an H3 in a section under 150 words. Never use H4.
 - Total length: 700 to 1500 words. Aim for about 1100.
 - Include at least 3 external citations as markdown links to sources you found with the Live Research tool. Name the source and the year in the sentence.
 - Research: Use the Live Research tool for the specific statistics, prices, study results and quotes the page needs, at most two searches per claim.
