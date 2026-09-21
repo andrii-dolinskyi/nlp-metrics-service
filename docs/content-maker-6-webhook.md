@@ -156,7 +156,7 @@ The Generation - Report Progress sub-workflow is called inline on the main chain
 
 ## Evaluation
 
-The Money Calculator sub-workflow, called after the callback, sums tokens and cost for every flow. For executions whose workflow name is exactly `Content Maker 6.0` it also runs the Content Maker 5.0 evaluator unchanged (text metrics, SEO metrics, rules compliance on GPT 5.6 Luna, final calculations) and appends the scores to the EVALUATOR sheet with Flow Version "Content Maker 6.0".
+The Money Calculator sub-workflow, called after the callback, sums tokens and cost for every flow. For executions whose workflow name is exactly `Content Maker 6.0` it also runs the Content Maker 5.0 evaluator (text metrics and rules compliance on GPT 5.6 Luna, final calculations) and appends the scores to the EVALUATOR sheet with Flow Version "Content Maker 6.0". The nine SEO metrics of the 5.0 evaluator are not calculated any more: their sheet columns are filled with N/A, and violation density and quality score come from text metrics (25 percent) and rules (75 percent) only.
 
 ## Helper workflows (test only)
 

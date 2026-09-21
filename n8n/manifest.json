@@ -73,12 +73,6 @@
  },
  {
   "workflowId": "7pGY0fAQ2bysqR3H",
-  "node": "Calculate SEO Metrics",
-  "param": "jsCode",
-  "file": "n8n/money/calculate_seo_metrics.js"
- },
- {
-  "workflowId": "7pGY0fAQ2bysqR3H",
   "node": "Final Calculations",
   "param": "jsCode",
   "file": "n8n/money/final_calculations.js"
@@ -88,5 +82,11 @@
   "node": "Rules Compliance Evaluation",
   "param": "options.systemMessage",
   "file": "n8n/money/rules_compliance_system.txt"
+ },
+ {
+  "workflowId": "7pGY0fAQ2bysqR3H",
+  "node": "Extract CM6 Article",
+  "param": "jsCode",
+  "file": "n8n/money/extract_cm6_article.js"
  }
 ]
