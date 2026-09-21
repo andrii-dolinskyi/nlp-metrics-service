@@ -5,6 +5,8 @@ try { rules = $('Rules Compliance Evaluation').first().json.output; } catch (e) 
 if (!metrics || metrics.burstinessScore === undefined || !rules || rules.negativeParallelisms === undefined) return [];
 
 const inRange = (val, min, max) => val >= min && val <= max;
+let totalWords = 1; try { totalWords = Number($('Extract CM6 Article').first().json.totalWords) || 1; } catch (e) { totalWords = 1; }
+const wordsK = Math.max(totalWords, 1) / 1000;
 const v = (violated) => violated ? 1 : 0;
 
 const metricsViolations = {
@@ -13,8 +15,8 @@ const metricsViolations = {
   avgParagraphLength:     v(!inRange(metrics.avgParagraphLength, 35, 60)),
   ttr:                    v(!inRange(metrics.ttr, 0.40, 0.55)),
   hapaxRatio:             v(!inRange(metrics.hapaxRatio, 0.25, 0.40)),
-  bigramRepCount:         v(!inRange(metrics.bigramRepCount, 0, 17)),
-  trigramRepCount:        v(!inRange(metrics.trigramRepCount, 0, 7)),
+  bigramRepCount:         v(!inRange(metrics.bigramRepCount / wordsK, 0, 17)),   // per 1,000 words
+  trigramRepCount:        v(!inRange(metrics.trigramRepCount / wordsK, 0, 7)),   // per 1,000 words
   nominalizationRatio:    v(!inRange(metrics.nominalizationRatio, 0.010, 0.039)),
   pronounNounRatio:       v(!inRange(metrics.pronounNounRatio, 0.06, 0.12)),
   openerVariety:          v(!inRange(metrics.openerVariety, 0.55, 0.80)),
@@ -59,14 +61,14 @@ const rulesPoints   = Object.entries(rules).reduce((sum, [key, value]) => {
   return sum + (value * weight);
 }, 0);
 
-const totalWords = ($('Extract CM6 Article').first().json.totalWords) || 1;
 
 const metricsDensity  = (metricsPoints / totalWords) * 1000;
 const rulesDensity    = (rulesPoints / totalWords) * 1000;
 const violationDensity = metricsDensity + rulesDensity;
 
-const METRICS_T = 12;
-const RULES_T   = 45;
+// Tolerance: the density (points per 1,000 words) at which a group scores 50. Recalibrated 2026-09-21 for Content Maker 6.0 pages.
+const METRICS_T = 24;
+const RULES_T   = 70;
 
 const metricsScore = 100 / (1 + (metricsDensity / METRICS_T));
 const rulesScore   = 100 / (1 + (rulesDensity / RULES_T));
