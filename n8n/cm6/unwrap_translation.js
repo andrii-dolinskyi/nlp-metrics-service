@@ -1,8 +1,28 @@
 const j = $input.first().json;
 const r = $('Parse Request').first().json;
 const a = $('Assemble Assets').first().json;
-const decode = s => String(s || '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, String.fromCharCode(34)).replace(/&#39;/g, String.fromCharCode(39));
+// DeepL runs with tag_handling html, so it returns entities (&#x27; for an apostrophe, &amp;, &quot;) and sometimes
+// joins clauses with semicolons the style rules forbid. Decode every entity and turn a semicolon into a comma.
+const decode = s => String(s || '')
+  .replace(/&#x([0-9a-f]+);/gi, (m, h) => String.fromCodePoint(parseInt(h, 16)))
+  .replace(/&#(\d+);/g, (m, n) => String.fromCodePoint(parseInt(n, 10)))
+  .replace(/&quot;/g, String.fromCharCode(34)).replace(/&apos;/g, String.fromCharCode(39)).replace(/&nbsp;/g, ' ')
+  .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
+  .replace(/\s*;\s+/g, ', ');
 const t = (j.translations || []).map(x => decode(x.text));
+// The meta description was written to 150 characters in English and grows in translation: cut it back at a
+// sentence end, else at a clause end, else at a word, and drop a dangling connector.
+const clampMeta = (x, max) => {
+  x = String(x || '').replace(/[—–;]/g, ',').replace(/\s+/g, ' ').trim();
+  if (x.length <= max) return x;
+  const cut = x.slice(0, max);
+  const dot = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('.'));
+  if (dot > max * 0.6) return cut.slice(0, dot + 1).trim();
+  const comma = cut.lastIndexOf(', ');
+  let out = comma > max * 0.5 ? cut.slice(0, comma) : cut.slice(0, Math.max(cut.lastIndexOf(' '), 0) || max);
+  out = out.replace(/[,:]$/, '').replace(/\s+(et|ou|de|des|du|à|au|aux|en|pour|par|sur|avec|dans|que|qui|and|or|of|to|for|with|in|on|by|und|oder|von|zu|für|mit|y|o|de|para|con|e|di|a|per|con)$/i, '').trim();
+  return out.replace(/[,:]$/, '') + '.';
+};
 if (!t.length || !t[0]) throw new Error('DeepL returned no translation');
 const clean = (v, d) => (!v || v === '-') ? d : v;
 const n = a.faq.length;
@@ -22,4 +42,4 @@ const finalPage = t[0].split('\n').map(line => {
   if (/^##\s+\S/.test(line)) { const idx = h2i++; if (idx < outline.length && outline[idx]) return '## ' + outline[idx]; }
   return line;
 }).join('\n');
-return [{ json: { finalPage, metaDescription: clean(t[1], a.metaDescription), faq, eeat, slug: a.slug, slugPath: a.slugPath, translated: true } }];
+return [{ json: { finalPage, metaDescription: clampMeta(clean(t[1], a.metaDescription), 150), faq, eeat, slug: a.slug, slugPath: a.slugPath, translated: true } }];
