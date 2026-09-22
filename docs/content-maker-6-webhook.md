@@ -85,7 +85,7 @@ The smallest valid request is `pageType`, `clientName`, `callback_url`, `h1`, `h
 
 ## Callbacks
 
-The final callback is one object whose parts stay separate: `articleTextMd` (the page), `metaDescription`, `faq` (array of question and answer), `eeat`, `jsonLd`, `author`, `reviewer`, `quality`. Nothing is merged into the page text, so the app stores and renders each part in its own template slot. For a non-English run all four text parts are in the target language and the H1 and H2s are the app's own wording.
+The final callback is one object whose parts stay separate: `articleTextMd` (the page), `metaDescription`, `faq` (array of question and answer), `eeat`, `jsonLd`, `author`, `reviewer`, `quality`. Nothing is merged into the page text, so the app stores and renders each part in its own template slot. For a non-English run all four text parts are in the target language and the H1 and H2s are the app's own wording. Every text field passes the `Clean Text` node before the callback: no HTML entities, no invisible characters, no em dashes, no semicolons in FAQ, meta or E-E-A-T lines, markdown intact.
 
 `POST {callback_url}/execution-started` at the start:
 
