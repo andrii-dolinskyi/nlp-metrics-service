@@ -1,6 +1,5 @@
 const r = $('Parse Request').first().json;
 const f = $input.first().json;
-let eeat = null; try { eeat = $('EEAT Analysis').first().json.output || null; } catch (e) { eeat = null; }
 let st = {}; try { st = $('Stabilizer').first().json; } catch (e) { st = {}; }
 // Page statistics for the callback, counted on the final page text (there is no validator step).
 const md = String(f.finalPage || '');
@@ -22,8 +21,8 @@ return [{ json: {
   metaDescription: f.metaDescription,
   articleTextMd: f.finalPage,
   faq: f.faq,
-  author: r.author, reviewer: r.reviewer || null,
-  eeat: eeat,
+  author: r.authorLocal || r.author, reviewer: r.reviewerLocal || r.reviewer || null,
+  eeat: f.eeat || null,
   jsonLd: f.jsonLd, schemaTypes: f.schemaTypes, schemaWarnings: f.schemaWarnings,
   quality: { totalWords, h2Count, h3Count, tableRows, ctaLinks, externalCitations, patternsFixed: { ingPileups: (st.ingPileups || []).length, parallelSeries: (st.parallelSeries || []).length, hedging: (st.hedging || []).length, negativeParallelisms: (st.negativeParallelisms || []).length, tailingNegations: (st.tailingNegations || []).length, aiPhrasing: (st.aiPhrasing || []).length } },
   generatedAt: new Date().toISOString()

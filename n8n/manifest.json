@@ -25,18 +25,6 @@
  },
  {
   "workflowId": "MZUUvWCdCXlHKllN",
-  "node": "Assemble Meta",
-  "param": "jsCode",
-  "file": "n8n/cm6/assemble_meta.js"
- },
- {
-  "workflowId": "MZUUvWCdCXlHKllN",
-  "node": "Collect FAQ",
-  "param": "jsCode",
-  "file": "n8n/cm6/collect_faq.js"
- },
- {
-  "workflowId": "MZUUvWCdCXlHKllN",
   "node": "Stabilizer",
   "param": "jsCode",
   "file": "n8n/cm6/stabilizer.js"
@@ -106,5 +94,29 @@
   "node": "Metadata Generator",
   "param": "text",
   "file": "n8n/cm6/metadata_generator_text.txt"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "DeepL Prep Inputs",
+  "param": "jsCode",
+  "file": "n8n/cm6/deepl_prep_inputs.js"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "Request EN",
+  "param": "jsCode",
+  "file": "n8n/cm6/request_en.js"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "Assemble Assets",
+  "param": "jsCode",
+  "file": "n8n/cm6/assemble_assets.js"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "Final Page",
+  "param": "jsonOutput",
+  "file": "n8n/cm6/final_page.txt"
  }
 ]

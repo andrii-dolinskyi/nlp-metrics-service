@@ -11,8 +11,8 @@ const today = new Date().toISOString().slice(0, 10);
 const common = { '@context': 'https://schema.org', url, name: r.h1, headline: r.h1, description: f.metaDescription, inLanguage, dateModified: today };
 // The author comes from the request (article settings in the app). For bio and profile pages the app sends the person the page is about as the author.
 const personBlock = (p) => p && p.name ? { '@type': 'Person', name: p.name, jobTitle: p.jobTitle || undefined, url: p.url || undefined, sameAs: (p.sameAs && p.sameAs.length) ? p.sameAs : undefined, image: p.image || undefined, description: p.description || undefined } : null;
-const author = personBlock(r.author) || { '@type': 'Organization', name: r.clientName };
-const reviewer = personBlock(r.reviewer);
+const author = personBlock(r.authorLocal || r.author) || { '@type': 'Organization', name: r.clientName };
+const reviewer = personBlock(r.reviewerLocal || r.reviewer);
 const steps = () => (f.finalPage.match(/^\d+\.\s+.+$/gm) || []).slice(0, 20);
 const article = (type) => Object.assign({}, common, { '@type': type, publisher: org, author, datePublished: today, reviewedBy: reviewer || undefined });
 const B = {
@@ -29,7 +29,7 @@ const B = {
   ContactPage: () => Object.assign({}, common, { '@type': 'ContactPage', mainEntity: org }),
   QAPage: () => Object.assign({}, common, { '@type': 'QAPage', publisher: org }),
   ProfilePage: () => Object.assign({}, common, { '@type': 'ProfilePage', mainEntity: author }),
-  Person: () => personBlock(r.author) ? Object.assign({ '@context': 'https://schema.org' }, personBlock(r.author)) : null,
+  Person: () => personBlock(r.authorLocal || r.author) ? Object.assign({ '@context': 'https://schema.org' }, personBlock(r.authorLocal || r.author)) : null,
   Organization: () => Object.assign({ '@context': 'https://schema.org' }, org, { description: r.clientDescription || undefined }),
   Service: () => Object.assign({}, common, { '@type': 'Service', serviceType: r.coreKeyword || r.h1, provider: org }),
   LegalService: () => Object.assign({}, common, { '@type': 'LegalService', name: r.clientName, serviceType: r.coreKeyword || r.h1, url: base || url }),

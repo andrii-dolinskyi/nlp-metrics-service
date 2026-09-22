@@ -1,0 +1,1 @@
+={{ $json.translated ? $json : Object.assign({}, $('Assemble Assets').first().json, { translated: false }) }}

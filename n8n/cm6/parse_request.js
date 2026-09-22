@@ -22,14 +22,19 @@ const out = {
   ctaRules: s(b.ctaRules), ctaUrl: s(b.ctaUrl), writingPreferences: s(b.writingPreferences),
   whitelistDomains: arr(b.whitelistDomains), blacklistDomains: arr(b.blacklistDomains),
   metaTitle: s(b.metaTitle), facts: obj(b.facts),
-  author: person(b.author, 'author'), reviewer: person(b.reviewer, 'reviewer')
+  author: person(b.author, 'author'), reviewer: person(b.reviewer, 'reviewer'),
+  // Filled by Request EN when the request came in another language: the app's own wording, restored on the final page.
+  original: obj(b._original), deeplTarget: s(b._deeplTarget)
 };
+out.authorLocal = person(Object.assign({}, obj(b.author), obj(out.original.author)), 'author');
+out.reviewerLocal = person(Object.assign({}, obj(b.reviewer), obj(out.original.reviewer)), 'reviewer');
+if (!out.reviewerLocal.name) out.reviewerLocal = null;
 const missing = ['pageType', 'clientName', 'callbackUrl', 'h1'].filter(k => !out[k]);
 if (!out.h2Outline.length) missing.push('h2Outline');
 if (!out.author.name) missing.push('author.name');
 if (!out.reviewer.name) out.reviewer = null;
 if (missing.length) throw new Error('Missing required fields: ' + missing.join(', '));
-if (!out.slugPath) out.slugPath = '/' + slugify(out.h1) + '/';
+if (!out.slugPath) out.slugPath = '/' + slugify(out.original.h1 || out.h1) + '/';
 if (out.slugPath.charAt(0) !== '/') out.slugPath = '/' + out.slugPath;
 const lang = out.targetLanguage.toLowerCase();
 out.isLang = !(lang === '' || lang.indexOf('english') === 0);
