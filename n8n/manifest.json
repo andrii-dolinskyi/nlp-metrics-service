@@ -82,5 +82,29 @@
   "node": "Extract CM6 Article",
   "param": "jsCode",
   "file": "n8n/money/extract_cm6_article.js"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "FAQ Writer",
+  "param": "options.systemMessage",
+  "file": "n8n/cm6/faq_writer_system.txt"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "DeepL Prep",
+  "param": "jsCode",
+  "file": "n8n/cm6/deepl_prep.js"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "Unwrap Translation",
+  "param": "jsCode",
+  "file": "n8n/cm6/unwrap_translation.js"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "Metadata Generator",
+  "param": "text",
+  "file": "n8n/cm6/metadata_generator_text.txt"
  }
 ]

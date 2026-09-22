@@ -8,7 +8,7 @@ const org = { '@type': 'Organization', name: r.clientName, url: base || undefine
 const langMap = { english: 'en', german: 'de', french: 'fr', spanish: 'es', italian: 'it', dutch: 'nl', polish: 'pl', portuguese: 'pt', ukrainian: 'uk', russian: 'ru', czech: 'cs', swedish: 'sv', danish: 'da', norwegian: 'nb', finnish: 'fi', greek: 'el', turkish: 'tr', arabic: 'ar', japanese: 'ja', korean: 'ko', chinese: 'zh', hungarian: 'hu', romanian: 'ro', bulgarian: 'bg', slovak: 'sk', slovenian: 'sl', croatian: 'hr', estonian: 'et', latvian: 'lv', lithuanian: 'lt', indonesian: 'id', vietnamese: 'vi', thai: 'th', hebrew: 'he', hindi: 'hi', afrikaans: 'af' };
 const inLanguage = langMap[String(r.targetLanguage).toLowerCase()] || r.targetLanguage;
 const today = new Date().toISOString().slice(0, 10);
-const common = { '@context': 'https://schema.org', url, name: f.metaTitle || r.h1, headline: r.h1, description: f.metaDescription, inLanguage, dateModified: today };
+const common = { '@context': 'https://schema.org', url, name: r.h1, headline: r.h1, description: f.metaDescription, inLanguage, dateModified: today };
 // The author comes from the request (article settings in the app). For bio and profile pages the app sends the person the page is about as the author.
 const personBlock = (p) => p && p.name ? { '@type': 'Person', name: p.name, jobTitle: p.jobTitle || undefined, url: p.url || undefined, sameAs: (p.sameAs && p.sameAs.length) ? p.sameAs : undefined, image: p.image || undefined, description: p.description || undefined } : null;
 const author = personBlock(r.author) || { '@type': 'Organization', name: r.clientName };

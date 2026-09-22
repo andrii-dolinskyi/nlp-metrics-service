@@ -19,7 +19,7 @@ return [{ json: {
   taskId: r.taskId, brandId: r.brandId, userId: r.userId, n8nExecutionId: String($execution.id),
   status: 'ok', pageType: r.pageType, language: r.targetLanguage,
   slug: f.slug, slugPath: f.slugPath, canonicalUrl: f.canonicalUrl,
-  metaTitle: f.metaTitle, metaDescription: f.metaDescription,
+  metaDescription: f.metaDescription,
   articleTextMd: f.finalPage,
   faq: f.faq,
   author: r.author, reviewer: r.reviewer || null,

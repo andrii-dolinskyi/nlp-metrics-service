@@ -13,6 +13,5 @@ const clamp = (s, max) => {
   const sp = cut.lastIndexOf(' ');
   return (sp > 0 ? cut.slice(0, sp) : cut).replace(/[,:]$/, '').trim() + '.';
 };
-const metaTitle = r.metaTitle || clamp(cap(m.meta_title), 60).replace(/\.$/, '');
-const metaDescription = clamp(cap(m.meta_description), 155);
-return [{ json: { slug, slugPath: r.slugPath, metaTitle, metaDescription, finalPage: page, faq: cf.faq || [] } }];
+const metaDescription = clamp(cap(m.meta_description), 150);
+return [{ json: { slug, slugPath: r.slugPath, metaDescription, finalPage: page, faq: cf.faq || [] } }];
