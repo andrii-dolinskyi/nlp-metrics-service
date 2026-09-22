@@ -71,7 +71,7 @@ One request writes one page in one language. Everything about the page comes fro
 | `coreKeyword` | per type | placed in the first 60 words and used lightly in the body; never density-checked |
 | `secondaryKeywords` | no | array or comma string |
 | `h2Outline` | yes | array of heading strings (a `\|` separated string also works); followed verbatim, in order. No per-heading format: the spec's `format_rules` decide where tables, steps, bullets and prose go. When the last heading already reads as a closing section (next steps, how to get started, contact, book) it is used as the closing section; otherwise the flow appends one closing H2 per the spec |
-| `aiPrompts` | no | answered inside the sections, then used as the first FAQ questions |
+| `aiPrompts` | no | answered inside the sections, used as the first FAQ questions, and returned word for word in `monitoringPrompts` |
 | `ctaRules`, `ctaUrl` | no | the action the closing section asks for and its link. The spec's `cta_mode` decides whether the page has a CTA at all: `required` types get one even when these are empty (the action is named in words, without a link), `optional` types get one only when `ctaRules` or `ctaUrl` is sent, `none` types never get one. The CTA appears in the closing section only, never in the body or the FAQ |
 | `writingPreferences`, `whitelistDomains`, `blacklistDomains` | no | as in Content Maker |
 | `metaTitle` | no | ignored since 2026-09-22: the page returns a meta description only |
@@ -85,7 +85,15 @@ The smallest valid request is `pageType`, `clientName`, `callback_url`, `h1`, `h
 
 ## Callbacks
 
-The final callback is one object whose parts stay separate: `articleTextMd` (the page), `metaDescription`, `faq` (array of question and answer), `eeat`, `jsonLd`, `author`, `reviewer`, `quality`. Nothing is merged into the page text, so the app stores and renders each part in its own template slot. For a non-English run all four text parts are in the target language and the H1 and H2s are the app's own wording. Every text field passes the `Clean Text` node before the callback: no HTML entities, no invisible characters, no em dashes, no semicolons in FAQ, meta or E-E-A-T lines, markdown intact.
+The final callback is one object whose parts stay separate: `articleTextMd` (the page), `metaDescription`, `faq` (array of five question and answer pairs, present only for page types whose spec has `faq_required` = Y; absent otherwise, and absent on an FAQ page whose questions sit in the body as H3s and feed the FAQPage block), `monitoringPrompts`, `eeat`, `jsonLd`, `author`, `reviewer`, `quality`.
+
+`monitoringPrompts` is the seed list for the app's monitoring page: the prompts a person types into ChatGPT, Perplexity or Google AI Mode for which this page should be cited. Each entry has `prompt` (page language), `promptEn`, `source` and `branded`:
+
+- `input`: every `aiPrompts` entry word for word as the app sent it, with its English rendering in `promptEn`;
+- `h1`: one unbranded question behind the H1 with the core keyword, written by the Prompt Maker agent;
+- `brand`: one question about the client on this subject, grounded in the page, `branded: true`.
+
+Three to five prompts per page. The two generated ones are translated with the page for non-English runs. Nothing is merged into the page text, so the app stores and renders each part in its own template slot. For a non-English run all four text parts are in the target language and the H1 and H2s are the app's own wording. Every text field passes the `Clean Text` node before the callback: no HTML entities, no invisible characters, no em dashes, no semicolons in FAQ, meta or E-E-A-T lines, markdown intact.
 
 `POST {callback_url}/execution-started` at the start:
 
