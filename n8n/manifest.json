@@ -118,5 +118,11 @@
   "node": "Final Page",
   "param": "jsonOutput",
   "file": "n8n/cm6/final_page.txt"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "Clean Text",
+  "param": "jsCode",
+  "file": "n8n/cm6/clean_text.js"
  }
 ]
