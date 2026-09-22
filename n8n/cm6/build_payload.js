@@ -15,6 +15,10 @@ const host = u => { const m = nu(u).match(/^https?:\/\/(?:www\.)?([^\/]+)/); ret
 const rootHost = host(r.siteRootUrl); const cta = nu(r.ctaUrl); const ctaHost = host(r.ctaUrl);
 const ctaLinks = cta ? urls.filter(u => nu(u) === cta).length : 0;
 const externalCitations = new Set(urls.filter(u => { const h = host(u); return h && h !== rootHost && h !== ctaHost; })).size;
+const esc = t => String(t || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const count = t => t ? (md.match(new RegExp(esc(t), 'gi')) || []).length : 0;
+const keywordLocal = r.coreKeywordLocal || (r.original && r.original.coreKeyword) || r.coreKeyword;
+const clientLocal = r.clientNameLocal || (r.original && r.original.clientName) || r.clientName;
 return [{ json: {
   taskId: r.taskId, brandId: r.brandId, userId: r.userId, n8nExecutionId: String($execution.id),
   status: 'ok', pageType: r.pageType, language: r.targetLanguage,
@@ -26,6 +30,6 @@ return [{ json: {
   author: r.authorLocal || r.author, reviewer: r.reviewerLocal || r.reviewer || null,
   eeat: f.eeat || null,
   jsonLd: f.jsonLd, schemaTypes: f.schemaTypes, schemaWarnings: f.schemaWarnings,
-  quality: { totalWords, h2Count, h3Count, tableRows, ctaLinks, externalCitations, patternsFixed: { ingPileups: (st.ingPileups || []).length, parallelSeries: (st.parallelSeries || []).length, hedging: (st.hedging || []).length, negativeParallelisms: (st.negativeParallelisms || []).length, tailingNegations: (st.tailingNegations || []).length, aiPhrasing: (st.aiPhrasing || []).length } },
+  quality: { totalWords, h2Count, h3Count, tableRows, ctaLinks, externalCitations, coreKeywordMentions: count(keywordLocal), clientNameMentions: count(clientLocal), patternsFixed: { ingPileups: (st.ingPileups || []).length, parallelSeries: (st.parallelSeries || []).length, hedging: (st.hedging || []).length, negativeParallelisms: (st.negativeParallelisms || []).length, tailingNegations: (st.tailingNegations || []).length, aiPhrasing: (st.aiPhrasing || []).length } },
   generatedAt: new Date().toISOString()
 } }];

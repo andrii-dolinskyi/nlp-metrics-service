@@ -15,6 +15,7 @@ if (preps.length && preps[0].paths.length) {
     p.paths.forEach((path, i) => { set(original, path, get(body, path)); set(body, path, String(tr[i].text || '').trim() || get(body, path)); });
   });
 }
+if (original.writingPreferences && body.writingPreferences && body.writingPreferences !== original.writingPreferences) body.writingPreferences = body.writingPreferences + ' (original wording in the page language: ' + original.writingPreferences + ')';
 body._original = original;
 body._deeplTarget = preps.length ? preps[0].targetLang : '';
 return [{ json: { headers: raw.headers, params: raw.params, query: raw.query, body } }];

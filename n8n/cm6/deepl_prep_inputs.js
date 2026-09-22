@@ -24,6 +24,7 @@ body.secondaryKeywords = list(b.secondaryKeywords).map(s).filter(Boolean);
 body.aiPrompts = list(b.aiPrompts).map(s).filter(Boolean);
 const fields = [];
 const add = (path, v) => { const t = s(v); if (t) fields.push({ path, text: t }); };
+add('clientName', b.clientName);
 add('clientDescription', b.clientDescription || b.productDescription);
 add('h1', b.h1);
 add('coreKeyword', b.coreKeyword);

@@ -33,16 +33,29 @@ const markdown = s => s
   .replace(/[ \t]+$/gm, '').replace(/\n{3,}/g, '\n\n').trim();
 const cleanBlock = s => markdown(typography(apostrophes(invisible(decode(s)))));
 const cleanLine = s => typography(apostrophes(invisible(decode(s)))).replace(/\*\*|__|`/g, '').replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/\s*;\s+/g, ', ').replace(/\s+/g, ' ').trim();
+const r = $('Parse Request').first().json;
+const unspan = s => String(s).replace(/<span[^>]*translate="no"[^>]*>([\s\S]*?)<\/span>/gi, '$1').replace(/<\/?span[^>]*>/gi, '');
+// The H1 and the outline H2s ship exactly as the app sent them, whatever the writer, the editor or DeepL did to them.
+const headings = s => {
+  const h1 = (r.original && r.original.h1) || r.h1 || '';
+  const outline = (r.original && Array.isArray(r.original.h2Outline) && r.original.h2Outline.length) ? r.original.h2Outline : (r.h2Outline || []);
+  let h2i = 0;
+  return s.split('\n').map(line => {
+    if (h1 && /^#\s+\S/.test(line)) return '# ' + h1;
+    if (/^##\s+\S/.test(line)) { const idx = h2i++; if (idx < outline.length && outline[idx]) return '## ' + outline[idx]; }
+    return line;
+  }).join('\n');
+};
 const out = Object.assign({}, f);
-out.finalPage = cleanBlock(f.finalPage);
-out.metaDescription = cleanLine(f.metaDescription);
-out.faq = (f.faq || []).map(q => ({ question: cleanLine(q.question), answer: cleanLine(q.answer) }));
+out.finalPage = headings(cleanBlock(unspan(f.finalPage)));
+out.metaDescription = cleanLine(unspan(f.metaDescription));
+out.faq = (f.faq || []).map(q => ({ question: cleanLine(unspan(q.question)), answer: cleanLine(unspan(q.answer)) }));
 if (f.eeat && typeof f.eeat === 'object') {
   out.eeat = JSON.parse(JSON.stringify(f.eeat));
-  ['experience', 'expertise', 'authoritativeness', 'trustworthiness'].forEach(k => { if (out.eeat[k] && out.eeat[k].evidence) out.eeat[k].evidence = cleanLine(out.eeat[k].evidence); });
-  if (out.eeat.priorityFix) out.eeat.priorityFix = cleanLine(out.eeat.priorityFix);
+  ['experience', 'expertise', 'authoritativeness', 'trustworthiness'].forEach(k => { if (out.eeat[k] && out.eeat[k].evidence) out.eeat[k].evidence = cleanLine(unspan(out.eeat[k].evidence)); });
+  if (out.eeat.priorityFix) out.eeat.priorityFix = cleanLine(unspan(out.eeat.priorityFix));
 }
-out.monitoringPrompts = (f.monitoringPrompts || []).map(x => Object.assign({}, x, { prompt: cleanLine(x.prompt), promptEn: cleanLine(x.promptEn) }));
+out.monitoringPrompts = (f.monitoringPrompts || []).map(x => Object.assign({}, x, { prompt: cleanLine(unspan(x.prompt)), promptEn: cleanLine(unspan(x.promptEn)) }));
 // Report what was repaired so a problem in a language shows up in the execution, not in production.
 const before = JSON.stringify({ p: f.finalPage, m: f.metaDescription, q: f.faq, e: f.eeat });
 out.textCleaned = { entities: (before.match(/&#?[a-z0-9]{1,8};/gi) || []).length, changed: before !== JSON.stringify({ p: out.finalPage, m: out.metaDescription, q: out.faq, e: out.eeat }) };

@@ -3,15 +3,19 @@ const c = $('Page Contract').first().json;
 const f = $input.first().json;
 const base = r.siteRootUrl;
 const url = base + r.slugPath;
+// The app's own wording for the schema: original H1, core keyword and client name on non-English runs.
+const h1 = r.h1Local || (r.original && r.original.h1) || r.h1;
+const keyword = r.coreKeywordLocal || (r.original && r.original.coreKeyword) || r.coreKeyword;
+const clientName = r.clientNameLocal || (r.original && r.original.clientName) || r.clientName;
 const types = String(c.spec.schemaTypes).split('+').map(x => x.trim()).filter(Boolean);
-const org = { '@type': 'Organization', name: r.clientName, url: base || undefined };
+const org = { '@type': 'Organization', name: clientName, url: base || undefined };
 const langMap = { english: 'en', german: 'de', french: 'fr', spanish: 'es', italian: 'it', dutch: 'nl', polish: 'pl', portuguese: 'pt', ukrainian: 'uk', russian: 'ru', czech: 'cs', swedish: 'sv', danish: 'da', norwegian: 'nb', finnish: 'fi', greek: 'el', turkish: 'tr', arabic: 'ar', japanese: 'ja', korean: 'ko', chinese: 'zh', hungarian: 'hu', romanian: 'ro', bulgarian: 'bg', slovak: 'sk', slovenian: 'sl', croatian: 'hr', estonian: 'et', latvian: 'lv', lithuanian: 'lt', indonesian: 'id', vietnamese: 'vi', thai: 'th', hebrew: 'he', hindi: 'hi', afrikaans: 'af' };
 const inLanguage = langMap[String(r.targetLanguage).toLowerCase()] || r.targetLanguage;
 const today = new Date().toISOString().slice(0, 10);
-const common = { '@context': 'https://schema.org', url, name: r.h1, headline: r.h1, description: f.metaDescription, inLanguage, dateModified: today };
+const common = { '@context': 'https://schema.org', url, name: h1, headline: h1, description: f.metaDescription, inLanguage, dateModified: today };
 // The author comes from the request (article settings in the app). For bio and profile pages the app sends the person the page is about as the author.
 const personBlock = (p) => p && p.name ? { '@type': 'Person', name: p.name, jobTitle: p.jobTitle || undefined, url: p.url || undefined, sameAs: (p.sameAs && p.sameAs.length) ? p.sameAs : undefined, image: p.image || undefined, description: p.description || undefined } : null;
-const author = personBlock(r.authorLocal || r.author) || { '@type': 'Organization', name: r.clientName };
+const author = personBlock(r.authorLocal || r.author) || { '@type': 'Organization', name: clientName };
 const reviewer = personBlock(r.reviewerLocal || r.reviewer);
 const steps = () => (f.finalPage.match(/^\d+\.\s+.+$/gm) || []).slice(0, 20);
 const article = (type) => Object.assign({}, common, { '@type': type, publisher: org, author, datePublished: today, reviewedBy: reviewer || undefined });
@@ -23,7 +27,7 @@ const B = {
   Report: () => article('Report'),
   MedicalWebPage: () => Object.assign({}, common, { '@type': 'MedicalWebPage', publisher: org, author, reviewedBy: reviewer || undefined, lastReviewed: today }),
   WebPage: () => Object.assign({}, common, { '@type': 'WebPage', publisher: org }),
-  WebSite: () => ({ '@context': 'https://schema.org', '@type': 'WebSite', name: r.clientName, url: base || url, publisher: org }),
+  WebSite: () => ({ '@context': 'https://schema.org', '@type': 'WebSite', name: clientName, url: base || url, publisher: org }),
   CollectionPage: () => Object.assign({}, common, { '@type': 'CollectionPage', publisher: org }),
   AboutPage: () => Object.assign({}, common, { '@type': 'AboutPage', mainEntity: org }),
   ContactPage: () => Object.assign({}, common, { '@type': 'ContactPage', mainEntity: org }),
@@ -31,12 +35,12 @@ const B = {
   ProfilePage: () => Object.assign({}, common, { '@type': 'ProfilePage', mainEntity: author }),
   Person: () => personBlock(r.authorLocal || r.author) ? Object.assign({ '@context': 'https://schema.org' }, personBlock(r.authorLocal || r.author)) : null,
   Organization: () => Object.assign({ '@context': 'https://schema.org' }, org, { description: r.clientDescription || undefined }),
-  Service: () => Object.assign({}, common, { '@type': 'Service', serviceType: r.coreKeyword || r.h1, provider: org }),
-  LegalService: () => Object.assign({}, common, { '@type': 'LegalService', name: r.clientName, serviceType: r.coreKeyword || r.h1, url: base || url }),
+  Service: () => Object.assign({}, common, { '@type': 'Service', serviceType: keyword || h1, provider: org }),
+  LegalService: () => Object.assign({}, common, { '@type': 'LegalService', name: clientName, serviceType: keyword || h1, url: base || url }),
   SoftwareApplication: () => Object.assign({}, common, { '@type': 'SoftwareApplication', applicationCategory: 'BusinessApplication', publisher: org }),
   WebApplication: () => Object.assign({}, common, { '@type': 'WebApplication', applicationCategory: 'BusinessApplication', publisher: org }),
-  DefinedTerm: () => Object.assign({}, common, { '@type': 'DefinedTerm', termCode: r.coreKeyword, inDefinedTermSet: base + '/glossary/' }),
-  DefinedTermSet: () => ({ '@context': 'https://schema.org', '@type': 'DefinedTermSet', name: r.clientName + ' glossary', url: base + '/glossary/' }),
+  DefinedTerm: () => Object.assign({}, common, { '@type': 'DefinedTerm', termCode: keyword, inDefinedTermSet: base + '/glossary/' }),
+  DefinedTermSet: () => ({ '@context': 'https://schema.org', '@type': 'DefinedTermSet', name: clientName, url: base + '/glossary/' }),
   HowTo: () => {
     let st = steps().map(s => ({ name: s.replace(/^\d+\.\s+/, '').replace(/[.:]\s*$/, '').slice(0, 120), text: s.replace(/^\d+\.\s+/, '') }));
     if (st.length < 2) {

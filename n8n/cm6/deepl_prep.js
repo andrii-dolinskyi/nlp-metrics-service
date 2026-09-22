@@ -8,11 +8,28 @@ const target = r.deeplTarget || LANG[String(r.targetLanguage || '').toLowerCase(
 if (!target) throw new Error('Unsupported targetLanguage for DeepL: ' + r.targetLanguage);
 const EEAT_KEYS = ['experience', 'expertise', 'authoritativeness', 'trustworthiness'];
 const e = a.eeat || {};
-const text = [a.finalPage, a.metaDescription || '-'];
+let text = [a.finalPage, a.metaDescription || '-'];
 a.faq.forEach(f => { text.push(f.question); text.push(f.answer); });
 EEAT_KEYS.forEach(k => text.push((e[k] && e[k].evidence) || '-'));
 text.push(e.priorityFix || '-');
 // Generated monitoring prompts (h1 and brand) go in the page language too; the input prompts already are.
 const gen = (a.monitoringPrompts || []).filter(x => x.source !== 'input');
 gen.forEach(x => text.push(x.promptEn || '-'));
-return [{ json: { text, target, faqCount: a.faq.length, generatedPromptCount: gen.length } }];
+// The client name must come back exactly as the app sent it. The writer used the English rendering, so every
+// mention (full name, or the name without a generic word such as Law Firm, LLC, GmbH, Group) is wrapped in a
+// translate="no" span holding the original; DeepL runs in HTML mode and leaves it alone, Unwrap strips the span.
+const orig = (r.original && r.original.clientName) ? String(r.original.clientName).trim() : '';
+const en = String(r.clientName || '').trim();
+if (orig && en && orig !== en) {
+  const GENERIC = /^(the|law firm|law office|law offices|law group|legal|law|attorneys|attorneys at law|llc|llp|ltd|inc|plc|gmbh|ag|sa|srl|s\.r\.l\.|s\.p\.a\.|spa|group|company|co|corporation|corp|agency|studio|clinic|firm|consulting|consultants|solutions|services|systems|technologies|international)$/i;
+  const words = en.replace(/[.,]+$/, '').split(/\s+/);
+  const forms = new Set([en]);
+  const stripTail = w => { let t = w.slice(); let changed = true; while (changed && t.length > 1) { changed = false; if (t.length > 2 && GENERIC.test(t.slice(-2).join(' '))) { t = t.slice(0, -2); changed = true; } else if (GENERIC.test(t[t.length - 1])) { t = t.slice(0, -1); changed = true; } if (changed) forms.add(t.join(' ')); } return t; };
+  const stripHead = w => { let t = w.slice(); let changed = true; while (changed && t.length > 1) { changed = false; if (t.length > 2 && GENERIC.test(t.slice(0, 2).join(' '))) { t = t.slice(2); changed = true; } else if (GENERIC.test(t[0])) { t = t.slice(1); changed = true; } if (changed) forms.add(t.join(' ')); } return t; };
+  stripTail(stripHead(words)); stripHead(stripTail(words));
+  const esc = t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const list = Array.from(forms).filter(f => f.length > 2).sort((x, y) => y.length - x.length);
+  const token = '<span translate="no">' + orig + '</span>';
+  text = text.map(t => { let out = String(t); list.forEach(f => { out = out.replace(new RegExp('(^|[^\\w>])' + esc(f) + '(?![\\w<])', 'g'), (m, pre) => pre + token); }); return out; });
+}
+return [{ json: { text, target, faqCount: a.faq.length, generatedPromptCount: gen.length, clientNameProtected: !!(orig && en && orig !== en) } }];

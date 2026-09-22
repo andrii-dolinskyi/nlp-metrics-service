@@ -26,6 +26,9 @@ const out = {
   // Filled by Request EN when the request came in another language: the app's own wording, restored on the final page.
   original: obj(b._original), deeplTarget: s(b._deeplTarget)
 };
+out.h1Local = out.original.h1 || out.h1;
+out.coreKeywordLocal = out.original.coreKeyword || out.coreKeyword;
+out.clientNameLocal = out.original.clientName || out.clientName;
 out.authorLocal = person(Object.assign({}, obj(b.author), obj(out.original.author)), 'author');
 out.reviewerLocal = person(Object.assign({}, obj(b.reviewer), obj(out.original.reviewer)), 'reviewer');
 if (!out.reviewerLocal.name) out.reviewerLocal = null;

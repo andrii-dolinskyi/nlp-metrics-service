@@ -9,7 +9,8 @@ const decode = s => String(s || '')
   .replace(/&quot;/g, String.fromCharCode(34)).replace(/&apos;/g, String.fromCharCode(39)).replace(/&nbsp;/g, ' ')
   .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
   .replace(/\s*;\s+/g, ', ');
-const t = (j.translations || []).map(x => decode(x.text));
+const unspan = s => String(s).replace(/<span[^>]*translate="no"[^>]*>([\s\S]*?)<\/span>/gi, '$1').replace(/<\/?span[^>]*>/gi, '');
+const t = (j.translations || []).map(x => unspan(decode(x.text)));
 // The meta description was written to 150 characters in English and grows in translation: cut it back at a
 // sentence end, else at a clause end, else at a word, and drop a dangling connector.
 const clampMeta = (x, max) => {
