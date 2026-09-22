@@ -63,7 +63,7 @@ One request writes one page in one language. Everything about the page comes fro
 |---|---|---|
 | `taskId`, `brandId`, `userId`, `callback_url` | yes | as in Content Maker 5.0 (`callbackUrl` also accepted) |
 | `pageType` | yes | a `type_id` from `page_type_specs` (dropdown = rows with `ai_writable` not `N`) |
-| `targetLanguage` | yes | language name; default English; one run per language |
+| `targetLanguage` | yes | language name as in Content Maker 5.0 (English name, e.g. "French", "German", "Japanese"); default English; one run per language. **Every text value in the request is sent in this language**, the way the app stores it. For a non-English run the flow translates those values to English with DeepL before Parse Request (`Translate Inputs?`, `DeepL Prep Inputs`, `Translate Inputs`, `Request EN`), writes and edits in English, then translates the page, meta description, FAQ and E-E-A-T back and restores the app's own `h1`, `h2Outline`, author and reviewer wording on the final page |
 | `clientName` | yes | `clientDescription` optional but strongly recommended (`productDescription` also accepted) |
 | `h1` | yes | used verbatim |
 | `slugPath` | no | the page's own path; echoed as `slug` and used for canonical and breadcrumb; derived from the H1 when empty |
@@ -84,6 +84,8 @@ Families `offer`, `proof`, `entity`, `local`, `catalogue`, `evaluation` and `too
 The smallest valid request is `pageType`, `clientName`, `callback_url`, `h1`, `h2Outline` and `author.name` (plus `facts` for the families above). No page type needs structured data for its schema beyond the author: every JSON-LD block is built from the request, the page, the FAQ and the author or reviewer objects. Page types whose schema needed client data (events, jobs, products, listings, vehicles, recipes, videos, podcasts, courses, datasets, infographics, rooms, tours, menus, app listings) were removed from the catalogue on 2026-09-21; it now has 128 types. Fields that were accepted earlier and are now ignored: `internalLinks`, per-heading `format`. Nothing else is required from the user.
 
 ## Callbacks
+
+The final callback is one object whose parts stay separate: `articleTextMd` (the page), `metaDescription`, `faq` (array of question and answer), `eeat`, `jsonLd`, `author`, `reviewer`, `quality`. Nothing is merged into the page text, so the app stores and renders each part in its own template slot. For a non-English run all four text parts are in the target language and the H1 and H2s are the app's own wording.
 
 `POST {callback_url}/execution-started` at the start:
 
@@ -153,6 +155,8 @@ The writer guidelines and the Style Updater prompt live inside the `Prep Writer`
 The Generation - Report Progress sub-workflow is called inline on the main chain (wait for completion off, so the page data passes through unchanged) at six stages: `article_request_received` (5%), `outline_ready` (15%, brief built), `draft_written` (25%), `editorial_scan_running` (35%, peelers done), `style_cleanup_done` (50%, FAQ, meta and E-E-A-T start), `final_assets_ready` (95%, before the callback).
 
 ## Evaluation
+
+The evaluator scores the English page as the Style Updater returned it (the `Extract Updated` output), never the translated callback text, so the text metrics and the rules judge apply to what the writer and editor wrote.
 
 The Money Calculator sub-workflow, called after the callback, sums tokens and cost for every flow. For executions whose workflow name is exactly `Content Maker 6.0` it also runs the Content Maker 5.0 evaluator (text metrics and rules compliance on GPT 5.6 Luna, final calculations) and appends the scores to the EVALUATOR sheet with Flow Version "Content Maker 6.0". The nine SEO metrics of the 5.0 evaluator are not calculated any more: their sheet columns are filled with N/A, and violation density and quality score come from text metrics (25 percent, tolerance 24 failed checks per 1,000 words) and rules (75 percent, tolerance 70 weighted points per 1,000 words). The bigram and trigram repeat limits are per 1,000 words. The tense-shift check deliberately requires more than 17 shifts, to break flat single-tense text.
 
