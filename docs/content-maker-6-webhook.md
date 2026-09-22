@@ -39,7 +39,6 @@ One request writes one page in one language. Everything about the page comes fro
   "writingPreferences": "US spelling. Never promise placement outcomes.",
   "whitelistDomains": [],
   "blacklistDomains": ["wikipedia.org", "reddit.com"],
-  "metaTitle": "",
 
   "author": {
     "name": "Jane Doe",
@@ -75,7 +74,7 @@ One request writes one page in one language. Everything about the page comes fro
 | `aiPrompts` | no | answered inside the sections, then used as the first FAQ questions |
 | `ctaRules`, `ctaUrl` | no | the action the closing section asks for and its link. The spec's `cta_mode` decides whether the page has a CTA at all: `required` types get one even when these are empty (the action is named in words, without a link), `optional` types get one only when `ctaRules` or `ctaUrl` is sent, `none` types never get one. The CTA appears in the closing section only, never in the body or the FAQ |
 | `writingPreferences`, `whitelistDomains`, `blacklistDomains` | no | as in Content Maker |
-| `metaTitle` | no | used as sent; generated when empty |
+| `metaTitle` | no | ignored since 2026-09-22: the page returns a meta description only |
 | `author` | yes | the page's author, stored once in the app's article settings: `name` (required), `jobTitle`, `url` (author page), `linkedin` or `sameAs[]`, `image`, `description`. Fills the Person and author blocks of the JSON-LD and the ProfilePage of bio pages (for a bio page send the person the page is about as the author) |
 | `reviewer` | no | optional expert reviewer for medical, legal and financial pages: `name`, `jobTitle` or `credentials`, `url`. Fills `reviewedBy` in the JSON-LD |
 | `facts` | per type | free-form object keyed by the spec's `required_facts`; the writer may only claim about the client what is in here |
@@ -101,7 +100,6 @@ The smallest valid request is `pageType`, `clientName`, `callback_url`, `h1`, `h
   "pageType": "service_page", "language": "English",
   "slug": "sales-leadership-recruiters", "slugPath": "/sales-leadership-recruiters/",
   "canonicalUrl": "https://trualignpartners.com/sales-leadership-recruiters/",
-  "metaTitle": "Sales leadership recruiters for medical device companies",
   "metaDescription": "TruAlign Partners provides sales leadership recruiters for medical device roles, so you get a shortlist of three to five vetted candidates.",
   "articleTextMd": "# Sales leadership recruiters for medical device companies\n\n...",
   "faq": [ { "question": "...", "answer": "..." } ],

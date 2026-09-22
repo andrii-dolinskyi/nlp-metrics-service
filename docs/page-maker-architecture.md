@@ -99,7 +99,7 @@ Every type serves one intent, which is why blog articles are not a type of their
 | `ctaRules`, `ctaUrl` | yes | what to say about the client and the one action to ask for, as in Content Maker; `ctaUrl` is placed in the closing section |
 | `writingPreferences` | no | client rules: tone, spelling, claims to avoid, formatting |
 | `whitelistDomains[]`, `blacklistDomains[]` | no | research and citation domains, as today |
-| `metaTitle` | no | used when sent; generated otherwise |
+| `metaTitle` | no | ignored since 2026-09-22; only the meta description is generated |
 | `facts` | per spec | object keyed by the spec's `required_facts` and `optional_facts` (section 3.2) |
 
 Gone from revision 2: `words`, `schemaTypes`, `researchDepth` (all from the spec), `mode`, `existingBody`, `pillarId`, `clusterId`, `hubSlug`, `linksOut`, `answerBlock`, `localizedKeyword`, `localizedH1`, `pineconeIndex`, `prompt`, `articleType`, `contentIdea`.
@@ -161,7 +161,6 @@ As built: everything in English through the peelers, the Style Updater, validati
 {
   taskId, brandId, userId, n8nExecutionId,
   slug,                 // echoed from slugPath
-  metaTitle,            // sent by the app or generated
   metaDescription,
   articleTextMd,        // the page as markdown, H1 included, internal links in place
   faq: [{question, answer}] × 5,
@@ -173,7 +172,7 @@ As built: everything in English through the peelers, the Style Updater, validati
 }
 ```
 
-`metaTitle`, `jsonLd`, `pageType`, `language`, `promptCoverage` and `status` are additions to the Content Maker shape; the rest is identical. `articleText` (Strapi blocks) and `similarArticles` are dropped.
+`jsonLd`, `pageType`, `language`, `promptCoverage` and `status` are additions to the Content Maker shape; the rest is identical. `articleText` (Strapi blocks) and `similarArticles` are dropped.
 
 ## 8. Relation to Content Maker 5.0
 
@@ -473,7 +472,9 @@ Revision of 2026-09-21:
 - **Progress inline.** The six progress calls sit on the main chain with wait-for-completion off, so no branch can fail to fire.
 - **Prompts inside the nodes.** The writer guidelines and the Style Updater prompt are template strings inside `Prep Writer` and `Prep Update`; the repo (`n8n/cm6/`) is the source and `CM6 Code Loader` writes it into the nodes through the n8n API. The `cm6_prompts` table is unused.
 - **No fixer, coverage or validation chain.** Section Fixer, Revalidate, Answer Coverage and Coverage Fixer are gone, and Validate Draft with its `quality_scores_ready` progress call was removed by hand on 2026-09-21. The writer prompt carries the keyword rule instead: core keyword in the first 100 and the last 100 words, headings as supplied. Build Payload counts the page statistics (`quality.totalWords`, H2 and H3 counts, table rows, CTA links, external citations) itself.
-- **Assets in parallel.** FAQ Writer, Metadata Generator and EEAT Analysis start together right after the `style_cleanup_done` progress call, read the page from Extract Updated, run on their own GPT 5.6 Sol Assets model node (Gemini Flash Assets as the E-E-A-T fallback) and meet in Assets Merger before Assemble Meta, translation, JSON-LD and the callback.
+- **Assets in parallel.** FAQ Writer, Metadata Generator and EEAT Analysis start together right after the `style_cleanup_done` progress call, read the page from Extract Updated and meet in Assets Merger before Assemble Meta, translation, JSON-LD and the callback. Models as of 2026-09-22, set by hand: FAQ Writer on the `gpt-6-astra` node, Metadata Generator and EEAT Analysis on Gemini Latest with GPT 5.6 Luna as fallback.
+- **FAQ prompt from Content Maker 5.0.** The FAQ Writer system message is the 5.0 FAQ prompt (`n8n/cm6/faq_writer_system.txt`) adapted for pages: page instead of article, the page type and the request's `aiPrompts` as the first questions, the core keyword as an expression, no search tool, and the client-mention rule replaced by the no-client rule that the Collect FAQ filter enforces. Questions up to 17 words, answers 30 to 70 words.
+- **Meta description only.** The meta title is no longer generated or returned. Prep Meta asks for the description alone (150 characters maximum), Meta Output parses one field, and Assemble Meta, DeepL Prep, Unwrap Translation, Build JSON-LD (`name` is the H1) and Build Payload carry no title.
 - **Prompts edited in the editor.** The persona, plain-style and tone sections of the writer guidelines and the wording of the Style Updater prompt were revised by hand inside the `Prep Writer` and `Prep Update` nodes on 2026-09-21 (sentence length 15 to 35 words, no one-sentence paragraphs, the given-new chain, reading test and worked example dropped, "page" instead of "article" throughout). The repo copies and the two markdown prompt files were regenerated from the node code with `tools/build_n8n_code.py --extract`. The peelers were switched to GPT 5.6 Sol with Gemini Flash as fallback and the Style Updater to the `gpt-6-astra` model, by hand.
 - **Evaluator restored.** The Money Calculator runs the Content Maker 5.0 evaluator (metrics, SEO metrics, rules compliance, final calculations, EVALUATOR sheet) only for executions named exactly "Content Maker 6.0".
 
@@ -491,5 +492,6 @@ Tests run against the draft, callbacks captured by the `CM6 Test Callback Receiv
 | 36609 | `how_to`, rerun after the procedure rule | Success in 7 min 29 s. The first section ends with the numbered list of the five steps, the HowTo block carries five HowToStep entries, no schema warnings. The evaluator, now without SEO metrics, scored the page 69.7 (rules: 2 series of three, 4 hedges, 5 salesy phrases, 4 repeated arguments) with the SEO columns as N/A. A merge race wrote one extra half-empty row first, fixed the same day by reading both evaluator outputs by node in Final Calculations. |
 | 36660 | `how_to`, rerun after the evaluator calibration | Success in 7 min 23 s. One evaluator row only (merge race fixed): quality score 78.2, violation density 26.4, SEO columns N/A. Rules judge (now GPT 5.6 Sol, switched by the user): 8 series of three, 4 repeated arguments, 3 hedges, 3 semicolons, 3 salesy, 3 intensifiers, 2 copula substitutes. Text metrics: 7 of 18 out of range (burstiness, variance, TTR, hapax, bigram and trigram repeats per 1,000 words, tense consistency, tense shifts). |
 | 37231 | `how_to` with the upstream nodes pinned in the editor, after the hand-made flow changes of 2026-09-21 | Success in 43 s (pinned draft). Every node after Progress style ran: 5 FAQs, meta title 45 characters, description 150, E-E-A-T 7.3, HowTo + Article + BreadcrumbList blocks, callback delivered with the page counts (1,340 words, 8 H2, 10 table rows, 1 CTA link, 5 citations). |
+| 38165 | `how_to`, upstream pinned, FAQ Writer on the adapted Content Maker 5.0 FAQ prompt, meta description only | Success in 25 s (pinned draft). Five FAQs, each opening with a question word, 9 to 15 words, answers 45 to 60 words, one carrying the core keyword, none naming the client. Meta description 138 characters, no meta title in the payload, JSON-LD name is the H1. Published as version 1aa6f557. |
 
 Known limits after the tests: the writer step itself takes about nine minutes with the full guidelines in the prompt, so the run length comes from the model's generation time, not from research; a translated meta title is not re-checked for length (the German title ran to 120 characters); the E-E-A-T judge scores pages without named authors or case studies low, which is informational; the two helper workflows are test tooling and can be deleted once the app calls the production webhook.
