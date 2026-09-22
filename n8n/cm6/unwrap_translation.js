@@ -16,9 +16,12 @@ const dedupe = s => {
   const esc = x => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const words = origName.split(/\s+/);
   let out = s;
+  // The generic words in front of the name come back inflected (juridychnij firmi «Juridychna firma ...»), so each
+  // leading word of the original matches by its stem: the first four letters (or all but the last) plus any ending.
+  const stem = w => { const core = w.length > 5 ? w.slice(0, Math.max(4, w.length - 2)) : w.slice(0, Math.max(3, w.length - 1)); return esc(core) + '\\p{L}*'; };
   for (let k = Math.min(3, words.length - 1); k >= 1; k--) {
-    const lead = words.slice(0, k).join(' ');
-    out = out.replace(new RegExp('(^|[^\\p{L}])' + esc(lead) + '\\s+([«"“]?)' + esc(origName), 'giu'), (m, pre, q) => pre + q + origName);
+    const lead = words.slice(0, k).map(stem).join('\\s+');
+    out = out.replace(new RegExp('(^|[^\\p{L}])' + lead + '\\s+([«"“]?)' + esc(origName), 'giu'), (m, pre, q) => pre + q + origName);
   }
   return out;
 };
