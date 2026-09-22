@@ -39,13 +39,16 @@ const unspan = s => String(s).replace(/<span[^>]*translate="no"[^>]*>([\s\S]*?)<
 const headings = s => {
   const h1 = (r.original && r.original.h1) || r.h1 || '';
   const outline = (r.original && Array.isArray(r.original.h2Outline) && r.original.h2Outline.length) ? r.original.h2Outline : (r.h2Outline || []);
+  const h2Lines = (s.match(/^##\s+\S/gm) || []).length;
+  headingsMismatch = outline.length > 0 && h2Lines < outline.length;
   let h2i = 0;
   return s.split('\n').map(line => {
     if (h1 && /^#\s+\S/.test(line)) return '# ' + h1;
-    if (/^##\s+\S/.test(line)) { const idx = h2i++; if (idx < outline.length && outline[idx]) return '## ' + outline[idx]; }
+    if (!headingsMismatch && /^##\s+\S/.test(line)) { const idx = h2i++; if (idx < outline.length && outline[idx]) return '## ' + outline[idx]; }
     return line;
   }).join('\n');
 };
+let headingsMismatch = false;
 const out = Object.assign({}, f);
 out.finalPage = headings(cleanBlock(unspan(f.finalPage)));
 out.metaDescription = cleanLine(unspan(f.metaDescription));
@@ -58,5 +61,5 @@ if (f.eeat && typeof f.eeat === 'object') {
 out.monitoringPrompts = (f.monitoringPrompts || []).map(x => Object.assign({}, x, { prompt: cleanLine(unspan(x.prompt)), promptEn: cleanLine(unspan(x.promptEn)) }));
 // Report what was repaired so a problem in a language shows up in the execution, not in production.
 const before = JSON.stringify({ p: f.finalPage, m: f.metaDescription, q: f.faq, e: f.eeat });
-out.textCleaned = { entities: (before.match(/&#?[a-z0-9]{1,8};/gi) || []).length, changed: before !== JSON.stringify({ p: out.finalPage, m: out.metaDescription, q: out.faq, e: out.eeat }) };
+out.textCleaned = { headingsMismatch, entities: (before.match(/&#?[a-z0-9]{1,8};/gi) || []).length, changed: before !== JSON.stringify({ p: out.finalPage, m: out.metaDescription, q: out.faq, e: out.eeat }) };
 return [{ json: out }];
