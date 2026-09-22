@@ -42,6 +42,7 @@ if (f.eeat && typeof f.eeat === 'object') {
   ['experience', 'expertise', 'authoritativeness', 'trustworthiness'].forEach(k => { if (out.eeat[k] && out.eeat[k].evidence) out.eeat[k].evidence = cleanLine(out.eeat[k].evidence); });
   if (out.eeat.priorityFix) out.eeat.priorityFix = cleanLine(out.eeat.priorityFix);
 }
+out.monitoringPrompts = (f.monitoringPrompts || []).map(x => Object.assign({}, x, { prompt: cleanLine(x.prompt), promptEn: cleanLine(x.promptEn) }));
 // Report what was repaired so a problem in a language shows up in the execution, not in production.
 const before = JSON.stringify({ p: f.finalPage, m: f.metaDescription, q: f.faq, e: f.eeat });
 out.textCleaned = { entities: (before.match(/&#?[a-z0-9]{1,8};/gi) || []).length, changed: before !== JSON.stringify({ p: out.finalPage, m: out.metaDescription, q: out.faq, e: out.eeat }) };

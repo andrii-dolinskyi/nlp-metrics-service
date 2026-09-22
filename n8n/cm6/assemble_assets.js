@@ -1,8 +1,10 @@
 // One item with the separate assets: page text, meta description, FAQ block and E-E-A-T. They stay separate
 // objects all the way to the callback. Translation, JSON-LD and the payload read this item.
 const r = $('Parse Request').first().json;
+const c = $('Page Contract').first().json;
 const page = $('Extract Updated').first().json.page;
-let faq = []; try { const j = $('FAQ Writer').first().json; faq = (j.output && Array.isArray(j.output.FAQ)) ? j.output.FAQ : (Array.isArray(j.FAQ) ? j.FAQ : []); } catch (e) { faq = []; }
+// FAQ only for page types that carry one (Page Contract sets faqCount from the spec's faq_required); No FAQ hands over an empty list otherwise.
+let faq = []; if (c.faqCount > 0) { try { const j = $('FAQ Writer').first().json; faq = (j.output && Array.isArray(j.output.FAQ)) ? j.output.FAQ : (Array.isArray(j.FAQ) ? j.FAQ : []); } catch (e) { faq = []; } }
 let m = {}; try { m = $('Metadata Generator').first().json.output || {}; } catch (e) { m = {}; }
 let eeat = null; try { eeat = $('EEAT Analysis').first().json.output || null; } catch (e) { eeat = null; }
 // The FAQ never names the client and never carries a call to action.
@@ -29,4 +31,12 @@ const clamp = (x, max) => {
 };
 const metaDescription = clamp(cap(m.meta_description), 150);
 const slug = r.slugPath.split('/').filter(Boolean).pop() || '';
-return [{ json: { slug, slugPath: r.slugPath, finalPage: page, metaDescription, faq, eeat } }];
+// Monitoring prompts for the app: the input prompts word for word in the page language, one unbranded prompt from
+// the H1 and core keyword, one branded prompt grounded in the page. The two generated ones are translated later.
+let pm = {}; try { pm = $('Prompt Maker').first().json.output || {}; } catch (e) { pm = {}; }
+const orig = (r.original && Array.isArray(r.original.aiPrompts)) ? r.original.aiPrompts : [];
+const monitoringPrompts = [];
+(r.aiPrompts || []).forEach((q, i) => { if (q) monitoringPrompts.push({ prompt: orig[i] || q, promptEn: q, source: 'input', branded: false }); });
+if (pm.h1Prompt) monitoringPrompts.push({ prompt: String(pm.h1Prompt).trim(), promptEn: String(pm.h1Prompt).trim(), source: 'h1', branded: false });
+if (pm.brandedPrompt) monitoringPrompts.push({ prompt: String(pm.brandedPrompt).trim(), promptEn: String(pm.brandedPrompt).trim(), source: 'brand', branded: true });
+return [{ json: { slug, slugPath: r.slugPath, finalPage: page, metaDescription, faq, eeat, monitoringPrompts, faqCount: c.faqCount } }];

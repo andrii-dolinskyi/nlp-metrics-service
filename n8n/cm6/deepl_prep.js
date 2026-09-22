@@ -12,4 +12,7 @@ const text = [a.finalPage, a.metaDescription || '-'];
 a.faq.forEach(f => { text.push(f.question); text.push(f.answer); });
 EEAT_KEYS.forEach(k => text.push((e[k] && e[k].evidence) || '-'));
 text.push(e.priorityFix || '-');
-return [{ json: { text, target, faqCount: a.faq.length } }];
+// Generated monitoring prompts (h1 and brand) go in the page language too; the input prompts already are.
+const gen = (a.monitoringPrompts || []).filter(x => x.source !== 'input');
+gen.forEach(x => text.push(x.promptEn || '-'));
+return [{ json: { text, target, faqCount: a.faq.length, generatedPromptCount: gen.length } }];

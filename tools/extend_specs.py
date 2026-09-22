@@ -306,6 +306,9 @@ def main():
             vals['cta_guidance'] = ''
         for k in KEYS:
             s[k] = vals[k]
+        # FAQ block: required (five questions) or not. Never on an FAQ page, whose questions the writer puts in the body.
+        faq_families = ('guide', 'evaluation', 'offer', 'local')
+        s['faq_required'] = 'Y' if s['type_id'] != 'faq_page' and s.get('ai_writable') != 'N' and ('FAQPage' in str(s.get('schema_types', '')) or s['family'] in faq_families) else 'N'
     json.dump(specs, open(SPECS, 'w'), indent=1, ensure_ascii=False)
     # review document
     out = ['# Page type writing rules: closing section, CTA, formats, H3s, meta description', '',
@@ -320,7 +323,7 @@ def main():
             flag = ' (not written by the flow)' if s.get('ai_writable') == 'N' else ''
             out += ['### `%s` (%s)%s' % (s['type_id'], s['label'], flag), '']
             out += ['| Rule | Value |', '|---|---|']
-            for k in KEYS:
+            for k in list(KEYS) + ['faq_required']:
                 v = str(s[k]).replace('|', '\\|')
                 out += ['| `%s` | %s |' % (k, v or '(none)')]
             out += ['']

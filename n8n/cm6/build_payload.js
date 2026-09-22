@@ -1,4 +1,5 @@
 const r = $('Parse Request').first().json;
+const c = $('Page Contract').first().json;
 const f = $input.first().json;
 let st = {}; try { st = $('Stabilizer').first().json; } catch (e) { st = {}; }
 // Page statistics for the callback, counted on the final page text (there is no validator step).
@@ -20,7 +21,8 @@ return [{ json: {
   slug: f.slug, slugPath: f.slugPath, canonicalUrl: f.canonicalUrl,
   metaDescription: f.metaDescription,
   articleTextMd: f.finalPage,
-  faq: f.faq,
+  faq: c.faqCount > 0 ? (f.faq || []) : undefined,
+  monitoringPrompts: f.monitoringPrompts || [],
   author: r.authorLocal || r.author, reviewer: r.reviewerLocal || r.reviewer || null,
   eeat: f.eeat || null,
   jsonLd: f.jsonLd, schemaTypes: f.schemaTypes, schemaWarnings: f.schemaWarnings,

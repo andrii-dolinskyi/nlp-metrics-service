@@ -124,5 +124,17 @@
   "node": "Clean Text",
   "param": "jsCode",
   "file": "n8n/cm6/clean_text.js"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "No FAQ",
+  "param": "jsCode",
+  "file": "n8n/cm6/no_faq.js"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "Prompt Maker",
+  "param": "options.systemMessage",
+  "file": "n8n/cm6/prompt_maker_system.txt"
  }
 ]

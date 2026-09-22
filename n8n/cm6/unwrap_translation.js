@@ -33,6 +33,9 @@ if (eeat) {
   EEAT_KEYS.forEach((k, i) => { if (eeat[k]) eeat[k].evidence = clean(t[2 + n * 2 + i], eeat[k].evidence); });
   eeat.priorityFix = clean(t[2 + n * 2 + EEAT_KEYS.length], eeat.priorityFix);
 }
+const promptBase = 2 + n * 2 + EEAT_KEYS.length + 1;
+let gi = 0;
+const monitoringPrompts = (a.monitoringPrompts || []).map(x => { if (x.source === 'input') return x; const tr = t[promptBase + gi++]; return Object.assign({}, x, { prompt: clean(tr, x.prompt) }); });
 // The app sent its own H1 and H2 wording in the target language: put it back over DeepL's rendering.
 const o = r.original || {};
 const outline = Array.isArray(o.h2Outline) ? o.h2Outline : [];
@@ -42,4 +45,4 @@ const finalPage = t[0].split('\n').map(line => {
   if (/^##\s+\S/.test(line)) { const idx = h2i++; if (idx < outline.length && outline[idx]) return '## ' + outline[idx]; }
   return line;
 }).join('\n');
-return [{ json: { finalPage, metaDescription: clampMeta(clean(t[1], a.metaDescription), 150), faq, eeat, slug: a.slug, slugPath: a.slugPath, translated: true } }];
+return [{ json: { finalPage, metaDescription: clampMeta(clean(t[1], a.metaDescription), 150), faq, eeat, monitoringPrompts, faqCount: a.faqCount, slug: a.slug, slugPath: a.slugPath, translated: true } }];

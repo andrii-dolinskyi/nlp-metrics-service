@@ -47,7 +47,15 @@ const B = {
     }
     return st.length >= 2 ? Object.assign({}, common, { '@type': 'HowTo', step: st.map((s, i) => ({ '@type': 'HowToStep', position: i + 1, name: s.name, text: s.text })) }) : null;
   },
-  FAQPage: () => (f.faq || []).length ? { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: f.faq.map(q => ({ '@type': 'Question', name: q.question, acceptedAnswer: { '@type': 'Answer', text: q.answer } })) } : null,
+  FAQPage: () => {
+    let qa = (f.faq || []).slice();
+    if (!qa.length && c.spec.typeId === 'faq_page') {
+      // An FAQ page carries its questions as H3s in the body: each H3 with the prose under it until the next heading.
+      const parts = f.finalPage.split(/^(?=#{1,3}\s)/m);
+      parts.forEach(pt => { const m = pt.match(/^###\s+(.+)\n([\s\S]*)$/); if (m) { const a = m[2].replace(/[#*|]/g, ' ').replace(/\[([^\]]+)\]\([^\)]*\)/g, '$1').replace(/\s+/g, ' ').trim(); if (a) qa.push({ question: m[1].trim(), answer: a }); } });
+    }
+    return qa.length ? { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: qa.map(q => ({ '@type': 'Question', name: q.question, acceptedAnswer: { '@type': 'Answer', text: q.answer } })) } : null;
+  },
   BreadcrumbList: () => { const segs = r.slugPath.split('/').filter(Boolean); return segs.length ? { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: segs.map((s, i) => ({ '@type': 'ListItem', position: i + 1, name: s.replace(/-/g, ' '), item: base + '/' + segs.slice(0, i + 1).join('/') + '/' })) } : null; }
 };
 const clean = o => { if (!o || typeof o !== 'object') return o; Object.keys(o).forEach(k => { if (o[k] === undefined || o[k] === null || o[k] === '') delete o[k]; else if (typeof o[k] === 'object') clean(o[k]); }); return o; };

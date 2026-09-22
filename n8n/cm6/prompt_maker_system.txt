@@ -1,0 +1,11 @@
+=You write the prompts a real person types into an AI assistant such as ChatGPT, Perplexity or Google AI Mode, for which the page the user supplies should be the answer. These prompts are used to monitor whether the page and the client get cited or recommended, so they must read exactly the way people ask assistants: a complete, natural question or request in the first person, plain words, no marketing wording, no quotation marks, no keyword stuffing.
+
+The page is a {{ $('Page Contract').first().json.label }} ({{ $('Page Contract').first().json.spec.definition }}) for the client {{ $('Parse Request').first().json.clientName }}. Its H1 is: {{ $('Parse Request').first().json.h1 }}. Its core keyword is: {{ $('Parse Request').first().json.coreKeyword || $('Parse Request').first().json.h1 }}.
+
+Write exactly two prompts in English:
+
+1. h1Prompt: the unbranded question behind the H1, the one a reader types when they want what this page gives. Use the core keyword naturally inside it. Name the audience or situation when the page is for one (a company size, an industry, a place, a stage). 8 to 20 words. Never name the client.
+
+2. brandedPrompt: the question a buyer or reader asks an assistant about the client in relation to this page's subject, grounded in what the page actually says the client does: what the client offers for this need, whether the client is a good choice for this situation, how the client handles this. Name the client exactly as written above. 8 to 20 words.
+
+Rules for both: one question each, question form ending with a question mark, no list, no bold, no links, no "best" or "top" unless the page itself compares options, no dates. Return JSON with h1Prompt and brandedPrompt.

@@ -13,7 +13,8 @@ const S = {
   opening: str(spec.opening), formatHints: str(spec.section_format_hints), aiWritable: str(spec.ai_writable, 'Y').toUpperCase(),
   closingMode: str(spec.closing_mode, 'none').toLowerCase(), closingHeading: str(spec.closing_heading), closingContent: str(spec.closing_content),
   ctaMode: str(spec.cta_mode, 'none').toLowerCase(), ctaGuidance: str(spec.cta_guidance), formatRules: str(spec.format_rules),
-  h3Policy: str(spec.h3_policy, 'optional'), metaPattern: str(spec.meta_description_pattern)
+  h3Policy: str(spec.h3_policy, 'optional'), metaPattern: str(spec.meta_description_pattern),
+  faqRequired: str(spec.faq_required, 'Y').toUpperCase() !== 'N'
 };
 S.h3Mode = (S.h3Policy.split(/[:.]/)[0] || 'optional').trim().toLowerCase();
 if (['required', 'optional', 'none'].indexOf(S.h3Mode) === -1) S.h3Mode = 'optional';
@@ -38,4 +39,4 @@ let per = Math.round((S.defaultWords - (S.answerParagraph ? S.answerMaxWords : 6
 per = Math.max(90, Math.min(per, 450));
 const sections = outline.map((h, i) => ({ index: i + 1, h2: h, words: per, isClosing: !appendClosing && i === n - 1 && (lastIsClosing || ctaMode !== 'none') }));
 const closing = appendClosing ? { index: n + 1, headingPatterns: S.closingHeading, content: S.closingContent, words: 100 } : null;
-return [{ json: { spec: S, sections, closing, appendClosing, lastIsClosing, expectedH2Count: n + (appendClosing ? 1 : 0), closingSectionIndex: appendClosing ? n + 1 : n, ctaMode, sectionCount: n, sectionWords: per, isLang: r.isLang, research: S.research, blocked, blockedReason: reason, missingFacts: missing, h1: r.h1, label: S.label, schemaTypes: S.schemaTypes, faqCount: 5 } }];
+return [{ json: { spec: S, sections, closing, appendClosing, lastIsClosing, expectedH2Count: n + (appendClosing ? 1 : 0), closingSectionIndex: appendClosing ? n + 1 : n, ctaMode, sectionCount: n, sectionWords: per, isLang: r.isLang, research: S.research, blocked, blockedReason: reason, missingFacts: missing, h1: r.h1, label: S.label, schemaTypes: S.schemaTypes, faqCount: (S.faqRequired && S.typeId !== 'faq_page') ? 5 : 0 } }];

@@ -18,6 +18,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Group the child pages: one H3 per group, each link as a bullet with a one or two sentence blurb. Prose for the scope statement and the closing. No table unless a section compares options. |
 | `h3_policy` | required: one H3 per group of child pages, phrased as the group topic. |
 | `meta_description_pattern` | What the hub covers and for whom, naming the two or three biggest subtopics it links to. No client name unless it is a service or industry hub. |
+| `faq_required` | Y |
 
 ### `cluster_hub` (Cluster hub)
 
@@ -31,6 +32,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Group the child pages: one H3 per group, each link as a bullet with a one or two sentence blurb. Prose for the scope statement and the closing. No table unless a section compares options. |
 | `h3_policy` | required: one H3 per group of child pages, phrased as the group topic. |
 | `meta_description_pattern` | What the hub covers and for whom, naming the two or three biggest subtopics it links to. No client name unless it is a service or industry hub. |
+| `faq_required` | Y |
 
 ### `resource_library` (Resource library)
 
@@ -44,6 +46,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Group the child pages: one H3 per group, each link as a bullet with a one or two sentence blurb. Prose for the scope statement and the closing. No table unless a section compares options. |
 | `h3_policy` | optional: one H3 per resource group. |
 | `meta_description_pattern` | What the hub covers and for whom, naming the two or three biggest subtopics it links to. No client name unless it is a service or industry hub. |
+| `faq_required` | N |
 
 ### `blog_category_hub` (Blog category hub)
 
@@ -57,6 +60,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Group the child pages: one H3 per group, each link as a bullet with a one or two sentence blurb. Prose for the scope statement and the closing. No table unless a section compares options. |
 | `h3_policy` | none: the category list needs no subheadings. |
 | `meta_description_pattern` | What the hub covers and for whom, naming the two or three biggest subtopics it links to. No client name unless it is a service or industry hub. |
+| `faq_required` | N |
 
 ### `glossary_index` (Glossary index)
 
@@ -70,6 +74,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Group the child pages: one H3 per group, each link as a bullet with a one or two sentence blurb. Prose for the scope statement and the closing. No table unless a section compares options. |
 | `h3_policy` | required: one H3 per letter or per group of terms. |
 | `meta_description_pattern` | What the hub covers and for whom, naming the two or three biggest subtopics it links to. No client name unless it is a service or industry hub. |
+| `faq_required` | N |
 
 ### `service_area_hub` (Service area hub)
 
@@ -83,6 +88,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Group the child pages: one H3 per group, each link as a bullet with a one or two sentence blurb. Prose for the scope statement and the closing. No table unless a section compares options. |
 | `h3_policy` | required: one H3 per group of child pages, phrased as the group topic. |
 | `meta_description_pattern` | What the hub covers and for whom, naming the two or three biggest subtopics it links to. No client name unless it is a service or industry hub. |
+| `faq_required` | N |
 
 ### `location_index` (Location index)
 
@@ -96,6 +102,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Group the child pages: one H3 per group, each link as a bullet with a one or two sentence blurb. Prose for the scope statement and the closing. No table unless a section compares options. |
 | `h3_policy` | required: one H3 per region or state. |
 | `meta_description_pattern` | What the hub covers and for whom, naming the two or three biggest subtopics it links to. No client name unless it is a service or industry hub. |
+| `faq_required` | N |
 
 ### `industry_hub` (Industry hub)
 
@@ -109,6 +116,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Group the child pages: one H3 per group, each link as a bullet with a one or two sentence blurb. Prose for the scope statement and the closing. No table unless a section compares options. |
 | `h3_policy` | required: one H3 per group of child pages, phrased as the group topic. |
 | `meta_description_pattern` | What the hub covers and for whom, naming the two or three biggest subtopics it links to. No client name unless it is a service or industry hub. |
+| `faq_required` | N |
 
 ### `integration_directory` (Integration directory)
 
@@ -122,6 +130,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Group the child pages: one H3 per group, each link as a bullet with a one or two sentence blurb. Prose for the scope statement and the closing. No table unless a section compares options. |
 | `h3_policy` | required: one H3 per integration category. |
 | `meta_description_pattern` | What the hub covers and for whom, naming the two or three biggest subtopics it links to. No client name unless it is a service or industry hub. |
+| `faq_required` | N |
 
 ### `template_gallery_hub` (Template gallery hub)
 
@@ -135,6 +144,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Group the child pages: one H3 per group, each link as a bullet with a one or two sentence blurb. Prose for the scope statement and the closing. No table unless a section compares options. |
 | `h3_policy` | required: one H3 per template group. |
 | `meta_description_pattern` | What the hub covers and for whom, naming the two or three biggest subtopics it links to. No client name unless it is a service or industry hub. |
+| `faq_required` | N |
 
 ### `topic_hub_programmatic` (Topic hub programmatic)
 
@@ -148,6 +158,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Group the child pages: one H3 per group, each link as a bullet with a one or two sentence blurb. Prose for the scope statement and the closing. No table unless a section compares options. |
 | `h3_policy` | required: one H3 per group of child pages, phrased as the group topic. |
 | `meta_description_pattern` | What the hub covers and for whom, naming the two or three biggest subtopics it links to. No client name unless it is a service or industry hub. |
+| `faq_required` | N |
 
 ## `guide` family
 
@@ -163,6 +174,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Numbered steps for any section that describes a sequence. A table for any section that compares two or more options, sets criteria against options, or shows costs, timelines or thresholds. Bullets only for checklists or lists of requirements with four or more items. Prose everywhere else, including the opening and the closing. |
 | `h3_policy` | required: two to four H3s inside every section over 250 words, each phrased as the sub-question it answers. |
 | `meta_description_pattern` | The question the page answers and the specific answer or scope (number of steps, options, years, or the key figure). No client name. Factual, no "learn how". |
+| `faq_required` | Y |
 
 ### `how_to` (How-to guide)
 
@@ -176,6 +188,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | This page is a procedure and always carries a numbered step list. When the supplied H2s are the steps themselves, the first section ends with a numbered list of all the steps, one short line each, and every step H2 then gives the detail. When the procedure sits inside one H2, that section is written as numbered steps. A table for any section that compares options or shows costs or timelines. Bullets only for checklists of four or more items. Prose elsewhere. |
 | `h3_policy` | optional: when a step section runs over 250 words, split it with two or more H3s phrased as the sub-actions (verb first). |
 | `meta_description_pattern` | The question the page answers and the specific answer or scope (number of steps, options, years, or the key figure). No client name. Factual, no "learn how". |
+| `faq_required` | Y |
 
 ### `supporting_article` (Supporting article)
 
@@ -189,6 +202,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Numbered steps for any section that describes a sequence. A table for any section that compares two or more options, sets criteria against options, or shows costs, timelines or thresholds. Bullets only for checklists or lists of requirements with four or more items. Prose everywhere else, including the opening and the closing. |
 | `h3_policy` | optional: use two to four H3s inside any section over 250 words, each phrased as the specific sub-question or item it covers. |
 | `meta_description_pattern` | The question the page answers and the specific answer or scope (number of steps, options, years, or the key figure). No client name. Factual, no "learn how". |
+| `faq_required` | Y |
 
 ### `explainer_what_is` (What-is explainer)
 
@@ -202,6 +216,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Numbered steps for any section that describes a sequence. A table for any section that compares two or more options, sets criteria against options, or shows costs, timelines or thresholds. Bullets only for checklists or lists of requirements with four or more items. Prose everywhere else, including the opening and the closing. |
 | `h3_policy` | optional: use two to four H3s inside any section over 250 words, each phrased as the specific sub-question or item it covers. |
 | `meta_description_pattern` | The question the page answers and the specific answer or scope (number of steps, options, years, or the key figure). No client name. Factual, no "learn how". |
+| `faq_required` | Y |
 
 ### `checklist` (Checklist)
 
@@ -215,6 +230,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | The checklist itself as one numbered list with a one sentence reason per item, inside the section that holds it. Prose for how to use the list. No table. |
 | `h3_policy` | none: the numbered list carries the structure. |
 | `meta_description_pattern` | The question the page answers and the specific answer or scope (number of steps, options, years, or the key figure). No client name. Factual, no "learn how". |
+| `faq_required` | Y |
 
 ### `regulation_compliance_explainer` (Regulation compliance explainer)
 
@@ -228,6 +244,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Numbered steps for any section that describes a sequence. A table for any section that compares two or more options, sets criteria against options, or shows costs, timelines or thresholds. Bullets only for checklists or lists of requirements with four or more items. Prose everywhere else, including the opening and the closing. |
 | `h3_policy` | required: one H3 per obligation or per article of the rule inside the sections that go through them. |
 | `meta_description_pattern` | The question the page answers and the specific answer or scope (number of steps, options, years, or the key figure). No client name. Factual, no "learn how". |
+| `faq_required` | Y |
 
 ### `process_page` (Process)
 
@@ -241,6 +258,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | This page is a procedure and always carries a numbered step list. When the supplied H2s are the steps themselves, the first section ends with a numbered list of all the steps, one short line each, and every step H2 then gives the detail. When the procedure sits inside one H2, that section is written as numbered steps. A table for any section that compares options or shows costs or timelines. Bullets only for checklists of four or more items. Prose elsewhere. |
 | `h3_policy` | optional: when a stage section runs over 250 words, split it with two or more H3s. |
 | `meta_description_pattern` | The question the page answers and the specific answer or scope (number of steps, options, years, or the key figure). No client name. Factual, no "learn how". |
+| `faq_required` | Y |
 
 ### `mistakes_pitfalls` (Mistakes pitfalls)
 
@@ -254,6 +272,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | One H3 per mistake with two or three prose paragraphs (what it is, why it happens, what to do instead). A table only when the section compares fixes. No bullets. |
 | `h3_policy` | required: one H3 per mistake, phrased as the mistake itself. |
 | `meta_description_pattern` | The question the page answers and the specific answer or scope (number of steps, options, years, or the key figure). No client name. Factual, no "learn how". |
+| `faq_required` | Y |
 
 ### `trend_outlook` (Trend outlook)
 
@@ -267,6 +286,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Numbered steps for any section that describes a sequence. A table for any section that compares two or more options, sets criteria against options, or shows costs, timelines or thresholds. Bullets only for checklists or lists of requirements with four or more items. Prose everywhere else, including the opening and the closing. |
 | `h3_policy` | required: one H3 per trend inside the section that lists them. |
 | `meta_description_pattern` | The question the page answers and the specific answer or scope (number of steps, options, years, or the key figure). No client name. Factual, no "learn how". |
+| `faq_required` | Y |
 
 ### `symptom_problem_page` (Symptom problem)
 
@@ -280,6 +300,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Numbered steps for any section that describes a sequence. A table for any section that compares two or more options, sets criteria against options, or shows costs, timelines or thresholds. Bullets only for checklists or lists of requirements with four or more items. Prose everywhere else, including the opening and the closing. |
 | `h3_policy` | required: one H3 per cause or per fix inside the sections that go through them. |
 | `meta_description_pattern` | The question the page answers and the specific answer or scope (number of steps, options, years, or the key figure). No client name. Factual, no "learn how". |
+| `faq_required` | Y |
 
 ### `destination_guide` (Destination guide)
 
@@ -293,6 +314,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Numbered steps for any section that describes a sequence. A table for any section that compares two or more options, sets criteria against options, or shows costs, timelines or thresholds. Bullets only for checklists or lists of requirements with four or more items. Prose everywhere else, including the opening and the closing. |
 | `h3_policy` | required: one H3 per place, season or activity inside the sections that list them. |
 | `meta_description_pattern` | The question the page answers and the specific answer or scope (number of steps, options, years, or the key figure). No client name. Factual, no "learn how". |
+| `faq_required` | Y |
 
 ### `career_guide` (Career guide)
 
@@ -306,6 +328,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Numbered steps for any section that describes a sequence. A table for any section that compares two or more options, sets criteria against options, or shows costs, timelines or thresholds. Bullets only for checklists or lists of requirements with four or more items. Prose everywhere else, including the opening and the closing. |
 | `h3_policy` | required: one H3 per role, step or skill inside the sections that list them. |
 | `meta_description_pattern` | The question the page answers and the specific answer or scope (number of steps, options, years, or the key figure). No client name. Factual, no "learn how". |
+| `faq_required` | Y |
 
 ## `reference` family
 
@@ -321,6 +344,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | The definition in prose. A table only when the term has variants to compare. Related terms as a short bullet list. |
 | `h3_policy` | none: a glossary entry has no subheadings. |
 | `meta_description_pattern` | The term and its one sentence definition in the industry the page serves. No client name. |
+| `faq_required` | N |
 
 ### `faq_page` (FAQ page)
 
@@ -334,6 +358,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Each question as an H3 in the section it belongs to, with a 40 to 80 word answer that opens with the direct answer. No table. |
 | `h3_policy` | required: every question is an H3 phrased exactly as a reader asks it. |
 | `meta_description_pattern` | The subject and the number of questions answered, naming the two most asked. No client name unless the FAQ is about the client's own product. |
+| `faq_required` | N |
 
 ### `statistics_page` (Statistics page)
 
@@ -347,6 +372,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Every statistic in a table with the value, the year and the source. One sentence of context per figure in prose. Key findings as a numbered list at the top. |
 | `h3_policy` | required: one H3 per statistic group, phrased as the figure it holds. |
 | `meta_description_pattern` | The exact fact, figure or definition the page holds, with the year and the scope. No client name. |
+| `faq_required` | N |
 
 ### `spec_sheet` (Spec sheet)
 
@@ -360,6 +386,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Specifications in tables grouped by category. Two or three sentences of prose per group at most. |
 | `h3_policy` | none: the table carries the structure. |
 | `meta_description_pattern` | The exact fact, figure or definition the page holds, with the year and the scope. No client name. |
+| `faq_required` | N |
 
 ### `question_page` (Question)
 
@@ -373,6 +400,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | The answer in prose, a table only when the answer depends on cases. |
 | `h3_policy` | none: one question, one answer, no subheadings. |
 | `meta_description_pattern` | The exact fact, figure or definition the page holds, with the year and the scope. No client name. |
+| `faq_required` | Y |
 
 ### `entity_lookup` (Entity lookup)
 
@@ -386,6 +414,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Facts in a two column table, then prose. |
 | `h3_policy` | none. |
 | `meta_description_pattern` | The exact fact, figure or definition the page holds, with the year and the scope. No client name. |
+| `faq_required` | N |
 
 ### `country_region_guide` (Country region guide)
 
@@ -399,6 +428,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Definitions and explanations in prose. Figures, ranges, specifications and comparisons in tables. Bullets only for lists of four or more short items. |
 | `h3_policy` | required: one H3 per topic (rules, costs, timelines) inside the sections that cover several. |
 | `meta_description_pattern` | The exact fact, figure or definition the page holds, with the year and the scope. No client name. |
+| `faq_required` | Y |
 
 ### `salary_guide` (Salary guide)
 
@@ -412,6 +442,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Salary ranges in tables with the year and the source. Prose for what moves the figure. |
 | `h3_policy` | required: one H3 per role, level or region inside the sections that list them. |
 | `meta_description_pattern` | The exact fact, figure or definition the page holds, with the year and the scope. No client name. |
+| `faq_required` | Y |
 
 ## `evaluation` family
 
@@ -427,6 +458,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | One comparison table in the section that sets the options against each other. Pros and cons as two short bullet lists per option. Prices and specifications in a table. Verdicts and reasoning in prose. |
 | `h3_policy` | required: one H3 per listed item, in ranked order, with the item name as the heading. |
 | `meta_description_pattern` | Which options are compared and on what criteria, or the price range with the year, and a hint of the verdict. No client name unless the client is one of the options. |
+| `faq_required` | Y |
 
 ### `head_to_head_vs` (Head-to-head comparison)
 
@@ -440,6 +472,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | One comparison table in the section that sets the options against each other. Pros and cons as two short bullet lists per option. Prices and specifications in a table. Verdicts and reasoning in prose. |
 | `h3_policy` | optional: one H3 per criterion inside the comparison section when it runs over 250 words. |
 | `meta_description_pattern` | Which options are compared and on what criteria, or the price range with the year, and a hint of the verdict. No client name unless the client is one of the options. |
+| `faq_required` | Y |
 
 ### `alternatives_page` (Alternatives page)
 
@@ -453,6 +486,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | One comparison table in the section that sets the options against each other. Pros and cons as two short bullet lists per option. Prices and specifications in a table. Verdicts and reasoning in prose. |
 | `h3_policy` | required: one H3 per alternative with its name as the heading. |
 | `meta_description_pattern` | Which options are compared and on what criteria, or the price range with the year, and a hint of the verdict. No client name unless the client is one of the options. |
+| `faq_required` | Y |
 
 ### `competitor_comparison_own` (Us-vs-competitor page)
 
@@ -466,6 +500,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | One comparison table in the section that sets the options against each other. Pros and cons as two short bullet lists per option. Prices and specifications in a table. Verdicts and reasoning in prose. |
 | `h3_policy` | required: one H3 per option, item or criterion inside the sections that go through them one by one. |
 | `meta_description_pattern` | Which options are compared and on what criteria, or the price range with the year, and a hint of the verdict. No client name unless the client is one of the options. |
+| `faq_required` | Y |
 
 ### `review_page` (Review)
 
@@ -479,6 +514,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | One comparison table in the section that sets the options against each other. Pros and cons as two short bullet lists per option. Prices and specifications in a table. Verdicts and reasoning in prose. |
 | `h3_policy` | optional: one H3 per aspect reviewed inside a section over 250 words. |
 | `meta_description_pattern` | Which options are compared and on what criteria, or the price range with the year, and a hint of the verdict. No client name unless the client is one of the options. |
+| `faq_required` | Y |
 
 ### `cost_page` (Cost page)
 
@@ -492,6 +528,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | One price table with the item, the range and the year. Cost drivers as prose under H3s. No bullets except a short list of inclusions. |
 | `h3_policy` | required: one H3 per cost driver inside the section that goes through them. |
 | `meta_description_pattern` | Which options are compared and on what criteria, or the price range with the year, and a hint of the verdict. No client name unless the client is one of the options. |
+| `faq_required` | Y |
 
 ### `is_x_worth_it` (Is-it-worth-it page)
 
@@ -505,6 +542,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | One comparison table in the section that sets the options against each other. Pros and cons as two short bullet lists per option. Prices and specifications in a table. Verdicts and reasoning in prose. |
 | `h3_policy` | optional. |
 | `meta_description_pattern` | Which options are compared and on what criteria, or the price range with the year, and a hint of the verdict. No client name unless the client is one of the options. |
+| `faq_required` | Y |
 
 ### `diy_vs_pro` (DIY-vs-professional page)
 
@@ -518,6 +556,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | One comparison table in the section that sets the options against each other. Pros and cons as two short bullet lists per option. Prices and specifications in a table. Verdicts and reasoning in prose. |
 | `h3_policy` | required: one H3 per option, item or criterion inside the sections that go through them one by one. |
 | `meta_description_pattern` | Which options are compared and on what criteria, or the price range with the year, and a hint of the verdict. No client name unless the client is one of the options. |
+| `faq_required` | Y |
 
 ### `category_comparison` (Category comparison)
 
@@ -531,6 +570,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | One comparison table in the section that sets the options against each other. Pros and cons as two short bullet lists per option. Prices and specifications in a table. Verdicts and reasoning in prose. |
 | `h3_policy` | required: one H3 per category compared. |
 | `meta_description_pattern` | Which options are compared and on what criteria, or the price range with the year, and a hint of the verdict. No client name unless the client is one of the options. |
+| `faq_required` | Y |
 
 ### `buying_guide` (Buying guide)
 
@@ -544,6 +584,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | One comparison table in the section that sets the options against each other. Pros and cons as two short bullet lists per option. Prices and specifications in a table. Verdicts and reasoning in prose. |
 | `h3_policy` | required: one H3 per buying criterion. |
 | `meta_description_pattern` | Which options are compared and on what criteria, or the price range with the year, and a hint of the verdict. No client name unless the client is one of the options. |
+| `faq_required` | Y |
 
 ### `top_in_location` (Best-in-location list)
 
@@ -557,6 +598,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | One comparison table in the section that sets the options against each other. Pros and cons as two short bullet lists per option. Prices and specifications in a table. Verdicts and reasoning in prose. |
 | `h3_policy` | required: one H3 per listed provider with its name as the heading. |
 | `meta_description_pattern` | Which options are compared and on what criteria, or the price range with the year, and a hint of the verdict. No client name unless the client is one of the options. |
+| `faq_required` | Y |
 
 ### `migration_switch_page` (Migration switch)
 
@@ -570,6 +612,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | One comparison table in the section that sets the options against each other. Pros and cons as two short bullet lists per option. Prices and specifications in a table. Verdicts and reasoning in prose. |
 | `h3_policy` | required: one H3 per migration stage. |
 | `meta_description_pattern` | Which options are compared and on what criteria, or the price range with the year, and a hint of the verdict. No client name unless the client is one of the options. |
+| `faq_required` | Y |
 
 ## `offer` family
 
@@ -585,6 +628,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose for the value proposition and the reasoning. A table for deliverables, process timelines, plan comparisons and prices. Bullets for lists of deliverables or inclusions with four or more items. No bullets in the opening or the closing. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one. |
 | `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
+| `faq_required` | Y |
 
 ### `solution_use_case_page` (Solution page)
 
@@ -598,6 +642,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose for the value proposition and the reasoning. A table for deliverables, process timelines, plan comparisons and prices. Bullets for lists of deliverables or inclusions with four or more items. No bullets in the opening or the closing. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one. |
 | `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
+| `faq_required` | Y |
 
 ### `industry_vertical_page` (Industry page)
 
@@ -611,6 +656,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose for the value proposition and the reasoning. A table for deliverables, process timelines, plan comparisons and prices. Bullets for lists of deliverables or inclusions with four or more items. No bullets in the opening or the closing. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one. |
 | `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
+| `faq_required` | Y |
 
 ### `role_persona_page` (Role page)
 
@@ -624,6 +670,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose for the value proposition and the reasoning. A table for deliverables, process timelines, plan comparisons and prices. Bullets for lists of deliverables or inclusions with four or more items. No bullets in the opening or the closing. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one. |
 | `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
+| `faq_required` | Y |
 
 ### `segment_size_page` (Segment page)
 
@@ -637,6 +684,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose for the value proposition and the reasoning. A table for deliverables, process timelines, plan comparisons and prices. Bullets for lists of deliverables or inclusions with four or more items. No bullets in the opening or the closing. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one. |
 | `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
+| `faq_required` | Y |
 
 ### `feature_page` (Feature)
 
@@ -650,6 +698,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose for the value proposition and the reasoning. A table for deliverables, process timelines, plan comparisons and prices. Bullets for lists of deliverables or inclusions with four or more items. No bullets in the opening or the closing. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one. |
 | `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
+| `faq_required` | Y |
 
 ### `integration_page` (Integration)
 
@@ -663,6 +712,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose for the value proposition and the reasoning. A table for deliverables, process timelines, plan comparisons and prices. Bullets for lists of deliverables or inclusions with four or more items. No bullets in the opening or the closing. |
 | `h3_policy` | optional: one H3 per setup stage. |
 | `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
+| `faq_required` | Y |
 
 ### `x_for_y_programmatic` (X-for-Y page)
 
@@ -676,6 +726,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose for the value proposition and the reasoning. A table for deliverables, process timelines, plan comparisons and prices. Bullets for lists of deliverables or inclusions with four or more items. No bullets in the opening or the closing. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one. |
 | `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
+| `faq_required` | Y |
 
 ### `pricing_page` (Pricing)
 
@@ -689,6 +740,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | One plan comparison table with price, limits and inclusions. One H3 per plan with two or three prose sentences on who it is for. Inclusions as bullets only inside the table or the plan block. No prose that repeats the table. |
 | `h3_policy` | required: one H3 per plan or tier. |
 | `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
+| `faq_required` | Y |
 
 ### `product_landing_page` (Product landing)
 
@@ -702,6 +754,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose for the value proposition and the reasoning. A table for deliverables, process timelines, plan comparisons and prices. Bullets for lists of deliverables or inclusions with four or more items. No bullets in the opening or the closing. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one. |
 | `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
+| `faq_required` | Y |
 
 ### `quote_request_page` (Quote request)
 
@@ -715,6 +768,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose for the value proposition and the reasoning. A table for deliverables, process timelines, plan comparisons and prices. Bullets for lists of deliverables or inclusions with four or more items. No bullets in the opening or the closing. |
 | `h3_policy` | none. |
 | `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
+| `faq_required` | Y |
 
 ### `brand_page` (Brand)
 
@@ -728,6 +782,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose for the value proposition and the reasoning. A table for deliverables, process timelines, plan comparisons and prices. Bullets for lists of deliverables or inclusions with four or more items. No bullets in the opening or the closing. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one. |
 | `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
+| `faq_required` | Y |
 
 ### `partnership_program_page` (Partnership program)
 
@@ -741,6 +796,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose for the value proposition and the reasoning. A table for deliverables, process timelines, plan comparisons and prices. Bullets for lists of deliverables or inclusions with four or more items. No bullets in the opening or the closing. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one. |
 | `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
+| `faq_required` | Y |
 
 ### `membership_plan_page` (Membership plan)
 
@@ -754,6 +810,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose for the value proposition and the reasoning. A table for deliverables, process timelines, plan comparisons and prices. Bullets for lists of deliverables or inclusions with four or more items. No bullets in the opening or the closing. |
 | `h3_policy` | required: one H3 per plan or tier. |
 | `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
+| `faq_required` | Y |
 
 ### `financing_page` (Financing)
 
@@ -767,6 +824,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose for the value proposition and the reasoning. A table for deliverables, process timelines, plan comparisons and prices. Bullets for lists of deliverables or inclusions with four or more items. No bullets in the opening or the closing. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one. |
 | `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
+| `faq_required` | Y |
 
 ### `ad_landing_page` (Ad landing)
 
@@ -780,6 +838,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose for the value proposition and the reasoning. A table for deliverables, process timelines, plan comparisons and prices. Bullets for lists of deliverables or inclusions with four or more items. No bullets in the opening or the closing. |
 | `h3_policy` | none. |
 | `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
+| `faq_required` | Y |
 
 ### `squeeze_lead_magnet_page` (Squeeze lead magnet)
 
@@ -793,6 +852,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose for the value proposition and the reasoning. A table for deliverables, process timelines, plan comparisons and prices. Bullets for lists of deliverables or inclusions with four or more items. No bullets in the opening or the closing. |
 | `h3_policy` | none. |
 | `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
+| `faq_required` | Y |
 
 ### `pre_launch_waitlist_page` (Pre launch waitlist)
 
@@ -806,6 +866,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose for the value proposition and the reasoning. A table for deliverables, process timelines, plan comparisons and prices. Bullets for lists of deliverables or inclusions with four or more items. No bullets in the opening or the closing. |
 | `h3_policy` | none. |
 | `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
+| `faq_required` | Y |
 
 ### `donate_page` (Donate)
 
@@ -819,6 +880,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose for the value proposition and the reasoning. A table for deliverables, process timelines, plan comparisons and prices. Bullets for lists of deliverables or inclusions with four or more items. No bullets in the opening or the closing. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one. |
 | `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
+| `faq_required` | Y |
 
 ### `program_page` (Program)
 
@@ -832,6 +894,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose for the value proposition and the reasoning. A table for deliverables, process timelines, plan comparisons and prices. Bullets for lists of deliverables or inclusions with four or more items. No bullets in the opening or the closing. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words that walks through steps, plans or deliverables one by one. |
 | `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
+| `faq_required` | Y |
 
 ### `specials_offers_page` (Specials offers)
 
@@ -845,6 +908,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose for the value proposition and the reasoning. A table for deliverables, process timelines, plan comparisons and prices. Bullets for lists of deliverables or inclusions with four or more items. No bullets in the opening or the closing. |
 | `h3_policy` | none. |
 | `meta_description_pattern` | Client name, the service or product, who it is for, and one concrete differentiator or deliverable from the facts. Factual, 120 to 155 characters. |
+| `faq_required` | Y |
 
 ## `proof` family
 
@@ -860,6 +924,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Results in a table with the metric, the before value and the after value. The story in prose. Quotes as plain paragraphs with the speaker named. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words. |
 | `meta_description_pattern` | Client name, who the customer was, and the headline result with its number from the facts. Factual. |
+| `faq_required` | N |
 
 ### `case_results_page` (Case results)
 
@@ -873,6 +938,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Results in a table (matter, outcome, year). Prose for how they were achieved. No bullets. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words. |
 | `meta_description_pattern` | Client name, who the customer was, and the headline result with its number from the facts. Factual. |
+| `faq_required` | N |
 
 ### `testimonials_reviews_page` (Testimonials reviews)
 
@@ -886,6 +952,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Each testimonial as a plain paragraph with the person, the role and the company named. No table. No invented quotes: use only the quotes in the facts. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words. |
 | `meta_description_pattern` | Client name, who the customer was, and the headline result with its number from the facts. Factual. |
+| `faq_required` | N |
 
 ### `portfolio_project_page` (Portfolio project)
 
@@ -899,6 +966,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Results in a table with the metric, the before value and the after value. The story in prose. Quotes as plain paragraphs with the speaker named. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words. |
 | `meta_description_pattern` | Client name, who the customer was, and the headline result with its number from the facts. Factual. |
+| `faq_required` | N |
 
 ### `impact_report_page` (Impact report)
 
@@ -912,6 +980,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Outcomes in a table with the metric, the value and the year. Programmes under H3s in prose. Key figures as a numbered list at the top. |
 | `h3_policy` | required: one H3 per programme or per outcome area. |
 | `meta_description_pattern` | Client name, who the customer was, and the headline result with its number from the facts. Factual. |
+| `faq_required` | N |
 
 ### `awards_certifications_page` (Awards certifications)
 
@@ -925,6 +994,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Awards in a table (award, body, year). One or two prose sentences per certification on what it covers. No bullets. |
 | `h3_policy` | optional: one H3 per certification body when there are several. |
 | `meta_description_pattern` | Client name, who the customer was, and the headline result with its number from the facts. Factual. |
+| `faq_required` | N |
 
 ### `customer_logos_wall` (Customer logos wall) (not written by the flow)
 
@@ -938,6 +1008,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Results in a table with the metric, the before value and the after value. The story in prose. Quotes as plain paragraphs with the speaker named. |
 | `h3_policy` | none. |
 | `meta_description_pattern` | Client name, who the customer was, and the headline result with its number from the facts. Factual. |
+| `faq_required` | N |
 
 ## `entity` family
 
@@ -953,6 +1024,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Narrative in prose. Credentials, education, languages, memberships and locations as short bullet lists. No table unless a section compares offices or roles. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words. |
 | `meta_description_pattern` | Who the person or company is, the role or specialty, the location, and one credential or fact from the facts. |
+| `faq_required` | N |
 
 ### `team_index` (Team index)
 
@@ -966,6 +1038,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | One H3 per team with each member as a bullet (name, role, one line). Prose for the intro only. |
 | `h3_policy` | required: one H3 per team or department. |
 | `meta_description_pattern` | Who the person or company is, the role or specialty, the location, and one credential or fact from the facts. |
+| `faq_required` | N |
 
 ### `team_member_bio` (Team member bio)
 
@@ -979,6 +1052,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Narrative in prose. Credentials, education, languages, memberships and locations as short bullet lists. No table unless a section compares offices or roles. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words. |
 | `meta_description_pattern` | Who the person or company is, the role or specialty, the location, and one credential or fact from the facts. |
+| `faq_required` | N |
 
 ### `author_bio_page` (Author page)
 
@@ -992,6 +1066,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Narrative in prose. Credentials and publications as bullets. No table. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words. |
 | `meta_description_pattern` | Who the person or company is, the role or specialty, the location, and one credential or fact from the facts. |
+| `faq_required` | N |
 
 ### `attorney_bio` (Attorney bio)
 
@@ -1005,6 +1080,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Narrative in prose. Credentials, education, languages, memberships and locations as short bullet lists. No table unless a section compares offices or roles. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words. |
 | `meta_description_pattern` | Who the person or company is, the role or specialty, the location, and one credential or fact from the facts. |
+| `faq_required` | N |
 
 ### `provider_profile` (Provider profile)
 
@@ -1018,6 +1094,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Narrative in prose. Credentials, education, languages, memberships and locations as short bullet lists. No table unless a section compares offices or roles. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words. |
 | `meta_description_pattern` | Who the person or company is, the role or specialty, the location, and one credential or fact from the facts. |
+| `faq_required` | N |
 
 ### `agent_profile` (Agent profile)
 
@@ -1031,6 +1108,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Narrative in prose. Credentials, education, languages, memberships and locations as short bullet lists. No table unless a section compares offices or roles. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words. |
 | `meta_description_pattern` | Who the person or company is, the role or specialty, the location, and one credential or fact from the facts. |
+| `faq_required` | N |
 
 ### `partner_vendor_profile` (Partner vendor profile)
 
@@ -1044,6 +1122,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Narrative in prose. Credentials, education, languages, memberships and locations as short bullet lists. No table unless a section compares offices or roles. |
 | `h3_policy` | optional: use H3s only inside a section over 250 words. |
 | `meta_description_pattern` | Who the person or company is, the role or specialty, the location, and one credential or fact from the facts. |
+| `faq_required` | N |
 
 ### `company_facts_page` (Company facts)
 
@@ -1057,6 +1136,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Facts in a two column table (fact, value). Prose only for context. No bullets. |
 | `h3_policy` | none. |
 | `meta_description_pattern` | Who the person or company is, the role or specialty, the location, and one credential or fact from the facts. |
+| `faq_required` | N |
 
 ### `press_room` (Press room)
 
@@ -1070,6 +1150,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Releases as a bulleted list with the date and the headline. Media contact as a short block. Prose for the intro only. |
 | `h3_policy` | optional: one H3 per year when there are many releases. |
 | `meta_description_pattern` | Who the person or company is, the role or specialty, the location, and one credential or fact from the facts. |
+| `faq_required` | N |
 
 ### `press_release_news` (Press release news)
 
@@ -1083,6 +1164,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Dateline and the news in the first paragraph. Quotes as plain paragraphs with the speaker and title named. No table, no bullets. |
 | `h3_policy` | none. |
 | `meta_description_pattern` | Who the person or company is, the role or specialty, the location, and one credential or fact from the facts. |
+| `faq_required` | N |
 
 ## `tool` family
 
@@ -1098,6 +1180,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Numbered steps for how to use the tool. A table for the inputs (name, meaning, where to find it) and for example outputs. Prose for how to read the result. |
 | `h3_policy` | optional: use H3s inside a section that explains several inputs or several result ranges. |
 | `meta_description_pattern` | What the tool calculates or checks, which inputs it needs, and what the result tells the reader. No client name. |
+| `faq_required` | Y |
 
 ### `quiz_assessment_page` (Quiz assessment)
 
@@ -1111,6 +1194,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Numbered steps for how to use the tool. A table for the inputs (name, meaning, where to find it) and for example outputs. Prose for how to read the result. |
 | `h3_policy` | optional: use H3s inside a section that explains several inputs or several result ranges. |
 | `meta_description_pattern` | What the tool calculates or checks, which inputs it needs, and what the result tells the reader. No client name. |
+| `faq_required` | N |
 
 ### `configurator_estimator` (Configurator estimator)
 
@@ -1124,6 +1208,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Numbered steps for how to use the tool. A table for the inputs (name, meaning, where to find it) and for example outputs. Prose for how to read the result. |
 | `h3_policy` | optional: use H3s inside a section that explains several inputs or several result ranges. |
 | `meta_description_pattern` | What the tool calculates or checks, which inputs it needs, and what the result tells the reader. No client name. |
+| `faq_required` | N |
 
 ### `generator_checker_tool` (Generator checker tool)
 
@@ -1137,6 +1222,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Numbered steps for how to use the tool. A table for the inputs (name, meaning, where to find it) and for example outputs. Prose for how to read the result. |
 | `h3_policy` | optional: use H3s inside a section that explains several inputs or several result ranges. |
 | `meta_description_pattern` | What the tool calculates or checks, which inputs it needs, and what the result tells the reader. No client name. |
+| `faq_required` | Y |
 
 ### `interactive_map_finder` (Locator page) (not written by the flow)
 
@@ -1150,6 +1236,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Numbered steps for how to use the tool. A table for the inputs (name, meaning, where to find it) and for example outputs. Prose for how to read the result. |
 | `h3_policy` | none. |
 | `meta_description_pattern` | What the tool calculates or checks, which inputs it needs, and what the result tells the reader. No client name. |
+| `faq_required` | N |
 
 ## `asset` family
 
@@ -1165,6 +1252,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Key findings as a numbered list. Data in tables. Timestamps or chapters as a table. Everything else in prose. |
 | `h3_policy` | required: one H3 per finding inside the findings section. |
 | `meta_description_pattern` | What the asset is, what it contains (number of findings, minutes, pages or records), who published it and when. |
+| `faq_required` | Y |
 
 ### `whitepaper_ebook_gate` (Whitepaper or ebook gate)
 
@@ -1178,6 +1266,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Key findings as a numbered list. Data in tables. Timestamps or chapters as a table. Everything else in prose. |
 | `h3_policy` | none. |
 | `meta_description_pattern` | What the asset is, what it contains (number of findings, minutes, pages or records), who published it and when. |
+| `faq_required` | N |
 
 ### `template_example_page` (Template example)
 
@@ -1191,6 +1280,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Key findings as a numbered list. Data in tables. Timestamps or chapters as a table. Everything else in prose. |
 | `h3_policy` | optional: use H3s inside a section that walks through several findings or chapters. |
 | `meta_description_pattern` | What the asset is, what it contains (number of findings, minutes, pages or records), who published it and when. |
+| `faq_required` | N |
 
 ## `local` family
 
@@ -1206,6 +1296,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Address, hours and phone as a short bullet list or a two column table. Services offered as bullets. Local specifics in prose. No table for narrative. |
 | `h3_policy` | optional: one H3 per service or per area inside a section that lists several. |
 | `meta_description_pattern` | Client name, the service, the city or area, and one local fact (hours, address area or years served) from the facts. |
+| `faq_required` | Y |
 
 ### `service_area_city_page` (Service-area city page)
 
@@ -1219,6 +1310,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Address, hours and phone as a short bullet list or a two column table. Services offered as bullets. Local specifics in prose. No table for narrative. |
 | `h3_policy` | optional: one H3 per service or per area inside a section that lists several. |
 | `meta_description_pattern` | Client name, the service, the city or area, and one local fact (hours, address area or years served) from the facts. |
+| `faq_required` | Y |
 
 ### `service_plus_location_page` (Service-in-location page)
 
@@ -1232,6 +1324,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Address, hours and phone as a short bullet list or a two column table. Services offered as bullets. Local specifics in prose. No table for narrative. |
 | `h3_policy` | optional: one H3 per service variant inside a section that lists several. |
 | `meta_description_pattern` | Client name, the service, the city or area, and one local fact (hours, address area or years served) from the facts. |
+| `faq_required` | Y |
 
 ### `neighborhood_area_guide` (Area guide)
 
@@ -1245,6 +1338,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Facts (commute times, prices, schools) in tables with the year and the source. Areas under H3s in prose. Bullets only for short lists of amenities. |
 | `h3_policy` | required: one H3 per neighbourhood, school, transport link or topic inside the sections that list them. |
 | `meta_description_pattern` | Client name, the service, the city or area, and one local fact (hours, address area or years served) from the facts. |
+| `faq_required` | Y |
 
 ### `practice_location_legal` (Practice area by location)
 
@@ -1258,6 +1352,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Address, hours and phone as a short bullet list or a two column table. Services offered as bullets. Local specifics in prose. No table for narrative. |
 | `h3_policy` | optional: one H3 per service or per area inside a section that lists several. |
 | `meta_description_pattern` | Client name, the service, the city or area, and one local fact (hours, address area or years served) from the facts. |
+| `faq_required` | Y |
 
 ### `branch_page_staffing` (Branch staffing)
 
@@ -1271,6 +1366,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Address, hours and phone as a short bullet list or a two column table. Services offered as bullets. Local specifics in prose. No table for narrative. |
 | `h3_policy` | optional: one H3 per service or per area inside a section that lists several. |
 | `meta_description_pattern` | Client name, the service, the city or area, and one local fact (hours, address area or years served) from the facts. |
+| `faq_required` | Y |
 
 ### `dealer_local_hub` (Dealer local hub)
 
@@ -1284,6 +1380,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Address, hours and phone as a short bullet list or a two column table. Services offered as bullets. Local specifics in prose. No table for narrative. |
 | `h3_policy` | optional: one H3 per service or per area inside a section that lists several. |
 | `meta_description_pattern` | Client name, the service, the city or area, and one local fact (hours, address area or years served) from the facts. |
+| `faq_required` | Y |
 
 ### `regional_country_landing` (Regional country landing)
 
@@ -1297,6 +1394,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Address, hours and phone as a short bullet list or a two column table. Services offered as bullets. Local specifics in prose. No table for narrative. |
 | `h3_policy` | optional: one H3 per service or per area inside a section that lists several. |
 | `meta_description_pattern` | Client name, the service, the city or area, and one local fact (hours, address area or years served) from the facts. |
+| `faq_required` | Y |
 
 ## `catalogue` family
 
@@ -1312,6 +1410,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose for what the category holds and how to choose. A table only when it compares sub ranges. No bullets. |
 | `h3_policy` | none. |
 | `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
+| `faq_required` | N |
 
 ### `collection_curated_page` (Collection curated)
 
@@ -1325,6 +1424,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Specifications, prices, sizes, doses, coverage and comparisons in tables. Sequences as numbered steps. Inclusions and options as bullets. Descriptions and reasoning in prose. |
 | `h3_policy` | none. |
 | `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
+| `faq_required` | N |
 
 ### `intermediary_category_page` (Intermediary category)
 
@@ -1338,6 +1438,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Specifications, prices, sizes, doses, coverage and comparisons in tables. Sequences as numbered steps. Inclusions and options as bullets. Descriptions and reasoning in prose. |
 | `h3_policy` | none. |
 | `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
+| `faq_required` | N |
 
 ### `search_results_listing_page` (Search results listing) (not written by the flow)
 
@@ -1351,6 +1452,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Specifications, prices, sizes, doses, coverage and comparisons in tables. Sequences as numbered steps. Inclusions and options as bullets. Descriptions and reasoning in prose. |
 | `h3_policy` | none. |
 | `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
+| `faq_required` | N |
 
 ### `careers_page` (Careers)
 
@@ -1364,6 +1466,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Specifications, prices, sizes, doses, coverage and comparisons in tables. Sequences as numbered steps. Inclusions and options as bullets. Descriptions and reasoning in prose. |
 | `h3_policy` | optional: use H3s inside a section over 250 words that covers several variants, options or stages. |
 | `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
+| `faq_required` | N |
 
 ### `material_capability_page` (Capability or material page)
 
@@ -1377,6 +1480,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Properties, tolerances and sizes in tables. Processes as numbered steps. Applications as bullets. Prose for the reasoning. |
 | `h3_policy` | optional: one H3 per grade or process inside a section that covers several. |
 | `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
+| `faq_required` | Y |
 
 ### `application_page_industrial` (Industrial application page)
 
@@ -1390,6 +1494,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Specifications, prices, sizes, doses, coverage and comparisons in tables. Sequences as numbered steps. Inclusions and options as bullets. Descriptions and reasoning in prose. |
 | `h3_policy` | optional: use H3s inside a section over 250 words that covers several variants, options or stages. |
 | `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
+| `faq_required` | Y |
 
 ### `condition_page` (Condition)
 
@@ -1403,6 +1508,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Specifications, prices, sizes, doses, coverage and comparisons in tables. Sequences as numbered steps. Inclusions and options as bullets. Descriptions and reasoning in prose. |
 | `h3_policy` | required: one H3 per symptom group, cause or treatment option inside the sections that go through them. |
 | `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
+| `faq_required` | Y |
 
 ### `treatment_procedure_page` (Treatment procedure)
 
@@ -1416,6 +1522,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Specifications, prices, sizes, doses, coverage and comparisons in tables. Sequences as numbered steps. Inclusions and options as bullets. Descriptions and reasoning in prose. |
 | `h3_policy` | required: one H3 per stage (before, during, after) or per option inside the sections that go through them. |
 | `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
+| `faq_required` | Y |
 
 ### `drug_medication_page` (Drug medication)
 
@@ -1429,6 +1536,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Doses, forms and interactions in tables. Everything else in prose. No bullets except a short list of warning signs. |
 | `h3_policy` | required: one H3 per dosage form, use or side effect group inside the sections that go through them. |
 | `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
+| `faq_required` | N |
 
 ### `practice_area_page` (Practice area)
 
@@ -1442,6 +1550,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Specifications, prices, sizes, doses, coverage and comparisons in tables. Sequences as numbered steps. Inclusions and options as bullets. Descriptions and reasoning in prose. |
 | `h3_policy` | required: one H3 per matter type or per stage inside the sections that go through them. |
 | `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
+| `faq_required` | Y |
 
 ### `coverage_line_page` (Coverage line)
 
@@ -1455,6 +1564,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Specifications, prices, sizes, doses, coverage and comparisons in tables. Sequences as numbered steps. Inclusions and options as bullets. Descriptions and reasoning in prose. |
 | `h3_policy` | required: one H3 per coverage part or per exclusion group. |
 | `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
+| `faq_required` | Y |
 
 ### `financial_product_page` (Financial product)
 
@@ -1468,6 +1578,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Specifications, prices, sizes, doses, coverage and comparisons in tables. Sequences as numbered steps. Inclusions and options as bullets. Descriptions and reasoning in prose. |
 | `h3_policy` | optional: one H3 per eligibility group or fee type. |
 | `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
+| `faq_required` | Y |
 
 ### `plan_tariff_page` (Plan tariff)
 
@@ -1481,6 +1592,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Specifications, prices, sizes, doses, coverage and comparisons in tables. Sequences as numbered steps. Inclusions and options as bullets. Descriptions and reasoning in prose. |
 | `h3_policy` | required: one H3 per plan. |
 | `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
+| `faq_required` | Y |
 
 ### `route_lane_page` (Route lane)
 
@@ -1494,6 +1606,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Specifications, prices, sizes, doses, coverage and comparisons in tables. Sequences as numbered steps. Inclusions and options as bullets. Descriptions and reasoning in prose. |
 | `h3_policy` | optional. |
 | `meta_description_pattern` | The item name, the two or three facts a buyer compares (price, size, dose, coverage or duration) and who it is for. Client name for the client's own products. |
+| `faq_required` | Y |
 
 ## `ops` family
 
@@ -1509,6 +1622,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | This page is a procedure and always carries a numbered step list. When the supplied H2s are the steps themselves, the first section ends with a numbered list of all the steps, one short line each, and every step H2 then gives the detail. When the procedure sits inside one H2, that section is written as numbered steps. A table for any section that compares options or shows costs or timelines. Bullets only for checklists of four or more items. Prose elsewhere. |
 | `h3_policy` | optional: when a stage section runs over 250 words, split it with two or more H3s. |
 | `meta_description_pattern` | What the page helps the reader do, naming the product and the version where relevant. No marketing. |
+| `faq_required` | N |
 
 ### `help_center_article` (Help center article)
 
@@ -1522,6 +1636,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | This page is a procedure and always carries a numbered step list. When the supplied H2s are the steps themselves, the first section ends with a numbered list of all the steps, one short line each, and every step H2 then gives the detail. When the procedure sits inside one H2, that section is written as numbered steps. A table for any section that compares options or shows costs or timelines. Bullets only for checklists of four or more items. Prose elsewhere. |
 | `h3_policy` | optional: one H3 per stage inside a long procedure. |
 | `meta_description_pattern` | What the page helps the reader do, naming the product and the version where relevant. No marketing. |
+| `faq_required` | Y |
 
 ### `changelog_release_notes` (Changelog release notes)
 
@@ -1535,6 +1650,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | One H3 per version with the date, then bullets grouped as added, changed and fixed. No prose beyond one line per version. |
 | `h3_policy` | required: one H3 per version. |
 | `meta_description_pattern` | What the page helps the reader do, naming the product and the version where relevant. No marketing. |
+| `faq_required` | N |
 
 ### `api_reference` (API reference) (not written by the flow)
 
@@ -1548,6 +1664,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Numbered steps for procedures. Tables for parameters, versions and settings. Bullets for prerequisites. Short prose between them. |
 | `h3_policy` | required: one H3 per endpoint. |
 | `meta_description_pattern` | What the page helps the reader do, naming the product and the version where relevant. No marketing. |
+| `faq_required` | N |
 
 ### `community_forum_thread` (Community forum thread) (not written by the flow)
 
@@ -1561,6 +1678,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Numbered steps for procedures. Tables for parameters, versions and settings. Bullets for prerequisites. Short prose between them. |
 | `h3_policy` | optional: one H3 per stage inside a long procedure. |
 | `meta_description_pattern` | What the page helps the reader do, naming the product and the version where relevant. No marketing. |
+| `faq_required` | N |
 
 ### `contact_page` (Contact)
 
@@ -1574,6 +1692,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Channels as a two column table or bullets (channel, when to use it, response time). Two or three prose sentences at most. |
 | `h3_policy` | none. |
 | `meta_description_pattern` | What the page helps the reader do, naming the product and the version where relevant. No marketing. |
+| `faq_required` | N |
 
 ### `thank_you_page` (Thank you)
 
@@ -1587,6 +1706,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose only: what happens next and when. |
 | `h3_policy` | none. |
 | `meta_description_pattern` | What the page helps the reader do, naming the product and the version where relevant. No marketing. |
+| `faq_required` | N |
 
 ### `legal_policy_page` (Legal policy) (not written by the flow)
 
@@ -1600,6 +1720,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Numbered steps for procedures. Tables for parameters, versions and settings. Bullets for prerequisites. Short prose between them. |
 | `h3_policy` | required: one H3 per clause. |
 | `meta_description_pattern` | What the page helps the reader do, naming the product and the version where relevant. No marketing. |
+| `faq_required` | N |
 
 ### `claims_how_to_file_page` (Claims how to file)
 
@@ -1613,6 +1734,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | This page is a procedure and always carries a numbered step list. When the supplied H2s are the steps themselves, the first section ends with a numbered list of all the steps, one short line each, and every step H2 then gives the detail. When the procedure sits inside one H2, that section is written as numbered steps. A table for any section that compares options or shows costs or timelines. Bullets only for checklists of four or more items. Prose elsewhere. |
 | `h3_policy` | optional: when a step section runs over 250 words, split it with two or more H3s. |
 | `meta_description_pattern` | What the page helps the reader do, naming the product and the version where relevant. No marketing. |
+| `faq_required` | Y |
 
 ### `patient_forms_prep_page` (Patient forms prep)
 
@@ -1626,6 +1748,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | This page is a procedure and always carries a numbered step list. When the supplied H2s are the steps themselves, the first section ends with a numbered list of all the steps, one short line each, and every step H2 then gives the detail. When the procedure sits inside one H2, that section is written as numbered steps. A table for any section that compares options or shows costs or timelines. Bullets only for checklists of four or more items. Prose elsewhere. |
 | `h3_policy` | optional: one H3 per stage inside a long procedure. |
 | `meta_description_pattern` | What the page helps the reader do, naming the product and the version where relevant. No marketing. |
+| `faq_required` | N |
 
 ### `sitemap_html` (HTML sitemap) (not written by the flow)
 
@@ -1639,6 +1762,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Numbered steps for procedures. Tables for parameters, versions and settings. Bullets for prerequisites. Short prose between them. |
 | `h3_policy` | optional: one H3 per stage inside a long procedure. |
 | `meta_description_pattern` | What the page helps the reader do, naming the product and the version where relevant. No marketing. |
+| `faq_required` | N |
 
 ### `login_account_cart_checkout` (Login, account, cart, checkout) (not written by the flow)
 
@@ -1652,6 +1776,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Numbered steps for procedures. Tables for parameters, versions and settings. Bullets for prerequisites. Short prose between them. |
 | `h3_policy` | optional: one H3 per stage inside a long procedure. |
 | `meta_description_pattern` | What the page helps the reader do, naming the product and the version where relevant. No marketing. |
+| `faq_required` | N |
 
 ### `search_results_internal` (Search results internal) (not written by the flow)
 
@@ -1665,6 +1790,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Numbered steps for procedures. Tables for parameters, versions and settings. Bullets for prerequisites. Short prose between them. |
 | `h3_policy` | optional: one H3 per stage inside a long procedure. |
 | `meta_description_pattern` | What the page helps the reader do, naming the product and the version where relevant. No marketing. |
+| `faq_required` | N |
 
 ### `error_404_page` (404 page)
 
@@ -1678,6 +1804,7 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose only, two or three short paragraphs. |
 | `h3_policy` | none. |
 | `meta_description_pattern` | What the page helps the reader do, naming the product and the version where relevant. No marketing. |
+| `faq_required` | N |
 
 ### `homepage` (Homepage)
 
@@ -1691,3 +1818,4 @@ Closing section: when `closing_mode` is `append`, the writer adds one H2 after t
 | `format_rules` | Prose for the value proposition. One H3 per service line with two or three sentences. A table only for plans or comparisons. No bullets in the opening. |
 | `h3_policy` | optional: one H3 per service or product line inside the section that lists them. |
 | `meta_description_pattern` | What the page helps the reader do, naming the product and the version where relevant. No marketing. |
+| `faq_required` | N |
