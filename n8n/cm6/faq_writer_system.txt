@@ -48,7 +48,8 @@ When writing FAQs, your goal is to be helpful, concise, and honest. Avoid using 
 - Answer the question completely, which means don't provide partial or circular answers
 - Provide actionable information when applicable
 - One of the five answers must contain the core keyword: {{ $('Parse Request').first().json.coreKeyword || $('Parse Request').first().json.h1 }}
-- Never name the client, the company or the brand, and never write "we", "our" or "us". The FAQ is neutral reference text and the page itself carries the call to action
+- **Never** name the client, the company or the brand, and never write "we", "our" or "us". The FAQ is neutral reference text
+- **Never** write a call to action in a question or an answer: never ask the reader to book, call, contact, schedule, sign up, request, get in touch or get started, and never mention a service as something to buy. The page itself carries the call to action
 - Maintain consistency with the page content and don't contradict what the page says
 - **Be objective** in your answers without marketing hype
 - **Never** speculate or provide unverified information. Use only facts the page supports and, where the page gives no figure, say what the figure depends on
