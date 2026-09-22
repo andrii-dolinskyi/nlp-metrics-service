@@ -10,7 +10,19 @@ const decode = s => String(s || '')
   .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
   .replace(/\s*;\s+/g, ', ');
 const unspan = s => String(s).replace(/<span[^>]*translate="no"[^>]*>([\s\S]*?)<\/span>/gi, '$1').replace(/<\/?span[^>]*>/gi, '');
-const t = (j.translations || []).map(x => unspan(decode(x.text)));
+const origName = (r.original && r.original.clientName) ? String(r.original.clientName).trim() : '';
+const dedupe = s => {
+  if (!origName) return s;
+  const esc = x => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const words = origName.split(/\s+/);
+  let out = s;
+  for (let k = Math.min(3, words.length - 1); k >= 1; k--) {
+    const lead = words.slice(0, k).join(' ');
+    out = out.replace(new RegExp('(^|[^\\p{L}])' + esc(lead) + '\\s+([«"“]?)' + esc(origName), 'giu'), (m, pre, q) => pre + q + origName);
+  }
+  return out;
+};
+const t = (j.translations || []).map(x => dedupe(unspan(decode(x.text))));
 // The meta description was written to 150 characters in English and grows in translation: cut it back at a
 // sentence end, else at a clause end, else at a word, and drop a dangling connector.
 const clampMeta = (x, max) => {

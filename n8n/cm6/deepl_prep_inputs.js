@@ -36,6 +36,16 @@ add('writingPreferences', b.writingPreferences);
 ['author', 'reviewer'].forEach(k => { const p = b[k]; if (p && typeof p === 'object') { add(k + '.jobTitle', p.jobTitle || p.role || p.title); add(k + '.description', p.description || p.bio); add(k + '.credentials', p.credentials); } });
 const facts = (b.facts && typeof b.facts === 'object' && !Array.isArray(b.facts)) ? b.facts : {};
 Object.keys(facts).forEach(k => { const v = facts[k]; if (Array.isArray(v)) v.forEach((x, i) => { if (typeof x === 'string') add('facts.' + k + '.' + i, x); }); else if (typeof v === 'string') add('facts.' + k, v); });
+// The client name appears inside the description, facts and CTA rule too. Left alone, DeepL renders it differently in
+// each text and the writer picks one at random. Every mention outside the clientName field becomes a protected token
+// (Translate Inputs runs in HTML mode, so translate="no" is honoured); Request EN replaces the token with the one
+// English rendering of clientName, so the writer sees a single form and the output protection can match it.
+const cn = s(b.clientName);
+if (cn) {
+  const escName = cn.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp('(^|[^\\p{L}\\p{N}])' + escName + '(?![\\p{L}\\p{N}])', 'gu');
+  fields.forEach(f => { if (f.path !== 'clientName') f.text = f.text.replace(re, (m, pre) => pre + '<span translate="no">CLIENTNAME</span>'); });
+}
 if (!fields.length) return [{ json: { paths: [], texts: [], sourceLang, targetLang, body } }];
 // DeepL accepts up to 50 texts per call: one item per batch, Request EN joins them again.
 const out = [];

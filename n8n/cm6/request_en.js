@@ -7,12 +7,19 @@ const body = preps[0].body || JSON.parse(JSON.stringify(raw.body || raw || {}));
 const get = (o, path) => path.split('.').reduce((x, p) => (x === undefined || x === null) ? undefined : x[p], o);
 const set = (o, path, value) => { const parts = path.split('.'); let cur = o; for (let i = 0; i < parts.length - 1; i++) { const p = parts[i]; if (cur[p] === undefined || cur[p] === null || typeof cur[p] !== 'object') cur[p] = /^\d+$/.test(parts[i + 1]) ? [] : {}; cur = cur[p]; } cur[parts[parts.length - 1]] = value; };
 const original = {};
+const decode = x => String(x || '')
+  .replace(/&#x([0-9a-f]{1,6});/gi, (m, h) => { try { return String.fromCodePoint(parseInt(h, 16)); } catch (e) { return m; } })
+  .replace(/&#(\d{1,7});/g, (m, n) => { try { return String.fromCodePoint(parseInt(n, 10)); } catch (e) { return m; } })
+  .replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+let enName = '';
+preps.forEach((p, k) => { const i = p.paths.indexOf('clientName'); if (i !== -1 && results[k] && results[k].translations && results[k].translations[i]) enName = decode(results[k].translations[i].text).trim(); });
+const fix = x => { let out = decode(x).replace(/<span[^>]*translate="no"[^>]*>\s*CLIENTNAME\s*<\/span>/gi, enName || get(body, 'clientName') || '').replace(/<\/?span[^>]*>/gi, ''); return out.replace(/\bCLIENTNAME\b/g, enName || get(body, 'clientName') || ''); };
 if (preps.length && preps[0].paths.length) {
   if (results.length !== preps.length) throw new Error('DeepL returned ' + results.length + ' batches for ' + preps.length + ' input batches');
   preps.forEach((p, k) => {
     const tr = results[k].translations || [];
     if (tr.length !== p.paths.length) throw new Error('DeepL returned ' + tr.length + ' translations but ' + p.paths.length + ' input texts were sent');
-    p.paths.forEach((path, i) => { set(original, path, get(body, path)); set(body, path, String(tr[i].text || '').trim() || get(body, path)); });
+    p.paths.forEach((path, i) => { set(original, path, get(body, path)); set(body, path, fix(String(tr[i].text || '')).trim() || get(body, path)); });
   });
 }
 if (original.writingPreferences && body.writingPreferences && body.writingPreferences !== original.writingPreferences) body.writingPreferences = body.writingPreferences + ' (original wording in the page language: ' + original.writingPreferences + ')';
