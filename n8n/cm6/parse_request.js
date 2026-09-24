@@ -14,6 +14,8 @@ const out = {
   taskId: s(b.taskId), brandId: s(b.brandId), userId: s(b.userId),
   callbackUrl: s(b.callback_url || b.callbackUrl).replace(/\/$/, ''),
   pageType: s(b.pageType).toLowerCase(),
+  // The app's dropdown: informational | commercial | transactional | navigational. Drives the writer brief and the meta description.
+  searchIntent: s(b.searchIntent || b.search_intent || b.intent).toLowerCase().replace(/\s+intent$/, ''),
   targetLanguage: s(b.targetLanguage) || 'English',
   clientName: s(b.clientName), clientDescription: s(b.clientDescription || b.productDescription),
   h1: s(b.h1), slugPath: s(b.slugPath || b.slug), siteRootUrl: s(b.siteRootUrl).replace(/\/$/, ''),
@@ -32,11 +34,13 @@ out.clientNameLocal = out.original.clientName || out.clientName;
 out.authorLocal = person(Object.assign({}, obj(b.author), obj(out.original.author)), 'author');
 out.reviewerLocal = person(Object.assign({}, obj(b.reviewer), obj(out.original.reviewer)), 'reviewer');
 if (!out.reviewerLocal.name) out.reviewerLocal = null;
-const missing = ['pageType', 'clientName', 'callbackUrl', 'h1'].filter(k => !out[k]);
+const missing = ['pageType', 'clientName', 'callbackUrl', 'h1', 'searchIntent'].filter(k => !out[k]);
 if (!out.h2Outline.length) missing.push('h2Outline');
 if (!out.author.name) missing.push('author.name');
 if (!out.reviewer.name) out.reviewer = null;
 if (missing.length) throw new Error('Missing required fields: ' + missing.join(', '));
+const INTENTS = ['informational', 'commercial', 'transactional', 'navigational'];
+if (INTENTS.indexOf(out.searchIntent) === -1) throw new Error('searchIntent must be one of ' + INTENTS.join(', ') + ', got: ' + out.searchIntent);
 if (!out.slugPath) out.slugPath = '/' + slugify(out.original.h1 || out.h1) + '/';
 if (out.slugPath.charAt(0) !== '/') out.slugPath = '/' + out.slugPath;
 const lang = out.targetLanguage.toLowerCase();
