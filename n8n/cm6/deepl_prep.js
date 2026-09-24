@@ -8,21 +8,20 @@ const target = r.deeplTarget || LANG[String(r.targetLanguage || '').toLowerCase(
 if (!target) throw new Error('Unsupported targetLanguage for DeepL: ' + r.targetLanguage);
 const EEAT_KEYS = ['experience', 'expertise', 'authoritativeness', 'trustworthiness'];
 const e = a.eeat || {};
-// The app's H1 and H2 wording in the page language goes back over the English headings before translation, in a
-// translate="no" span so DeepL leaves it alone (Unwrap strips the span). Headings are matched by their text, not by
-// position, because the writer may add H2 sections of its own; those are translated like the body.
+// The app's H1 and H2 wording goes back over the translated page in Unwrap Translation. Because the writer may add
+// H2 sections of its own, each H2 line of the English page is matched here, by text, to the outline it came from,
+// and the resulting position map travels with the batch: the k-th H2 line after translation is the same heading.
+// (DeepL keeps markdown heading lines in place; a translate="no" span on a heading made DeepL copy the client-name
+// pattern into it, so headings are not wrapped.)
 const norm = t => String(t || '').toLowerCase().replace(/&#?[a-z0-9]{1,8};/gi, ' ').replace(/[*_`]/g, '').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
-const o = r.original || {};
-const hmap = {};
-(Array.isArray(o.h2Outline) ? o.h2Outline : []).forEach((h, i) => { const en = (r.h2Outline || [])[i]; if (h && en) hmap[norm(en)] = h; });
-const protectHeadings = page => String(page || '').split('\n').map(line => {
-  const m = line.match(/^(#{1,2})\s+(.+?)\s*$/);
-  if (!m) return line;
-  if (m[1] === '#' && o.h1) return '# <span translate="no">' + o.h1 + '</span>';
-  if (m[1] === '##' && hmap[norm(m[2])]) return '## <span translate="no">' + hmap[norm(m[2])] + '</span>';
-  return line;
-}).join('\n');
-let text = [protectHeadings(a.finalPage), a.metaDescription || '-'];
+const outlineIndex = {};
+(r.h2Outline || []).forEach((h, i) => { if (h) outlineIndex[norm(h)] = i; });
+const headingMap = [];
+String(a.finalPage || '').split('\n').forEach(line => {
+  const m = line.match(/^##\s+(.+?)\s*$/);
+  if (m) headingMap.push(outlineIndex[norm(m[1])] === undefined ? null : outlineIndex[norm(m[1])]);
+});
+let text = [a.finalPage, a.metaDescription || '-'];
 a.faq.forEach(f => { text.push(f.question); text.push(f.answer); });
 EEAT_KEYS.forEach(k => text.push((e[k] && e[k].evidence) || '-'));
 text.push(e.priorityFix || '-');
@@ -46,4 +45,4 @@ if (orig && en && orig !== en) {
   const token = '<span translate="no">' + orig + '</span>';
   text = text.map(t => { let out = String(t); list.forEach(f => { out = out.replace(new RegExp('(^|[^\\w>])' + esc(f) + '(?![\\w<])', 'g'), (m, pre) => pre + token); }); return out; });
 }
-return [{ json: { text, target, faqCount: a.faq.length, generatedPromptCount: gen.length, clientNameProtected: !!(orig && en && orig !== en) } }];
+return [{ json: { text, target, faqCount: a.faq.length, generatedPromptCount: gen.length, clientNameProtected: !!(orig && en && orig !== en), headingMap } }];

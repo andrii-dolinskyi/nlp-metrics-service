@@ -9,20 +9,33 @@ const decode = s => String(s || '')
   .replace(/&quot;/g, String.fromCharCode(34)).replace(/&apos;/g, String.fromCharCode(39)).replace(/&nbsp;/g, ' ')
   .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
   .replace(/\s*;\s+/g, ', ');
-const unspan = s => String(s).replace(/<span[^>]*translate="no"[^>]*>([\s\S]*?)<\/span>/gi, '$1').replace(/<\/?span[^>]*>/gi, '');
+// DeepL sometimes returns the protected span on a paragraph of its own in the middle of a sentence (… «\n\nNAME\n\n» …):
+// when the text before the blank lines is an open clause (no sentence end, no heading), the span goes back inline.
+// Then every span is stripped. The dedupe below removes the quotes and the generic noun DeepL put around the name.
+const unspan = s => String(s)
+  .replace(/([^\n.!?:»"”\s])[ \t]*\n[ \t]*\n[ \t]*(<span[^>]*translate="no"[^>]*>[\s\S]*?<\/span>)[ \t]*\n[ \t]*\n[ \t]*(?=[^\n#|*\-\d])/gi, '$1 $2 ')
+  .replace(/<span[^>]*translate="no"[^>]*>\s*([\s\S]*?)\s*<\/span>/gi, '$1')
+  .replace(/<\/?span[^>]*>/gi, '')
+  // A paragraph that is only a stray closing quote (what DeepL leaves after a span it broke out) goes away.
+  .replace(/\n[ \t]*\n[ \t]*[»"”][ \t]*(?=\n)/g, '\n');
 const origName = (r.original && r.original.clientName) ? String(r.original.clientName).trim() : '';
 const dedupe = s => {
   if (!origName) return s;
   const esc = x => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const words = origName.split(/\s+/);
   let out = s;
-  // The generic words in front of the name come back inflected (juridychnij firmi «Juridychna firma ...»), so each
-  // leading word of the original matches by its stem: the first four letters (or all but the last) plus any ending.
+  // DeepL puts an inflected generic noun and « » quotes in front of the protected name (juridychnij firmi «Juridychna
+  // firma ...»), sometimes across a line break. Each leading word of the original matches by its stem, the quotes and
+  // the whitespace are optional, and the whole run collapses to the name exactly as the app sent it.
   const stem = w => { const core = w.length > 5 ? w.slice(0, Math.max(4, w.length - 2)) : w.slice(0, Math.max(3, w.length - 1)); return esc(core) + '\\p{L}*'; };
   for (let k = Math.min(3, words.length - 1); k >= 1; k--) {
     const lead = words.slice(0, k).map(stem).join('\\s+');
-    out = out.replace(new RegExp('(^|[^\\p{L}])' + lead + '\\s+([«"“]?)' + esc(origName), 'giu'), (m, pre, q) => pre + q + origName);
+    out = out.replace(new RegExp('(^|[^\\p{L}])' + lead + '\\s*[«"“]?\\s*' + esc(origName) + '\\s*[»"”]?', 'giu'), (m, pre) => pre + origName);
   }
+  // Quotes DeepL added around the bare name go too: the app sent the name without them.
+  out = out.replace(new RegExp('[«"“]\\s*' + esc(origName) + '\\s*[»"”]', 'gu'), origName);
+  // No space between the name and a following comma or full stop, none after an opening bracket or quote.
+  out = out.replace(new RegExp(esc(origName) + '[ \\t]+(?=[,.;:!?)])', 'gu'), origName).replace(new RegExp('([«("“])[ \\t]+' + esc(origName), 'gu'), '$1' + origName);
   return out;
 };
 const t = (j.translations || []).map(x => dedupe(unspan(decode(x.text))));
@@ -52,8 +65,19 @@ if (eeat) {
 const promptBase = 2 + n * 2 + EEAT_KEYS.length + 1;
 let gi = 0;
 const monitoringPrompts = (a.monitoringPrompts || []).map(x => { if (x.source === 'input') return x; const tr = t[promptBase + gi++]; return Object.assign({}, x, { prompt: clean(tr, x.prompt) }); });
-// DeepL Prep put the app's H1 and H2 wording back before translation (translate="no" spans, stripped above); Clean
-// Text re-checks every heading by text. Only the H1 is forced here, in case a model or DeepL bent it.
+// The app's H1 and H2 wording goes back by position: DeepL Prep recorded, for every H2 line of the English page,
+// which outline heading it was (null for a section the writer added or the closing H2). DeepL keeps the heading lines
+// in place, so the k-th H2 line after translation is the same heading. Clean Text re-checks every heading by text.
 const o = r.original || {};
-const finalPage = t[0].split('\n').map(line => (o.h1 && /^#\s+\S/.test(line)) ? '# ' + o.h1 : line).join('\n');
-return [{ json: { finalPage, metaDescription: clampMeta(clean(t[1], a.metaDescription), 150), faq, eeat, monitoringPrompts, faqCount: a.faqCount, slug: a.slug, slugPath: a.slugPath, translated: true } }];
+const outline = Array.isArray(o.h2Outline) ? o.h2Outline : [];
+const headingMap = Array.isArray($('DeepL Prep').first().json.headingMap) ? $('DeepL Prep').first().json.headingMap : [];
+const lines = t[0].split('\n');
+const h2Count = lines.filter(l => /^##\s+\S/.test(l)).length;
+const restore = outline.length > 0 && headingMap.length === h2Count;
+let k = 0;
+const finalPage = lines.map(line => {
+  if (o.h1 && /^#\s+\S/.test(line)) return '# ' + o.h1;
+  if (/^##\s+\S/.test(line)) { const idx = headingMap[k++]; if (restore && typeof idx === 'number' && outline[idx]) return '## ' + outline[idx]; }
+  return line;
+}).join('\n');
+return [{ json: { finalPage, headingsRestored: restore, metaDescription: clampMeta(clean(t[1], a.metaDescription), 150), faq, eeat, monitoringPrompts, faqCount: a.faqCount, slug: a.slug, slugPath: a.slugPath, translated: true } }];
