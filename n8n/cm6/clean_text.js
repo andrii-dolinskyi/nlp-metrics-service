@@ -35,19 +35,29 @@ const cleanBlock = s => markdown(typography(apostrophes(invisible(decode(s)))));
 const cleanLine = s => typography(apostrophes(invisible(decode(s)))).replace(/\*\*|__|`/g, '').replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/\s*;\s+/g, ', ').replace(/\s+/g, ' ').trim();
 const r = $('Parse Request').first().json;
 const unspan = s => String(s).replace(/<span[^>]*translate="no"[^>]*>([\s\S]*?)<\/span>/gi, '$1').replace(/<\/?span[^>]*>/gi, '');
-// The H1 and the outline H2s ship exactly as the app sent them, whatever the writer, the editor or DeepL did to them.
+// The H1 and the outline H2s ship exactly as the app sent them, whatever the writer, the editor or DeepL did to
+// them. Each H2 line is matched by its text against the English outline and the app's original wording, so the H2
+// sections the writer added keep their own headings and the supplied ones come back word for word.
+const norm = t => String(t || '').toLowerCase().replace(/[*_`]/g, '').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
 const headings = s => {
-  const h1 = (r.original && r.original.h1) || r.h1 || '';
-  const outline = (r.original && Array.isArray(r.original.h2Outline) && r.original.h2Outline.length) ? r.original.h2Outline : (r.h2Outline || []);
-  const h2Lines = (s.match(/^##\s+\S/gm) || []).length;
-  headingsMismatch = outline.length > 0 && h2Lines < outline.length;
-  let h2i = 0;
-  return s.split('\n').map(line => {
+  const o = r.original || {};
+  const h1 = o.h1 || r.h1 || '';
+  const en = r.h2Outline || [];
+  const local = (Array.isArray(o.h2Outline) && o.h2Outline.length === en.length) ? o.h2Outline : en;
+  const map = {};
+  en.forEach((h, i) => { const want = local[i] || h; if (h) map[norm(h)] = want; if (local[i]) map[norm(local[i])] = want; });
+  const found = {};
+  const out = s.split('\n').map(line => {
     if (h1 && /^#\s+\S/.test(line)) return '# ' + h1;
-    if (!headingsMismatch && /^##\s+\S/.test(line)) { const idx = h2i++; if (idx < outline.length && outline[idx]) return '## ' + outline[idx]; }
+    const m = line.match(/^##\s+(.+?)\s*$/);
+    if (m && map[norm(m[1])]) { found[map[norm(m[1])]] = true; return '## ' + map[norm(m[1])]; }
     return line;
   }).join('\n');
+  headingsMissing = en.map((h, i) => local[i] || h).filter(h => h && !found[h]);
+  headingsMismatch = headingsMissing.length > 0;
+  return out;
 };
+let headingsMissing = [];
 let headingsMismatch = false;
 const out = Object.assign({}, f);
 out.finalPage = headings(cleanBlock(unspan(f.finalPage)));
@@ -61,5 +71,5 @@ if (f.eeat && typeof f.eeat === 'object') {
 out.monitoringPrompts = (f.monitoringPrompts || []).map(x => Object.assign({}, x, { prompt: cleanLine(unspan(x.prompt)), promptEn: cleanLine(unspan(x.promptEn)) }));
 // Report what was repaired so a problem in a language shows up in the execution, not in production.
 const before = JSON.stringify({ p: f.finalPage, m: f.metaDescription, q: f.faq, e: f.eeat });
-out.textCleaned = { headingsMismatch, entities: (before.match(/&#?[a-z0-9]{1,8};/gi) || []).length, changed: before !== JSON.stringify({ p: out.finalPage, m: out.metaDescription, q: out.faq, e: out.eeat }) };
+out.textCleaned = { headingsMismatch, headingsMissing, entities: (before.match(/&#?[a-z0-9]{1,8};/gi) || []).length, changed: before !== JSON.stringify({ p: out.finalPage, m: out.metaDescription, q: out.faq, e: out.eeat }) };
 return [{ json: out }];

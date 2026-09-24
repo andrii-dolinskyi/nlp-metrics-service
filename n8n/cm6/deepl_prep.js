@@ -8,7 +8,21 @@ const target = r.deeplTarget || LANG[String(r.targetLanguage || '').toLowerCase(
 if (!target) throw new Error('Unsupported targetLanguage for DeepL: ' + r.targetLanguage);
 const EEAT_KEYS = ['experience', 'expertise', 'authoritativeness', 'trustworthiness'];
 const e = a.eeat || {};
-let text = [a.finalPage, a.metaDescription || '-'];
+// The app's H1 and H2 wording in the page language goes back over the English headings before translation, in a
+// translate="no" span so DeepL leaves it alone (Unwrap strips the span). Headings are matched by their text, not by
+// position, because the writer may add H2 sections of its own; those are translated like the body.
+const norm = t => String(t || '').toLowerCase().replace(/&#?[a-z0-9]{1,8};/gi, ' ').replace(/[*_`]/g, '').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+const o = r.original || {};
+const hmap = {};
+(Array.isArray(o.h2Outline) ? o.h2Outline : []).forEach((h, i) => { const en = (r.h2Outline || [])[i]; if (h && en) hmap[norm(en)] = h; });
+const protectHeadings = page => String(page || '').split('\n').map(line => {
+  const m = line.match(/^(#{1,2})\s+(.+?)\s*$/);
+  if (!m) return line;
+  if (m[1] === '#' && o.h1) return '# <span translate="no">' + o.h1 + '</span>';
+  if (m[1] === '##' && hmap[norm(m[2])]) return '## <span translate="no">' + hmap[norm(m[2])] + '</span>';
+  return line;
+}).join('\n');
+let text = [protectHeadings(a.finalPage), a.metaDescription || '-'];
 a.faq.forEach(f => { text.push(f.question); text.push(f.answer); });
 EEAT_KEYS.forEach(k => text.push((e[k] && e[k].evidence) || '-'));
 text.push(e.priorityFix || '-');

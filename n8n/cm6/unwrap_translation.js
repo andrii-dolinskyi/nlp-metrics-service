@@ -52,15 +52,8 @@ if (eeat) {
 const promptBase = 2 + n * 2 + EEAT_KEYS.length + 1;
 let gi = 0;
 const monitoringPrompts = (a.monitoringPrompts || []).map(x => { if (x.source === 'input') return x; const tr = t[promptBase + gi++]; return Object.assign({}, x, { prompt: clean(tr, x.prompt) }); });
-// The app sent its own H1 and H2 wording in the target language: put it back over DeepL's rendering.
+// DeepL Prep put the app's H1 and H2 wording back before translation (translate="no" spans, stripped above); Clean
+// Text re-checks every heading by text. Only the H1 is forced here, in case a model or DeepL bent it.
 const o = r.original || {};
-const outline = Array.isArray(o.h2Outline) ? o.h2Outline : [];
-const h2Lines = (t[0].match(/^##\s+\S/gm) || []).length;
-const restoreH2 = outline.length > 0 && h2Lines >= outline.length;
-let h2i = 0;
-const finalPage = t[0].split('\n').map(line => {
-  if (o.h1 && /^#\s+\S/.test(line)) return '# ' + o.h1;
-  if (restoreH2 && /^##\s+\S/.test(line)) { const idx = h2i++; if (idx < outline.length && outline[idx]) return '## ' + outline[idx]; }
-  return line;
-}).join('\n');
+const finalPage = t[0].split('\n').map(line => (o.h1 && /^#\s+\S/.test(line)) ? '# ' + o.h1 : line).join('\n');
 return [{ json: { finalPage, metaDescription: clampMeta(clean(t[1], a.metaDescription), 150), faq, eeat, monitoringPrompts, faqCount: a.faqCount, slug: a.slug, slugPath: a.slugPath, translated: true } }];
