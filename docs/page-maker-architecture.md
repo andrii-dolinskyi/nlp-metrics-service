@@ -100,7 +100,8 @@ Every type serves one intent, which is why blog articles are not a type of their
 | `writingPreferences` | no | client rules: tone, spelling, claims to avoid, formatting |
 | `whitelistDomains[]`, `blacklistDomains[]` | no | research and citation domains, as today |
 | `metaTitle` | no | ignored since 2026-09-22; only the meta description is generated |
-| `facts` | per spec | object keyed by the spec's `required_facts` and `optional_facts` (section 3.2) |
+| `facts` | recommended | free-form object; since 2026-09-24 no type prescribes keys (section 3.2 is the original design) |
+| `searchIntent` | yes (since 2026-09-24) | informational, commercial, transactional or navigational; selects the intent block of the writer brief and the meta description rules |
 
 Gone from revision 2: `words`, `schemaTypes`, `researchDepth` (all from the spec), `mode`, `existingBody`, `pillarId`, `clusterId`, `hubSlug`, `linksOut`, `answerBlock`, `localizedKeyword`, `localizedH1`, `pineconeIndex`, `prompt`, `articleType`, `contentIdea`.
 
@@ -127,7 +128,7 @@ A missing required fact stops the run before any model call; the callback carrie
 
 ## 4. Writing rules the spec and payload drive
 
-**Outline is sacred.** The H2s come from the app, in the order sent, verbatim. No outline agent, no added sections, no reordering. Each section gets a word budget from the spec's `default_words` divided by the number of H2s, clamped to the spec's per-section band. Format hints (table, steps, bullets) come from the outline item when present and from the spec otherwise.
+**Outline is sacred.** The H2s come from the app, in the order sent, verbatim. No outline agent, no reordering. Since 2026-09-24 the writer may add H2 sections of its own between or after the supplied ones when the reader needs a subject the outline misses, the page has one approximate length (`words_count_approx`) that the writer spreads by what each section needs, and the format of each section (prose, steps, table, bullets) is decided from the heading, the search intent and the writer's research rather than from a spec column.
 
 **SEO and GEO at once, without reading forced.** The page serves the core keyword through placement (H1, one H2, first 60 words) and serves the AI prompts through answers woven into the section whose H2 is closest to each question: a direct answering sentence first, then the explanation, then the evidence. There are no inserted "Q&A" blocks and no restated questions. After the Style Updater, an answer-coverage check asks a judge model, for each prompt, which passage answers it; a prompt with no passage goes to the Section Fixer once with the instruction to answer it inside the most related section. Prompts still unanswered become FAQ questions. The callback reports coverage per prompt.
 
@@ -135,7 +136,7 @@ A missing required fact stops the run before any model call; the callback carrie
 
 **Internal links.** Exactly the list from the app: every URL placed once with its anchor (a natural variant of the anchor is allowed, never a bare URL), in body text only. The validator checks each URL appears exactly once and that no other internal-looking URL exists. There is no minimum or maximum; the count is whatever the app sent.
 
-**Facts and evidence.** Numbers, prices, results, certifications and capabilities come only from `facts` or from a Live Research result the writer saw, each statistic with a named source and a link. The spec's `citations_min` sets how many external citations the page needs; `tables_min` how many tables.
+**Facts and evidence.** Numbers, prices, results, certifications and capabilities come only from `facts` or from a Live Research result the writer saw, each statistic with a named source and a link. `tables_min` sets how many tables the page needs; citations go wherever a figure, a study or a quote needs one (the `citations_min` column was dropped on 2026-09-24).
 
 **Style.** The five peelers (participle pile-ups, series of three, hedging, negative parallelism, tailing negations) and the Style Updater stay as built, on the English text. Banned words, em dashes and semicolons stay in the validator. The validator no longer checks keyword density.
 
