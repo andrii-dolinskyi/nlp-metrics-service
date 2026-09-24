@@ -1,14 +1,16 @@
 # Writer page briefs: `entity` family (11 types)
 
-Rendered with the standard sample request described in [README.md](README.md). Lines that come from the spec row are the ones to review.
+Rendered by `tools/render_writer_briefs.py` from the real node code with the sample request described in [README.md](README.md), search intent `navigational`. Lines that come from the spec row are the ones to review.
 
 ## `about_page` (About)
 
-Spec: {"words_min": 500, "words_max": 1200, "default_words": 850, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words.", "schema_types": "AboutPage + Organization + BreadcrumbList"}
+Spec: {"words_count_approx": 900, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "research": "none", "closing_heading": "How to work with us", "cta_mode": "required", "faq_required": "N", "schema_types": "AboutPage + Organization + BreadcrumbList"}
 
 ```text
 <page_brief>
-Page type: About (entity family). Company story, mission, facts
+Page type: About (entity family). The company story, mission and facts. Readers expect who the company is, what it does, since when, who leads it, what it stands for and how to work with it.
+Search intent: navigational. The reader searched for this client or this page by name and wants to confirm they are in the right place and get to the practical information fast. The first sentence names the client and what this page is. Then the facts the reader came for, in the order they need them: who, what, where, hours, how to reach or use it. Short sections, no persuasion, no background essay; every sentence carries a fact or a direction.
+The page type and the search intent are not suggestions. A page of this type written for a reader with another intent fails the brief, however well it reads.
 Client: Example Client
 What the client does: What the client does, as sent by the app.
 H1 (use verbatim): Sample H1 sent by the app
@@ -18,20 +20,21 @@ Language: write in English.
 
 Structure:
 - Opening paragraph: Key facts: who, role, credentials, where. Not a definitional answer paragraph. Then begin the first H2.
-- Then these H2 sections, in this exact order, with these exact headings. Do not add, merge, rename or reorder them.
-  1. First H2 from the app [172 words]
-  2. Second H2 from the app [172 words]
-  3. Third H2 from the app [172 words]
-  4. Fourth H2 from the app [172 words]
-  5. A closing H2 that you write yourself [about 100 words]. Heading: follow one of these patterns, filling any <...> from the H1 or the facts, in sentence case: How to work with us. Never head it "Conclusion", "Summary", "Final thoughts" or "Key takeaways". Content: What a first contact looks like and what the reader should bring, in 50 to 90 words, then the CTA sentence.
-- Formats for this page type: Narrative in prose. Credentials, education, languages, memberships and locations as short bullet lists. No table unless a section compares offices or roles. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
-- Tables are optional. Use one only where it helps the reader.
-- H3 subheadings are optional: use H3s only inside a section over 250 words. When you use H3s in a section, use at least two, phrase each as the specific sub-question or item it covers (that is what answer engines quote), keep them in sentence case, and never put an H3 in a section under 150 words. Never use H4.
-- Total length: 500 to 1200 words. Aim for about 850.
-- External citations are optional. Any you use must come from the Live Research tool.
+- These H2 sections, in this order, with these exact headings. Every one of them must appear on the page, word for word: never rename, merge, reorder or drop one.
+  1. First H2 from the app
+  2. Second H2 from the app
+  3. Third H2 from the app
+  4. Fourth H2 from the app
+  5. A closing H2 that you write yourself, about 60 to 120 words. Heading: follow one of these patterns, filling any <...> from the H1 or the facts, in sentence case: How to work with us. Never head it "Conclusion", "Summary", "Final thoughts" or "Key takeaways". Content: the one decision or action the reader should take now and why, adding a last useful point instead of summarising the sections, and the call to action as its last sentence or two.
+- You may add H2 sections of your own, between or after the supplied ones, when the reader with this intent needs a subject the outline does not cover and it would not fit under a supplied heading without overloading it. Phrase an added H2 as the subject it covers, in sentence case, and keep it before the closing section. Adding a focused section is better than stuffing two subjects under one heading; adding a section the reader does not need is padding.
+- Format of each section: decide it from what the heading asks for and from what your research shows the strongest pages on this subject use for that section. Prose for reasoning, explanation and anything with a "because". A numbered list for a sequence the reader performs in order. A table only when the section sets two or more items against the same attributes (options, figures, dates, thresholds) and a reader would scan it. Bullets only for four or more short parallel items. Never a table where prose answers the heading, never bullets to pad, never a list of one or two items.
+- Tables are optional. Use one only where a section compares items on the same attributes.
+- H3 subheadings: at least one H2 on this page carries two or more H3s. Choose the H2 whose subject splits into distinct sub-questions or items a reader would scan for (the section your research shows answer engines quote), and put at least two H3s there; use H3s in other sections only where they split the same way. Phrase each H3 as the specific sub-question or item it covers, in sentence case. Never one lone H3, never an H3 in a section under 150 words, never an H4.
+- Length: about 900 words for the whole page. Give each section the length its subject needs, not an equal share; a section that answers its heading in 80 words stops there, and a section the reader will act on gets the room. Stay within roughly 20 percent of the target.
 - Research: This page type is written from the client facts and general professional knowledge. Use the Live Research tool only when a sentence needs a specific external figure or quote, and drop the sentence if nothing reliable comes back.
+- External citations are welcome where a figure, a study or a quote needs one; every citation is a markdown link to a source you found with the Live Research tool, with the source named in the sentence. Never cite from memory.
 - Every H2 section opens with a sentence that answers that heading directly, then explains, then gives what varies, then what to check.
-- Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
+- Each section has its own job. Say a thing once, in the section where it belongs. Never recycle a fact to reach a length; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
 Questions this page must answer:
 Readers and answer engines ask these questions. Answer each one once, inside the section where it fits best, with a direct answering sentence first and the evidence after it. Never insert a question as text, never add a question and answer block, never restate the question. The reader must not notice the question was planted.
@@ -39,9 +42,9 @@ Readers and answer engines ask these questions. Answer each one once, inside the
   2. Second AI prompt sent by the app?
 
 Client facts:
-These are the only claims you may make about the client. Use them exactly and invent nothing about the client beyond them. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
-- fact_key_1: fact value from the app
-- fact_key_2: ["list","of","values"]
+These are the only claims you may make about the client. They are material, not a list to reproduce: work each fact into the page at the point where it supports what that section is saying, as evidence inside the argument, in your own sentence. Never list them, never put them all in one section, never copy a fact as a datasheet line, never use a fact twice. A fact that supports nothing on this page is left out. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
+- fact key 1: fact value from the app
+- fact key 2: ["list","of","values"]
 
 Hard rules for this page:
 - Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
@@ -49,19 +52,20 @@ Hard rules for this page:
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
 
-
 CTA:
-One call to action, in the closing section only (section 5). Direct: one or two plain sentences asking for the one action in the CTA rule, linked to the CTA URL with a two to four word anchor. The action: CTA rule sent by the app.. Link the action to https://example.com/contact/ with a plain anchor of two to four words. That is the only link to the client's site on the page. Outside the closing section, never ask the reader to contact, book, call, schedule, sign up or get in touch, and never write "we" as the client.
+One call to action, at the end of the closing section only (section 5), as its last one or two sentences. It reads as the natural end of the page: a plain statement of what the client does on this subject, from the facts, and the one action to take. The action and its wording: CTA rule sent by the app. Link the action to https://example.com/contact/ with a plain anchor of two to four words. That is the only link to the client's site on the page. Never force it: no urgency, no "don't wait", no "imagine", no superlative, no exclamation, no sentence that could sit in an advert. Outside the closing section, never ask the reader to contact, book, call, schedule, sign up or get in touch, and never write "we" as the client.
 </page_brief>
 ```
 
 ## `team_index` (Team index)
 
-Spec: {"words_min": 200, "words_max": 500, "default_words": 350, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "required: one H3 per team or department.", "schema_types": "CollectionPage + Person + BreadcrumbList"}
+Spec: {"words_count_approx": 350, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "research": "none", "closing_heading": "", "cta_mode": "none", "faq_required": "N", "schema_types": "CollectionPage + Person + BreadcrumbList"}
 
 ```text
 <page_brief>
-Page type: Team index (entity family). Team directory
+Page type: Team index (entity family). The team directory. Readers expect the people, their roles and specialties, and a route to each profile.
+Search intent: navigational. The reader searched for this client or this page by name and wants to confirm they are in the right place and get to the practical information fast. The first sentence names the client and what this page is. Then the facts the reader came for, in the order they need them: who, what, where, hours, how to reach or use it. Short sections, no persuasion, no background essay; every sentence carries a fact or a direction.
+The page type and the search intent are not suggestions. A page of this type written for a reader with another intent fails the brief, however well it reads.
 Client: Example Client
 What the client does: What the client does, as sent by the app.
 H1 (use verbatim): Sample H1 sent by the app
@@ -71,20 +75,21 @@ Language: write in English.
 
 Structure:
 - Opening paragraph: Key facts: who, role, credentials, where. Not a definitional answer paragraph. Then begin the first H2.
-- Then these H2 sections, in this exact order, with these exact headings. Do not add, merge, rename or reorder them.
-  1. First H2 from the app [90 words]
-  2. Second H2 from the app [90 words]
-  3. Third H2 from the app [90 words]
-  4. Fourth H2 from the app [90 words]
+- These H2 sections, in this order, with these exact headings. Every one of them must appear on the page, word for word: never rename, merge, reorder or drop one.
+  1. First H2 from the app
+  2. Second H2 from the app
+  3. Third H2 from the app
+  4. Fourth H2 from the app
 
-- Formats for this page type: One H3 per team with each member as a bullet (name, role, one line). Prose for the intro only. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
-- Tables are optional. Use one only where it helps the reader.
-- H3 subheadings are required: one H3 per team or department. When you use H3s in a section, use at least two, phrase each as the specific sub-question or item it covers (that is what answer engines quote), keep them in sentence case, and never put an H3 in a section under 150 words. Never use H4.
-- Total length: 200 to 500 words. Aim for about 350.
-- External citations are optional. Any you use must come from the Live Research tool.
+- You may add H2 sections of your own, between or after the supplied ones, when the reader with this intent needs a subject the outline does not cover and it would not fit under a supplied heading without overloading it. Phrase an added H2 as the subject it covers, in sentence case, and keep it before the closing section. Adding a focused section is better than stuffing two subjects under one heading; adding a section the reader does not need is padding.
+- Format of each section: decide it from what the heading asks for and from what your research shows the strongest pages on this subject use for that section. Prose for reasoning, explanation and anything with a "because". A numbered list for a sequence the reader performs in order. A table only when the section sets two or more items against the same attributes (options, figures, dates, thresholds) and a reader would scan it. Bullets only for four or more short parallel items. Never a table where prose answers the heading, never bullets to pad, never a list of one or two items.
+- Tables are optional. Use one only where a section compares items on the same attributes.
+- H3 subheadings: at least one H2 on this page carries two or more H3s. Choose the H2 whose subject splits into distinct sub-questions or items a reader would scan for (the section your research shows answer engines quote), and put at least two H3s there; use H3s in other sections only where they split the same way. Phrase each H3 as the specific sub-question or item it covers, in sentence case. Never one lone H3, never an H3 in a section under 150 words, never an H4.
+- Length: about 350 words for the whole page. Give each section the length its subject needs, not an equal share; a section that answers its heading in 80 words stops there, and a section the reader will act on gets the room. Stay within roughly 20 percent of the target.
 - Research: This page type is written from the client facts and general professional knowledge. Use the Live Research tool only when a sentence needs a specific external figure or quote, and drop the sentence if nothing reliable comes back.
+- External citations are welcome where a figure, a study or a quote needs one; every citation is a markdown link to a source you found with the Live Research tool, with the source named in the sentence. Never cite from memory.
 - Every H2 section opens with a sentence that answers that heading directly, then explains, then gives what varies, then what to check.
-- Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
+- Each section has its own job. Say a thing once, in the section where it belongs. Never recycle a fact to reach a length; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
 Questions this page must answer:
 Readers and answer engines ask these questions. Answer each one once, inside the section where it fits best, with a direct answering sentence first and the evidence after it. Never insert a question as text, never add a question and answer block, never restate the question. The reader must not notice the question was planted.
@@ -92,16 +97,15 @@ Readers and answer engines ask these questions. Answer each one once, inside the
   2. Second AI prompt sent by the app?
 
 Client facts:
-These are the only claims you may make about the client. Use them exactly and invent nothing about the client beyond them. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
-- fact_key_1: fact value from the app
-- fact_key_2: ["list","of","values"]
+These are the only claims you may make about the client. They are material, not a list to reproduce: work each fact into the page at the point where it supports what that section is saying, as evidence inside the argument, in your own sentence. Never list them, never put them all in one section, never copy a fact as a datasheet line, never use a fact twice. A fact that supports nothing on this page is left out. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
+- fact key 1: fact value from the app
+- fact key 2: ["list","of","values"]
 
 Hard rules for this page:
 - Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
 - Never link to the client's own website (https://example.com) and never invent an internal link. Links between the client's pages are placed by a separate process after this page is written. The only client link allowed is the CTA link described below, when there is one.
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
-
 
 CTA:
 There is no call to action on this page. Nowhere on the page do you ask the reader to contact, book, call, schedule, sign up, request or get in touch.
@@ -110,11 +114,13 @@ There is no call to action on this page. Nowhere on the page do you ask the read
 
 ## `team_member_bio` (Team member bio)
 
-Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "optional: use H3s only inside a section over 250 words.", "schema_types": "ProfilePage + Person + BreadcrumbList"}
+Spec: {"words_count_approx": 600, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "research": "none", "closing_heading": "How to contact <name>", "cta_mode": "required", "faq_required": "N", "schema_types": "ProfilePage + Person + BreadcrumbList"}
 
 ```text
 <page_brief>
-Page type: Team member bio (entity family). Individual staff profile
+Page type: Team member bio (entity family). The profile of one staff member. Readers expect the role, expertise, credentials, experience and how to reach or work with this person.
+Search intent: navigational. The reader searched for this client or this page by name and wants to confirm they are in the right place and get to the practical information fast. The first sentence names the client and what this page is. Then the facts the reader came for, in the order they need them: who, what, where, hours, how to reach or use it. Short sections, no persuasion, no background essay; every sentence carries a fact or a direction.
+The page type and the search intent are not suggestions. A page of this type written for a reader with another intent fails the brief, however well it reads.
 Client: Example Client
 What the client does: What the client does, as sent by the app.
 H1 (use verbatim): Sample H1 sent by the app
@@ -124,20 +130,21 @@ Language: write in English.
 
 Structure:
 - Opening paragraph: Key facts: who, role, credentials, where. Not a definitional answer paragraph. Then begin the first H2.
-- Then these H2 sections, in this exact order, with these exact headings. Do not add, merge, rename or reorder them.
-  1. First H2 from the app [98 words]
-  2. Second H2 from the app [98 words]
-  3. Third H2 from the app [98 words]
-  4. Fourth H2 from the app [98 words]
-  5. A closing H2 that you write yourself [about 100 words]. Heading: follow one of these patterns, filling any <...> from the H1 or the facts, in sentence case: How to contact <name>. Never head it "Conclusion", "Summary", "Final thoughts" or "Key takeaways". Content: What a first contact looks like and what the reader should bring, in 50 to 90 words, then the CTA sentence.
-- Formats for this page type: Narrative in prose. Credentials, education, languages, memberships and locations as short bullet lists. No table unless a section compares offices or roles. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
-- Tables are optional. Use one only where it helps the reader.
-- H3 subheadings are optional: use H3s only inside a section over 250 words. When you use H3s in a section, use at least two, phrase each as the specific sub-question or item it covers (that is what answer engines quote), keep them in sentence case, and never put an H3 in a section under 150 words. Never use H4.
-- Total length: 300 to 800 words. Aim for about 550.
-- External citations are optional. Any you use must come from the Live Research tool.
+- These H2 sections, in this order, with these exact headings. Every one of them must appear on the page, word for word: never rename, merge, reorder or drop one.
+  1. First H2 from the app
+  2. Second H2 from the app
+  3. Third H2 from the app
+  4. Fourth H2 from the app
+  5. A closing H2 that you write yourself, about 60 to 120 words. Heading: follow one of these patterns, filling any <...> from the H1 or the facts, in sentence case: How to contact <name>. Never head it "Conclusion", "Summary", "Final thoughts" or "Key takeaways". Content: the one decision or action the reader should take now and why, adding a last useful point instead of summarising the sections, and the call to action as its last sentence or two.
+- You may add H2 sections of your own, between or after the supplied ones, when the reader with this intent needs a subject the outline does not cover and it would not fit under a supplied heading without overloading it. Phrase an added H2 as the subject it covers, in sentence case, and keep it before the closing section. Adding a focused section is better than stuffing two subjects under one heading; adding a section the reader does not need is padding.
+- Format of each section: decide it from what the heading asks for and from what your research shows the strongest pages on this subject use for that section. Prose for reasoning, explanation and anything with a "because". A numbered list for a sequence the reader performs in order. A table only when the section sets two or more items against the same attributes (options, figures, dates, thresholds) and a reader would scan it. Bullets only for four or more short parallel items. Never a table where prose answers the heading, never bullets to pad, never a list of one or two items.
+- Tables are optional. Use one only where a section compares items on the same attributes.
+- H3 subheadings: at least one H2 on this page carries two or more H3s. Choose the H2 whose subject splits into distinct sub-questions or items a reader would scan for (the section your research shows answer engines quote), and put at least two H3s there; use H3s in other sections only where they split the same way. Phrase each H3 as the specific sub-question or item it covers, in sentence case. Never one lone H3, never an H3 in a section under 150 words, never an H4.
+- Length: about 600 words for the whole page. Give each section the length its subject needs, not an equal share; a section that answers its heading in 80 words stops there, and a section the reader will act on gets the room. Stay within roughly 20 percent of the target.
 - Research: This page type is written from the client facts and general professional knowledge. Use the Live Research tool only when a sentence needs a specific external figure or quote, and drop the sentence if nothing reliable comes back.
+- External citations are welcome where a figure, a study or a quote needs one; every citation is a markdown link to a source you found with the Live Research tool, with the source named in the sentence. Never cite from memory.
 - Every H2 section opens with a sentence that answers that heading directly, then explains, then gives what varies, then what to check.
-- Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
+- Each section has its own job. Say a thing once, in the section where it belongs. Never recycle a fact to reach a length; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
 Questions this page must answer:
 Readers and answer engines ask these questions. Answer each one once, inside the section where it fits best, with a direct answering sentence first and the evidence after it. Never insert a question as text, never add a question and answer block, never restate the question. The reader must not notice the question was planted.
@@ -145,9 +152,9 @@ Readers and answer engines ask these questions. Answer each one once, inside the
   2. Second AI prompt sent by the app?
 
 Client facts:
-These are the only claims you may make about the client. Use them exactly and invent nothing about the client beyond them. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
-- fact_key_1: fact value from the app
-- fact_key_2: ["list","of","values"]
+These are the only claims you may make about the client. They are material, not a list to reproduce: work each fact into the page at the point where it supports what that section is saying, as evidence inside the argument, in your own sentence. Never list them, never put them all in one section, never copy a fact as a datasheet line, never use a fact twice. A fact that supports nothing on this page is left out. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
+- fact key 1: fact value from the app
+- fact key 2: ["list","of","values"]
 
 Hard rules for this page:
 - Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
@@ -155,19 +162,20 @@ Hard rules for this page:
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
 
-
 CTA:
-One call to action, in the closing section only (section 5). Direct: one or two plain sentences asking for the one action in the CTA rule, linked to the CTA URL with a two to four word anchor. The action: CTA rule sent by the app.. Link the action to https://example.com/contact/ with a plain anchor of two to four words. That is the only link to the client's site on the page. Outside the closing section, never ask the reader to contact, book, call, schedule, sign up or get in touch, and never write "we" as the client.
+One call to action, at the end of the closing section only (section 5), as its last one or two sentences. It reads as the natural end of the page: a plain statement of what the client does on this subject, from the facts, and the one action to take. The action and its wording: CTA rule sent by the app. Link the action to https://example.com/contact/ with a plain anchor of two to four words. That is the only link to the client's site on the page. Never force it: no urgency, no "don't wait", no "imagine", no superlative, no exclamation, no sentence that could sit in an advert. Outside the closing section, never ask the reader to contact, book, call, schedule, sign up or get in touch, and never write "we" as the client.
 </page_brief>
 ```
 
 ## `author_bio_page` (Author page)
 
-Spec: {"words_min": 300, "words_max": 800, "default_words": 1400, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "optional: use H3s only inside a section over 250 words.", "schema_types": "Person + ProfilePage + BreadcrumbList"}
+Spec: {"words_count_approx": 600, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "research": "none", "closing_heading": "", "cta_mode": "none", "faq_required": "N", "schema_types": "Person + ProfilePage + BreadcrumbList"}
 
 ```text
 <page_brief>
-Page type: Author page (entity family). Author page for bylines
+Page type: Author page (entity family). The author page behind bylines. Readers expect who the author is, their expertise and credentials, what they write about and where else they are published.
+Search intent: navigational. The reader searched for this client or this page by name and wants to confirm they are in the right place and get to the practical information fast. The first sentence names the client and what this page is. Then the facts the reader came for, in the order they need them: who, what, where, hours, how to reach or use it. Short sections, no persuasion, no background essay; every sentence carries a fact or a direction.
+The page type and the search intent are not suggestions. A page of this type written for a reader with another intent fails the brief, however well it reads.
 Client: Example Client
 What the client does: What the client does, as sent by the app.
 H1 (use verbatim): Sample H1 sent by the app
@@ -177,20 +185,21 @@ Language: write in English.
 
 Structure:
 - Opening paragraph: Key facts: who, role, credentials, where. Not a definitional answer paragraph. Then begin the first H2.
-- Then these H2 sections, in this exact order, with these exact headings. Do not add, merge, rename or reorder them.
-  1. First H2 from the app [335 words]
-  2. Second H2 from the app [335 words]
-  3. Third H2 from the app [335 words]
-  4. Fourth H2 from the app [335 words]
+- These H2 sections, in this order, with these exact headings. Every one of them must appear on the page, word for word: never rename, merge, reorder or drop one.
+  1. First H2 from the app
+  2. Second H2 from the app
+  3. Third H2 from the app
+  4. Fourth H2 from the app
 
-- Formats for this page type: Narrative in prose. Credentials and publications as bullets. No table. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
-- Tables are optional. Use one only where it helps the reader.
-- H3 subheadings are optional: use H3s only inside a section over 250 words. When you use H3s in a section, use at least two, phrase each as the specific sub-question or item it covers (that is what answer engines quote), keep them in sentence case, and never put an H3 in a section under 150 words. Never use H4.
-- Total length: 300 to 800 words. Aim for about 1400.
-- External citations are optional. Any you use must come from the Live Research tool.
+- You may add H2 sections of your own, between or after the supplied ones, when the reader with this intent needs a subject the outline does not cover and it would not fit under a supplied heading without overloading it. Phrase an added H2 as the subject it covers, in sentence case, and keep it before the closing section. Adding a focused section is better than stuffing two subjects under one heading; adding a section the reader does not need is padding.
+- Format of each section: decide it from what the heading asks for and from what your research shows the strongest pages on this subject use for that section. Prose for reasoning, explanation and anything with a "because". A numbered list for a sequence the reader performs in order. A table only when the section sets two or more items against the same attributes (options, figures, dates, thresholds) and a reader would scan it. Bullets only for four or more short parallel items. Never a table where prose answers the heading, never bullets to pad, never a list of one or two items.
+- Tables are optional. Use one only where a section compares items on the same attributes.
+- H3 subheadings: at least one H2 on this page carries two or more H3s. Choose the H2 whose subject splits into distinct sub-questions or items a reader would scan for (the section your research shows answer engines quote), and put at least two H3s there; use H3s in other sections only where they split the same way. Phrase each H3 as the specific sub-question or item it covers, in sentence case. Never one lone H3, never an H3 in a section under 150 words, never an H4.
+- Length: about 600 words for the whole page. Give each section the length its subject needs, not an equal share; a section that answers its heading in 80 words stops there, and a section the reader will act on gets the room. Stay within roughly 20 percent of the target.
 - Research: This page type is written from the client facts and general professional knowledge. Use the Live Research tool only when a sentence needs a specific external figure or quote, and drop the sentence if nothing reliable comes back.
+- External citations are welcome where a figure, a study or a quote needs one; every citation is a markdown link to a source you found with the Live Research tool, with the source named in the sentence. Never cite from memory.
 - Every H2 section opens with a sentence that answers that heading directly, then explains, then gives what varies, then what to check.
-- Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
+- Each section has its own job. Say a thing once, in the section where it belongs. Never recycle a fact to reach a length; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
 Questions this page must answer:
 Readers and answer engines ask these questions. Answer each one once, inside the section where it fits best, with a direct answering sentence first and the evidence after it. Never insert a question as text, never add a question and answer block, never restate the question. The reader must not notice the question was planted.
@@ -198,16 +207,15 @@ Readers and answer engines ask these questions. Answer each one once, inside the
   2. Second AI prompt sent by the app?
 
 Client facts:
-These are the only claims you may make about the client. Use them exactly and invent nothing about the client beyond them. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
-- fact_key_1: fact value from the app
-- fact_key_2: ["list","of","values"]
+These are the only claims you may make about the client. They are material, not a list to reproduce: work each fact into the page at the point where it supports what that section is saying, as evidence inside the argument, in your own sentence. Never list them, never put them all in one section, never copy a fact as a datasheet line, never use a fact twice. A fact that supports nothing on this page is left out. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
+- fact key 1: fact value from the app
+- fact key 2: ["list","of","values"]
 
 Hard rules for this page:
 - Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
 - Never link to the client's own website (https://example.com) and never invent an internal link. Links between the client's pages are placed by a separate process after this page is written. The only client link allowed is the CTA link described below, when there is one.
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
-
 
 CTA:
 There is no call to action on this page. Nowhere on the page do you ask the reader to contact, book, call, schedule, sign up, request or get in touch.
@@ -216,11 +224,13 @@ There is no call to action on this page. Nowhere on the page do you ask the read
 
 ## `attorney_bio` (Attorney bio)
 
-Spec: {"words_min": 500, "words_max": 1200, "default_words": 850, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words.", "schema_types": "ProfilePage + Person + BreadcrumbList"}
+Spec: {"words_count_approx": 900, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "research": "none", "closing_heading": "How to book a consultation with <name>", "cta_mode": "required", "faq_required": "N", "schema_types": "ProfilePage + Person + BreadcrumbList"}
 
 ```text
 <page_brief>
-Page type: Attorney bio (entity family). Lawyer profile
+Page type: Attorney bio (entity family). The profile of one lawyer. Readers expect practice areas, bar admissions, education, notable matters, approach and how to book a consultation.
+Search intent: navigational. The reader searched for this client or this page by name and wants to confirm they are in the right place and get to the practical information fast. The first sentence names the client and what this page is. Then the facts the reader came for, in the order they need them: who, what, where, hours, how to reach or use it. Short sections, no persuasion, no background essay; every sentence carries a fact or a direction.
+The page type and the search intent are not suggestions. A page of this type written for a reader with another intent fails the brief, however well it reads.
 Client: Example Client
 What the client does: What the client does, as sent by the app.
 H1 (use verbatim): Sample H1 sent by the app
@@ -230,20 +240,21 @@ Language: write in English.
 
 Structure:
 - Opening paragraph: Key facts: who, role, credentials, where. Not a definitional answer paragraph. Then begin the first H2.
-- Then these H2 sections, in this exact order, with these exact headings. Do not add, merge, rename or reorder them.
-  1. First H2 from the app [172 words]
-  2. Second H2 from the app [172 words]
-  3. Third H2 from the app [172 words]
-  4. Fourth H2 from the app [172 words]
-  5. A closing H2 that you write yourself [about 100 words]. Heading: follow one of these patterns, filling any <...> from the H1 or the facts, in sentence case: How to book a consultation with <name>. Never head it "Conclusion", "Summary", "Final thoughts" or "Key takeaways". Content: What a first contact looks like and what the reader should bring, in 50 to 90 words, then the CTA sentence.
-- Formats for this page type: Narrative in prose. Credentials, education, languages, memberships and locations as short bullet lists. No table unless a section compares offices or roles. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
-- Tables are optional. Use one only where it helps the reader.
-- H3 subheadings are optional: use H3s only inside a section over 250 words. When you use H3s in a section, use at least two, phrase each as the specific sub-question or item it covers (that is what answer engines quote), keep them in sentence case, and never put an H3 in a section under 150 words. Never use H4.
-- Total length: 500 to 1200 words. Aim for about 850.
-- External citations are optional. Any you use must come from the Live Research tool.
+- These H2 sections, in this order, with these exact headings. Every one of them must appear on the page, word for word: never rename, merge, reorder or drop one.
+  1. First H2 from the app
+  2. Second H2 from the app
+  3. Third H2 from the app
+  4. Fourth H2 from the app
+  5. A closing H2 that you write yourself, about 60 to 120 words. Heading: follow one of these patterns, filling any <...> from the H1 or the facts, in sentence case: How to book a consultation with <name>. Never head it "Conclusion", "Summary", "Final thoughts" or "Key takeaways". Content: the one decision or action the reader should take now and why, adding a last useful point instead of summarising the sections, and the call to action as its last sentence or two.
+- You may add H2 sections of your own, between or after the supplied ones, when the reader with this intent needs a subject the outline does not cover and it would not fit under a supplied heading without overloading it. Phrase an added H2 as the subject it covers, in sentence case, and keep it before the closing section. Adding a focused section is better than stuffing two subjects under one heading; adding a section the reader does not need is padding.
+- Format of each section: decide it from what the heading asks for and from what your research shows the strongest pages on this subject use for that section. Prose for reasoning, explanation and anything with a "because". A numbered list for a sequence the reader performs in order. A table only when the section sets two or more items against the same attributes (options, figures, dates, thresholds) and a reader would scan it. Bullets only for four or more short parallel items. Never a table where prose answers the heading, never bullets to pad, never a list of one or two items.
+- Tables are optional. Use one only where a section compares items on the same attributes.
+- H3 subheadings: at least one H2 on this page carries two or more H3s. Choose the H2 whose subject splits into distinct sub-questions or items a reader would scan for (the section your research shows answer engines quote), and put at least two H3s there; use H3s in other sections only where they split the same way. Phrase each H3 as the specific sub-question or item it covers, in sentence case. Never one lone H3, never an H3 in a section under 150 words, never an H4.
+- Length: about 900 words for the whole page. Give each section the length its subject needs, not an equal share; a section that answers its heading in 80 words stops there, and a section the reader will act on gets the room. Stay within roughly 20 percent of the target.
 - Research: This page type is written from the client facts and general professional knowledge. Use the Live Research tool only when a sentence needs a specific external figure or quote, and drop the sentence if nothing reliable comes back.
+- External citations are welcome where a figure, a study or a quote needs one; every citation is a markdown link to a source you found with the Live Research tool, with the source named in the sentence. Never cite from memory.
 - Every H2 section opens with a sentence that answers that heading directly, then explains, then gives what varies, then what to check.
-- Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
+- Each section has its own job. Say a thing once, in the section where it belongs. Never recycle a fact to reach a length; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
 Questions this page must answer:
 Readers and answer engines ask these questions. Answer each one once, inside the section where it fits best, with a direct answering sentence first and the evidence after it. Never insert a question as text, never add a question and answer block, never restate the question. The reader must not notice the question was planted.
@@ -251,29 +262,30 @@ Readers and answer engines ask these questions. Answer each one once, inside the
   2. Second AI prompt sent by the app?
 
 Client facts:
-These are the only claims you may make about the client. Use them exactly and invent nothing about the client beyond them. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
-- fact_key_1: fact value from the app
-- fact_key_2: ["list","of","values"]
+These are the only claims you may make about the client. They are material, not a list to reproduce: work each fact into the page at the point where it supports what that section is saying, as evidence inside the argument, in your own sentence. Never list them, never put them all in one section, never copy a fact as a datasheet line, never use a fact twice. A fact that supports nothing on this page is left out. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
+- fact key 1: fact value from the app
+- fact key 2: ["list","of","values"]
 
 Hard rules for this page:
 - Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
 - Never link to the client's own website (https://example.com) and never invent an internal link. Links between the client's pages are placed by a separate process after this page is written. The only client link allowed is the CTA link described below, when there is one.
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
-- Page type constraints: Bar admissions, education and results only from the facts; results carry the prior-results disclaimer; no expert or specialist unless certified.
 
 CTA:
-One call to action, in the closing section only (section 5). Direct: one or two plain sentences asking for the consultation in the CTA rule, linked to the CTA URL. Bar admissions and any results carry the disclaimers the constraints require. The action: CTA rule sent by the app.. Link the action to https://example.com/contact/ with a plain anchor of two to four words. That is the only link to the client's site on the page. Outside the closing section, never ask the reader to contact, book, call, schedule, sign up or get in touch, and never write "we" as the client.
+One call to action, at the end of the closing section only (section 5), as its last one or two sentences. It reads as the natural end of the page: a plain statement of what the client does on this subject, from the facts, and the one action to take. The action and its wording: CTA rule sent by the app. Link the action to https://example.com/contact/ with a plain anchor of two to four words. That is the only link to the client's site on the page. Never force it: no urgency, no "don't wait", no "imagine", no superlative, no exclamation, no sentence that could sit in an advert. Outside the closing section, never ask the reader to contact, book, call, schedule, sign up or get in touch, and never write "we" as the client.
 </page_brief>
 ```
 
 ## `provider_profile` (Provider profile)
 
-Spec: {"words_min": 400, "words_max": 1000, "default_words": 700, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words.", "schema_types": "ProfilePage + Person + Organization + BreadcrumbList"}
+Spec: {"words_count_approx": 700, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "research": "none", "closing_heading": "How to book an appointment with <name>", "cta_mode": "required", "faq_required": "N", "schema_types": "ProfilePage + Person + Organization + BreadcrumbList"}
 
 ```text
 <page_brief>
-Page type: Provider profile (entity family). Clinician profile
+Page type: Provider profile (entity family). The profile of one clinician. Readers expect specialties, credentials, conditions treated, approach, locations, insurance and how to book.
+Search intent: navigational. The reader searched for this client or this page by name and wants to confirm they are in the right place and get to the practical information fast. The first sentence names the client and what this page is. Then the facts the reader came for, in the order they need them: who, what, where, hours, how to reach or use it. Short sections, no persuasion, no background essay; every sentence carries a fact or a direction.
+The page type and the search intent are not suggestions. A page of this type written for a reader with another intent fails the brief, however well it reads.
 Client: Example Client
 What the client does: What the client does, as sent by the app.
 H1 (use verbatim): Sample H1 sent by the app
@@ -283,20 +295,21 @@ Language: write in English.
 
 Structure:
 - Opening paragraph: Key facts: who, role, credentials, where. Not a definitional answer paragraph. Then begin the first H2.
-- Then these H2 sections, in this exact order, with these exact headings. Do not add, merge, rename or reorder them.
-  1. First H2 from the app [135 words]
-  2. Second H2 from the app [135 words]
-  3. Third H2 from the app [135 words]
-  4. Fourth H2 from the app [135 words]
-  5. A closing H2 that you write yourself [about 100 words]. Heading: follow one of these patterns, filling any <...> from the H1 or the facts, in sentence case: How to book an appointment with <name>. Never head it "Conclusion", "Summary", "Final thoughts" or "Key takeaways". Content: What a first contact looks like and what the reader should bring, in 50 to 90 words, then the CTA sentence.
-- Formats for this page type: Narrative in prose. Credentials, education, languages, memberships and locations as short bullet lists. No table unless a section compares offices or roles. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
-- Tables are optional. Use one only where it helps the reader.
-- H3 subheadings are optional: use H3s only inside a section over 250 words. When you use H3s in a section, use at least two, phrase each as the specific sub-question or item it covers (that is what answer engines quote), keep them in sentence case, and never put an H3 in a section under 150 words. Never use H4.
-- Total length: 400 to 1000 words. Aim for about 700.
-- External citations are optional. Any you use must come from the Live Research tool.
+- These H2 sections, in this order, with these exact headings. Every one of them must appear on the page, word for word: never rename, merge, reorder or drop one.
+  1. First H2 from the app
+  2. Second H2 from the app
+  3. Third H2 from the app
+  4. Fourth H2 from the app
+  5. A closing H2 that you write yourself, about 60 to 120 words. Heading: follow one of these patterns, filling any <...> from the H1 or the facts, in sentence case: How to book an appointment with <name>. Never head it "Conclusion", "Summary", "Final thoughts" or "Key takeaways". Content: the one decision or action the reader should take now and why, adding a last useful point instead of summarising the sections, and the call to action as its last sentence or two.
+- You may add H2 sections of your own, between or after the supplied ones, when the reader with this intent needs a subject the outline does not cover and it would not fit under a supplied heading without overloading it. Phrase an added H2 as the subject it covers, in sentence case, and keep it before the closing section. Adding a focused section is better than stuffing two subjects under one heading; adding a section the reader does not need is padding.
+- Format of each section: decide it from what the heading asks for and from what your research shows the strongest pages on this subject use for that section. Prose for reasoning, explanation and anything with a "because". A numbered list for a sequence the reader performs in order. A table only when the section sets two or more items against the same attributes (options, figures, dates, thresholds) and a reader would scan it. Bullets only for four or more short parallel items. Never a table where prose answers the heading, never bullets to pad, never a list of one or two items.
+- Tables are optional. Use one only where a section compares items on the same attributes.
+- H3 subheadings: at least one H2 on this page carries two or more H3s. Choose the H2 whose subject splits into distinct sub-questions or items a reader would scan for (the section your research shows answer engines quote), and put at least two H3s there; use H3s in other sections only where they split the same way. Phrase each H3 as the specific sub-question or item it covers, in sentence case. Never one lone H3, never an H3 in a section under 150 words, never an H4.
+- Length: about 700 words for the whole page. Give each section the length its subject needs, not an equal share; a section that answers its heading in 80 words stops there, and a section the reader will act on gets the room. Stay within roughly 20 percent of the target.
 - Research: This page type is written from the client facts and general professional knowledge. Use the Live Research tool only when a sentence needs a specific external figure or quote, and drop the sentence if nothing reliable comes back.
+- External citations are welcome where a figure, a study or a quote needs one; every citation is a markdown link to a source you found with the Live Research tool, with the source named in the sentence. Never cite from memory.
 - Every H2 section opens with a sentence that answers that heading directly, then explains, then gives what varies, then what to check.
-- Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
+- Each section has its own job. Say a thing once, in the section where it belongs. Never recycle a fact to reach a length; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
 Questions this page must answer:
 Readers and answer engines ask these questions. Answer each one once, inside the section where it fits best, with a direct answering sentence first and the evidence after it. Never insert a question as text, never add a question and answer block, never restate the question. The reader must not notice the question was planted.
@@ -304,29 +317,30 @@ Readers and answer engines ask these questions. Answer each one once, inside the
   2. Second AI prompt sent by the app?
 
 Client facts:
-These are the only claims you may make about the client. Use them exactly and invent nothing about the client beyond them. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
-- fact_key_1: fact value from the app
-- fact_key_2: ["list","of","values"]
+These are the only claims you may make about the client. They are material, not a list to reproduce: work each fact into the page at the point where it supports what that section is saying, as evidence inside the argument, in your own sentence. Never list them, never put them all in one section, never copy a fact as a datasheet line, never use a fact twice. A fact that supports nothing on this page is left out. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
+- fact key 1: fact value from the app
+- fact key 2: ["list","of","values"]
 
 Hard rules for this page:
 - Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
 - Never link to the client's own website (https://example.com) and never invent an internal link. Links between the client's pages are placed by a separate process after this page is written. The only client link allowed is the CTA link described below, when there is one.
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
-- Page type constraints: Credentials, board certifications and licence data only from the facts; no superlatives such as best or top.
 
 CTA:
-One call to action, in the closing section only (section 5). Direct: one or two plain sentences asking for the appointment in the CTA rule, linked to the CTA URL. No medical outcome promise. The action: CTA rule sent by the app.. Link the action to https://example.com/contact/ with a plain anchor of two to four words. That is the only link to the client's site on the page. Outside the closing section, never ask the reader to contact, book, call, schedule, sign up or get in touch, and never write "we" as the client.
+One call to action, at the end of the closing section only (section 5), as its last one or two sentences. It reads as the natural end of the page: a plain statement of what the client does on this subject, from the facts, and the one action to take. The action and its wording: CTA rule sent by the app. Link the action to https://example.com/contact/ with a plain anchor of two to four words. That is the only link to the client's site on the page. Never force it: no urgency, no "don't wait", no "imagine", no superlative, no exclamation, no sentence that could sit in an advert. Outside the closing section, never ask the reader to contact, book, call, schedule, sign up or get in touch, and never write "we" as the client.
 </page_brief>
 ```
 
 ## `agent_profile` (Agent profile)
 
-Spec: {"words_min": 400, "words_max": 900, "default_words": 650, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "required", "h3_policy": "optional: use H3s only inside a section over 250 words.", "schema_types": "ProfilePage + Person + BreadcrumbList"}
+Spec: {"words_count_approx": 650, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "research": "none", "closing_heading": "How to contact <name>", "cta_mode": "required", "faq_required": "N", "schema_types": "ProfilePage + Person + BreadcrumbList"}
 
 ```text
 <page_brief>
-Page type: Agent profile (entity family). Real estate or insurance agent
+Page type: Agent profile (entity family). The profile of one real estate or insurance agent. Readers expect the areas or lines served, experience, licences, results and how to contact the agent.
+Search intent: navigational. The reader searched for this client or this page by name and wants to confirm they are in the right place and get to the practical information fast. The first sentence names the client and what this page is. Then the facts the reader came for, in the order they need them: who, what, where, hours, how to reach or use it. Short sections, no persuasion, no background essay; every sentence carries a fact or a direction.
+The page type and the search intent are not suggestions. A page of this type written for a reader with another intent fails the brief, however well it reads.
 Client: Example Client
 What the client does: What the client does, as sent by the app.
 H1 (use verbatim): Sample H1 sent by the app
@@ -336,20 +350,21 @@ Language: write in English.
 
 Structure:
 - Opening paragraph: Key facts: who, role, credentials, where. Not a definitional answer paragraph. Then begin the first H2.
-- Then these H2 sections, in this exact order, with these exact headings. Do not add, merge, rename or reorder them.
-  1. First H2 from the app [122 words]
-  2. Second H2 from the app [122 words]
-  3. Third H2 from the app [122 words]
-  4. Fourth H2 from the app [122 words]
-  5. A closing H2 that you write yourself [about 100 words]. Heading: follow one of these patterns, filling any <...> from the H1 or the facts, in sentence case: How to contact <name>. Never head it "Conclusion", "Summary", "Final thoughts" or "Key takeaways". Content: What a first contact looks like and what the reader should bring, in 50 to 90 words, then the CTA sentence.
-- Formats for this page type: Narrative in prose. Credentials, education, languages, memberships and locations as short bullet lists. No table unless a section compares offices or roles. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
-- Tables are optional. Use one only where it helps the reader.
-- H3 subheadings are optional: use H3s only inside a section over 250 words. When you use H3s in a section, use at least two, phrase each as the specific sub-question or item it covers (that is what answer engines quote), keep them in sentence case, and never put an H3 in a section under 150 words. Never use H4.
-- Total length: 400 to 900 words. Aim for about 650.
-- External citations are optional. Any you use must come from the Live Research tool.
+- These H2 sections, in this order, with these exact headings. Every one of them must appear on the page, word for word: never rename, merge, reorder or drop one.
+  1. First H2 from the app
+  2. Second H2 from the app
+  3. Third H2 from the app
+  4. Fourth H2 from the app
+  5. A closing H2 that you write yourself, about 60 to 120 words. Heading: follow one of these patterns, filling any <...> from the H1 or the facts, in sentence case: How to contact <name>. Never head it "Conclusion", "Summary", "Final thoughts" or "Key takeaways". Content: the one decision or action the reader should take now and why, adding a last useful point instead of summarising the sections, and the call to action as its last sentence or two.
+- You may add H2 sections of your own, between or after the supplied ones, when the reader with this intent needs a subject the outline does not cover and it would not fit under a supplied heading without overloading it. Phrase an added H2 as the subject it covers, in sentence case, and keep it before the closing section. Adding a focused section is better than stuffing two subjects under one heading; adding a section the reader does not need is padding.
+- Format of each section: decide it from what the heading asks for and from what your research shows the strongest pages on this subject use for that section. Prose for reasoning, explanation and anything with a "because". A numbered list for a sequence the reader performs in order. A table only when the section sets two or more items against the same attributes (options, figures, dates, thresholds) and a reader would scan it. Bullets only for four or more short parallel items. Never a table where prose answers the heading, never bullets to pad, never a list of one or two items.
+- Tables are optional. Use one only where a section compares items on the same attributes.
+- H3 subheadings: at least one H2 on this page carries two or more H3s. Choose the H2 whose subject splits into distinct sub-questions or items a reader would scan for (the section your research shows answer engines quote), and put at least two H3s there; use H3s in other sections only where they split the same way. Phrase each H3 as the specific sub-question or item it covers, in sentence case. Never one lone H3, never an H3 in a section under 150 words, never an H4.
+- Length: about 650 words for the whole page. Give each section the length its subject needs, not an equal share; a section that answers its heading in 80 words stops there, and a section the reader will act on gets the room. Stay within roughly 20 percent of the target.
 - Research: This page type is written from the client facts and general professional knowledge. Use the Live Research tool only when a sentence needs a specific external figure or quote, and drop the sentence if nothing reliable comes back.
+- External citations are welcome where a figure, a study or a quote needs one; every citation is a markdown link to a source you found with the Live Research tool, with the source named in the sentence. Never cite from memory.
 - Every H2 section opens with a sentence that answers that heading directly, then explains, then gives what varies, then what to check.
-- Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
+- Each section has its own job. Say a thing once, in the section where it belongs. Never recycle a fact to reach a length; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
 Questions this page must answer:
 Readers and answer engines ask these questions. Answer each one once, inside the section where it fits best, with a direct answering sentence first and the evidence after it. Never insert a question as text, never add a question and answer block, never restate the question. The reader must not notice the question was planted.
@@ -357,9 +372,9 @@ Readers and answer engines ask these questions. Answer each one once, inside the
   2. Second AI prompt sent by the app?
 
 Client facts:
-These are the only claims you may make about the client. Use them exactly and invent nothing about the client beyond them. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
-- fact_key_1: fact value from the app
-- fact_key_2: ["list","of","values"]
+These are the only claims you may make about the client. They are material, not a list to reproduce: work each fact into the page at the point where it supports what that section is saying, as evidence inside the argument, in your own sentence. Never list them, never put them all in one section, never copy a fact as a datasheet line, never use a fact twice. A fact that supports nothing on this page is left out. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
+- fact key 1: fact value from the app
+- fact key 2: ["list","of","values"]
 
 Hard rules for this page:
 - Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
@@ -367,19 +382,20 @@ Hard rules for this page:
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
 
-
 CTA:
-One call to action, in the closing section only (section 5). Direct: one or two plain sentences asking for the one action in the CTA rule, linked to the CTA URL with a two to four word anchor. The action: CTA rule sent by the app.. Link the action to https://example.com/contact/ with a plain anchor of two to four words. That is the only link to the client's site on the page. Outside the closing section, never ask the reader to contact, book, call, schedule, sign up or get in touch, and never write "we" as the client.
+One call to action, at the end of the closing section only (section 5), as its last one or two sentences. It reads as the natural end of the page: a plain statement of what the client does on this subject, from the facts, and the one action to take. The action and its wording: CTA rule sent by the app. Link the action to https://example.com/contact/ with a plain anchor of two to four words. That is the only link to the client's site on the page. Never force it: no urgency, no "don't wait", no "imagine", no superlative, no exclamation, no sentence that could sit in an advert. Outside the closing section, never ask the reader to contact, book, call, schedule, sign up or get in touch, and never write "we" as the client.
 </page_brief>
 ```
 
 ## `partner_vendor_profile` (Partner vendor profile)
 
-Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "optional", "h3_policy": "optional: use H3s only inside a section over 250 words.", "schema_types": "ProfilePage + Organization + BreadcrumbList"}
+Spec: {"words_count_approx": 550, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "research": "none", "closing_heading": "How to contact <partner>", "cta_mode": "none", "faq_required": "N", "schema_types": "ProfilePage + Organization + BreadcrumbList"}
 
 ```text
 <page_brief>
-Page type: Partner vendor profile (entity family). Partner or vendor listing
+Page type: Partner vendor profile (entity family). A listing of one partner or vendor. Readers expect what the partner does, what it offers through the client, its credentials and how to engage it.
+Search intent: navigational. The reader searched for this client or this page by name and wants to confirm they are in the right place and get to the practical information fast. The first sentence names the client and what this page is. Then the facts the reader came for, in the order they need them: who, what, where, hours, how to reach or use it. Short sections, no persuasion, no background essay; every sentence carries a fact or a direction.
+The page type and the search intent are not suggestions. A page of this type written for a reader with another intent fails the brief, however well it reads.
 Client: Example Client
 What the client does: What the client does, as sent by the app.
 H1 (use verbatim): Sample H1 sent by the app
@@ -389,20 +405,21 @@ Language: write in English.
 
 Structure:
 - Opening paragraph: Key facts: who, role, credentials, where. Not a definitional answer paragraph. Then begin the first H2.
-- Then these H2 sections, in this exact order, with these exact headings. Do not add, merge, rename or reorder them.
-  1. First H2 from the app [98 words]
-  2. Second H2 from the app [98 words]
-  3. Third H2 from the app [98 words]
-  4. Fourth H2 from the app [98 words]
-  5. A closing H2 that you write yourself [about 100 words]. Heading: follow one of these patterns, filling any <...> from the H1 or the facts, in sentence case: How to contact <partner>. Never head it "Conclusion", "Summary", "Final thoughts" or "Key takeaways". Content: What a first contact looks like and what the reader should bring, in 50 to 90 words, then the CTA sentence.
-- Formats for this page type: Narrative in prose. Credentials, education, languages, memberships and locations as short bullet lists. No table unless a section compares offices or roles. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
-- Tables are optional. Use one only where it helps the reader.
-- H3 subheadings are optional: use H3s only inside a section over 250 words. When you use H3s in a section, use at least two, phrase each as the specific sub-question or item it covers (that is what answer engines quote), keep them in sentence case, and never put an H3 in a section under 150 words. Never use H4.
-- Total length: 300 to 800 words. Aim for about 550.
-- External citations are optional. Any you use must come from the Live Research tool.
+- These H2 sections, in this order, with these exact headings. Every one of them must appear on the page, word for word: never rename, merge, reorder or drop one.
+  1. First H2 from the app
+  2. Second H2 from the app
+  3. Third H2 from the app
+  4. Fourth H2 from the app
+  5. A closing H2 that you write yourself, about 60 to 120 words. Heading: follow one of these patterns, filling any <...> from the H1 or the facts, in sentence case: How to contact <partner>. Never head it "Conclusion", "Summary", "Final thoughts" or "Key takeaways". Content: the one decision or action the reader should take now and why, adding a last useful point instead of summarising the sections.
+- You may add H2 sections of your own, between or after the supplied ones, when the reader with this intent needs a subject the outline does not cover and it would not fit under a supplied heading without overloading it. Phrase an added H2 as the subject it covers, in sentence case, and keep it before the closing section. Adding a focused section is better than stuffing two subjects under one heading; adding a section the reader does not need is padding.
+- Format of each section: decide it from what the heading asks for and from what your research shows the strongest pages on this subject use for that section. Prose for reasoning, explanation and anything with a "because". A numbered list for a sequence the reader performs in order. A table only when the section sets two or more items against the same attributes (options, figures, dates, thresholds) and a reader would scan it. Bullets only for four or more short parallel items. Never a table where prose answers the heading, never bullets to pad, never a list of one or two items.
+- Tables are optional. Use one only where a section compares items on the same attributes.
+- H3 subheadings: at least one H2 on this page carries two or more H3s. Choose the H2 whose subject splits into distinct sub-questions or items a reader would scan for (the section your research shows answer engines quote), and put at least two H3s there; use H3s in other sections only where they split the same way. Phrase each H3 as the specific sub-question or item it covers, in sentence case. Never one lone H3, never an H3 in a section under 150 words, never an H4.
+- Length: about 550 words for the whole page. Give each section the length its subject needs, not an equal share; a section that answers its heading in 80 words stops there, and a section the reader will act on gets the room. Stay within roughly 20 percent of the target.
 - Research: This page type is written from the client facts and general professional knowledge. Use the Live Research tool only when a sentence needs a specific external figure or quote, and drop the sentence if nothing reliable comes back.
+- External citations are welcome where a figure, a study or a quote needs one; every citation is a markdown link to a source you found with the Live Research tool, with the source named in the sentence. Never cite from memory.
 - Every H2 section opens with a sentence that answers that heading directly, then explains, then gives what varies, then what to check.
-- Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
+- Each section has its own job. Say a thing once, in the section where it belongs. Never recycle a fact to reach a length; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
 Questions this page must answer:
 Readers and answer engines ask these questions. Answer each one once, inside the section where it fits best, with a direct answering sentence first and the evidence after it. Never insert a question as text, never add a question and answer block, never restate the question. The reader must not notice the question was planted.
@@ -410,9 +427,9 @@ Readers and answer engines ask these questions. Answer each one once, inside the
   2. Second AI prompt sent by the app?
 
 Client facts:
-These are the only claims you may make about the client. Use them exactly and invent nothing about the client beyond them. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
-- fact_key_1: fact value from the app
-- fact_key_2: ["list","of","values"]
+These are the only claims you may make about the client. They are material, not a list to reproduce: work each fact into the page at the point where it supports what that section is saying, as evidence inside the argument, in your own sentence. Never list them, never put them all in one section, never copy a fact as a datasheet line, never use a fact twice. A fact that supports nothing on this page is left out. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
+- fact key 1: fact value from the app
+- fact key 2: ["list","of","values"]
 
 Hard rules for this page:
 - Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
@@ -420,19 +437,20 @@ Hard rules for this page:
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
 
-
 CTA:
-One call to action, in the closing section only (section 5). Direct: one or two plain sentences asking for the one action in the CTA rule, linked to the CTA URL with a two to four word anchor. The action: CTA rule sent by the app.. Link the action to https://example.com/contact/ with a plain anchor of two to four words. That is the only link to the client's site on the page. Outside the closing section, never ask the reader to contact, book, call, schedule, sign up or get in touch, and never write "we" as the client.
+There is no call to action on this page. Nowhere on the page do you ask the reader to contact, book, call, schedule, sign up, request or get in touch.
 </page_brief>
 ```
 
 ## `company_facts_page` (Company facts)
 
-Spec: {"words_min": 300, "words_max": 800, "default_words": 550, "answer_paragraph": true, "answer_style": "key_facts", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "none.", "schema_types": "Organization + ProfilePage + BreadcrumbList"}
+Spec: {"words_count_approx": 550, "answer_paragraph": true, "answer_style": "key_facts", "tables_min": 0, "research": "none", "closing_heading": "", "cta_mode": "none", "faq_required": "N", "schema_types": "Organization + ProfilePage + BreadcrumbList"}
 
 ```text
 <page_brief>
-Page type: Company facts (entity family). Programmatic company profile
+Page type: Company facts (entity family). A programmatic profile of one company. Readers expect the key facts in a fixed order: what it does, size, location, founding, leadership and sources.
+Search intent: navigational. The reader searched for this client or this page by name and wants to confirm they are in the right place and get to the practical information fast. The first sentence names the client and what this page is. Then the facts the reader came for, in the order they need them: who, what, where, hours, how to reach or use it. Short sections, no persuasion, no background essay; every sentence carries a fact or a direction.
+The page type and the search intent are not suggestions. A page of this type written for a reader with another intent fails the brief, however well it reads.
 Client: Example Client
 What the client does: What the client does, as sent by the app.
 H1 (use verbatim): Sample H1 sent by the app
@@ -442,20 +460,21 @@ Language: write in English.
 
 Structure:
 - Opening paragraph: a direct answer of 40 to 80 words in the key facts style (Key facts: who, role, credentials, where). No heading above it, no preamble. It answers the question the H1 implies.
-- Then these H2 sections, in this exact order, with these exact headings. Do not add, merge, rename or reorder them.
-  1. First H2 from the app [118 words]
-  2. Second H2 from the app [118 words]
-  3. Third H2 from the app [118 words]
-  4. Fourth H2 from the app [118 words]
+- These H2 sections, in this order, with these exact headings. Every one of them must appear on the page, word for word: never rename, merge, reorder or drop one.
+  1. First H2 from the app
+  2. Second H2 from the app
+  3. Third H2 from the app
+  4. Fourth H2 from the app
 
-- Formats for this page type: Facts in a two column table (fact, value). Prose only for context. No bullets. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
-- Tables are optional. Use one only where it helps the reader.
-- No H3 subheadings on this page type. 
-- Total length: 300 to 800 words. Aim for about 550.
-- External citations are optional. Any you use must come from the Live Research tool.
+- You may add H2 sections of your own, between or after the supplied ones, when the reader with this intent needs a subject the outline does not cover and it would not fit under a supplied heading without overloading it. Phrase an added H2 as the subject it covers, in sentence case, and keep it before the closing section. Adding a focused section is better than stuffing two subjects under one heading; adding a section the reader does not need is padding.
+- Format of each section: decide it from what the heading asks for and from what your research shows the strongest pages on this subject use for that section. Prose for reasoning, explanation and anything with a "because". A numbered list for a sequence the reader performs in order. A table only when the section sets two or more items against the same attributes (options, figures, dates, thresholds) and a reader would scan it. Bullets only for four or more short parallel items. Never a table where prose answers the heading, never bullets to pad, never a list of one or two items.
+- Tables are optional. Use one only where a section compares items on the same attributes.
+- H3 subheadings: at least one H2 on this page carries two or more H3s. Choose the H2 whose subject splits into distinct sub-questions or items a reader would scan for (the section your research shows answer engines quote), and put at least two H3s there; use H3s in other sections only where they split the same way. Phrase each H3 as the specific sub-question or item it covers, in sentence case. Never one lone H3, never an H3 in a section under 150 words, never an H4.
+- Length: about 550 words for the whole page. Give each section the length its subject needs, not an equal share; a section that answers its heading in 80 words stops there, and a section the reader will act on gets the room. Stay within roughly 20 percent of the target.
 - Research: This page type is written from the client facts and general professional knowledge. Use the Live Research tool only when a sentence needs a specific external figure or quote, and drop the sentence if nothing reliable comes back.
+- External citations are welcome where a figure, a study or a quote needs one; every citation is a markdown link to a source you found with the Live Research tool, with the source named in the sentence. Never cite from memory.
 - Every H2 section opens with a sentence that answers that heading directly, then explains, then gives what varies, then what to check.
-- Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
+- Each section has its own job. Say a thing once, in the section where it belongs. Never recycle a fact to reach a length; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
 Questions this page must answer:
 Readers and answer engines ask these questions. Answer each one once, inside the section where it fits best, with a direct answering sentence first and the evidence after it. Never insert a question as text, never add a question and answer block, never restate the question. The reader must not notice the question was planted.
@@ -463,16 +482,15 @@ Readers and answer engines ask these questions. Answer each one once, inside the
   2. Second AI prompt sent by the app?
 
 Client facts:
-These are the only claims you may make about the client. Use them exactly and invent nothing about the client beyond them. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
-- fact_key_1: fact value from the app
-- fact_key_2: ["list","of","values"]
+These are the only claims you may make about the client. They are material, not a list to reproduce: work each fact into the page at the point where it supports what that section is saying, as evidence inside the argument, in your own sentence. Never list them, never put them all in one section, never copy a fact as a datasheet line, never use a fact twice. A fact that supports nothing on this page is left out. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
+- fact key 1: fact value from the app
+- fact key 2: ["list","of","values"]
 
 Hard rules for this page:
 - Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
 - Never link to the client's own website (https://example.com) and never invent an internal link. Links between the client's pages are placed by a separate process after this page is written. The only client link allowed is the CTA link described below, when there is one.
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
-
 
 CTA:
 There is no call to action on this page. Nowhere on the page do you ask the reader to contact, book, call, schedule, sign up, request or get in touch.
@@ -481,11 +499,13 @@ There is no call to action on this page. Nowhere on the page do you ask the read
 
 ## `press_room` (Press room)
 
-Spec: {"words_min": 200, "words_max": 500, "default_words": 350, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "none", "cta_mode": "none", "h3_policy": "optional: one H3 per year when there are many releases.", "schema_types": "CollectionPage + Organization + BreadcrumbList"}
+Spec: {"words_count_approx": 350, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "research": "none", "closing_heading": "", "cta_mode": "none", "faq_required": "N", "schema_types": "CollectionPage + Organization + BreadcrumbList"}
 
 ```text
 <page_brief>
-Page type: Press room (entity family). Media kit and releases index
+Page type: Press room (entity family). The media kit and press release index. Readers expect company facts for journalists, brand assets, recent releases and the press contact.
+Search intent: navigational. The reader searched for this client or this page by name and wants to confirm they are in the right place and get to the practical information fast. The first sentence names the client and what this page is. Then the facts the reader came for, in the order they need them: who, what, where, hours, how to reach or use it. Short sections, no persuasion, no background essay; every sentence carries a fact or a direction.
+The page type and the search intent are not suggestions. A page of this type written for a reader with another intent fails the brief, however well it reads.
 Client: Example Client
 What the client does: What the client does, as sent by the app.
 H1 (use verbatim): Sample H1 sent by the app
@@ -495,20 +515,21 @@ Language: write in English.
 
 Structure:
 - Opening paragraph: Key facts: who, role, credentials, where. Not a definitional answer paragraph. Then begin the first H2.
-- Then these H2 sections, in this exact order, with these exact headings. Do not add, merge, rename or reorder them.
-  1. First H2 from the app [90 words]
-  2. Second H2 from the app [90 words]
-  3. Third H2 from the app [90 words]
-  4. Fourth H2 from the app [90 words]
+- These H2 sections, in this order, with these exact headings. Every one of them must appear on the page, word for word: never rename, merge, reorder or drop one.
+  1. First H2 from the app
+  2. Second H2 from the app
+  3. Third H2 from the app
+  4. Fourth H2 from the app
 
-- Formats for this page type: Releases as a bulleted list with the date and the headline. Media contact as a short block. Prose for the intro only. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
-- Tables are optional. Use one only where it helps the reader.
-- H3 subheadings are optional: one H3 per year when there are many releases. When you use H3s in a section, use at least two, phrase each as the specific sub-question or item it covers (that is what answer engines quote), keep them in sentence case, and never put an H3 in a section under 150 words. Never use H4.
-- Total length: 200 to 500 words. Aim for about 350.
-- External citations are optional. Any you use must come from the Live Research tool.
+- You may add H2 sections of your own, between or after the supplied ones, when the reader with this intent needs a subject the outline does not cover and it would not fit under a supplied heading without overloading it. Phrase an added H2 as the subject it covers, in sentence case, and keep it before the closing section. Adding a focused section is better than stuffing two subjects under one heading; adding a section the reader does not need is padding.
+- Format of each section: decide it from what the heading asks for and from what your research shows the strongest pages on this subject use for that section. Prose for reasoning, explanation and anything with a "because". A numbered list for a sequence the reader performs in order. A table only when the section sets two or more items against the same attributes (options, figures, dates, thresholds) and a reader would scan it. Bullets only for four or more short parallel items. Never a table where prose answers the heading, never bullets to pad, never a list of one or two items.
+- Tables are optional. Use one only where a section compares items on the same attributes.
+- H3 subheadings: at least one H2 on this page carries two or more H3s. Choose the H2 whose subject splits into distinct sub-questions or items a reader would scan for (the section your research shows answer engines quote), and put at least two H3s there; use H3s in other sections only where they split the same way. Phrase each H3 as the specific sub-question or item it covers, in sentence case. Never one lone H3, never an H3 in a section under 150 words, never an H4.
+- Length: about 350 words for the whole page. Give each section the length its subject needs, not an equal share; a section that answers its heading in 80 words stops there, and a section the reader will act on gets the room. Stay within roughly 20 percent of the target.
 - Research: This page type is written from the client facts and general professional knowledge. Use the Live Research tool only when a sentence needs a specific external figure or quote, and drop the sentence if nothing reliable comes back.
+- External citations are welcome where a figure, a study or a quote needs one; every citation is a markdown link to a source you found with the Live Research tool, with the source named in the sentence. Never cite from memory.
 - Every H2 section opens with a sentence that answers that heading directly, then explains, then gives what varies, then what to check.
-- Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
+- Each section has its own job. Say a thing once, in the section where it belongs. Never recycle a fact to reach a length; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
 Questions this page must answer:
 Readers and answer engines ask these questions. Answer each one once, inside the section where it fits best, with a direct answering sentence first and the evidence after it. Never insert a question as text, never add a question and answer block, never restate the question. The reader must not notice the question was planted.
@@ -516,16 +537,15 @@ Readers and answer engines ask these questions. Answer each one once, inside the
   2. Second AI prompt sent by the app?
 
 Client facts:
-These are the only claims you may make about the client. Use them exactly and invent nothing about the client beyond them. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
-- fact_key_1: fact value from the app
-- fact_key_2: ["list","of","values"]
+These are the only claims you may make about the client. They are material, not a list to reproduce: work each fact into the page at the point where it supports what that section is saying, as evidence inside the argument, in your own sentence. Never list them, never put them all in one section, never copy a fact as a datasheet line, never use a fact twice. A fact that supports nothing on this page is left out. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
+- fact key 1: fact value from the app
+- fact key 2: ["list","of","values"]
 
 Hard rules for this page:
 - Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
 - Never link to the client's own website (https://example.com) and never invent an internal link. Links between the client's pages are placed by a separate process after this page is written. The only client link allowed is the CTA link described below, when there is one.
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
-
 
 CTA:
 There is no call to action on this page. Nowhere on the page do you ask the reader to contact, book, call, schedule, sign up, request or get in touch.
@@ -534,11 +554,13 @@ There is no call to action on this page. Nowhere on the page do you ask the read
 
 ## `press_release_news` (Press release news)
 
-Spec: {"words_min": 400, "words_max": 900, "default_words": 650, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "citations_min": 0, "research": "none", "closing_mode": "append", "cta_mode": "none", "h3_policy": "none.", "schema_types": "NewsArticle + BreadcrumbList"}
+Spec: {"words_count_approx": 650, "answer_paragraph": false, "answer_style": "none", "tables_min": 0, "research": "none", "closing_heading": "About <client>", "cta_mode": "none", "faq_required": "N", "schema_types": "NewsArticle + BreadcrumbList"}
 
 ```text
 <page_brief>
-Page type: Press release news (entity family). Single press release
+Page type: Press release news (entity family). A single press release. Readers expect the news in the first paragraph, the facts and quotes that support it, background on the company and a contact.
+Search intent: navigational. The reader searched for this client or this page by name and wants to confirm they are in the right place and get to the practical information fast. The first sentence names the client and what this page is. Then the facts the reader came for, in the order they need them: who, what, where, hours, how to reach or use it. Short sections, no persuasion, no background essay; every sentence carries a fact or a direction.
+The page type and the search intent are not suggestions. A page of this type written for a reader with another intent fails the brief, however well it reads.
 Client: Example Client
 What the client does: What the client does, as sent by the app.
 H1 (use verbatim): Sample H1 sent by the app
@@ -548,20 +570,21 @@ Language: write in English.
 
 Structure:
 - Opening paragraph: Key facts: who, role, credentials, where. Not a definitional answer paragraph. Then begin the first H2.
-- Then these H2 sections, in this exact order, with these exact headings. Do not add, merge, rename or reorder them.
-  1. First H2 from the app [122 words]
-  2. Second H2 from the app [122 words]
-  3. Third H2 from the app [122 words]
-  4. Fourth H2 from the app [122 words]
-  5. A closing H2 that you write yourself [about 100 words]. Heading: follow one of these patterns, filling any <...> from the H1 or the facts, in sentence case: About <client>. Never head it "Conclusion", "Summary", "Final thoughts" or "Key takeaways". Content: The standard boilerplate paragraph about the client from the facts, 50 to 90 words, then the media contact line from the facts.
-- Formats for this page type: Dateline and the news in the first paragraph. Quotes as plain paragraphs with the speaker and title named. No table, no bullets. Decide per section from what the heading asks for. Never put a table where prose answers the heading, never pad a section with bullets, and never write a list of one or two items.
-- Tables are optional. Use one only where it helps the reader.
-- No H3 subheadings on this page type. 
-- Total length: 400 to 900 words. Aim for about 650.
-- External citations are optional. Any you use must come from the Live Research tool.
+- These H2 sections, in this order, with these exact headings. Every one of them must appear on the page, word for word: never rename, merge, reorder or drop one.
+  1. First H2 from the app
+  2. Second H2 from the app
+  3. Third H2 from the app
+  4. Fourth H2 from the app
+  5. A closing H2 that you write yourself, about 60 to 120 words. Heading: follow one of these patterns, filling any <...> from the H1 or the facts, in sentence case: About <client>. Never head it "Conclusion", "Summary", "Final thoughts" or "Key takeaways". Content: the one decision or action the reader should take now and why, adding a last useful point instead of summarising the sections.
+- You may add H2 sections of your own, between or after the supplied ones, when the reader with this intent needs a subject the outline does not cover and it would not fit under a supplied heading without overloading it. Phrase an added H2 as the subject it covers, in sentence case, and keep it before the closing section. Adding a focused section is better than stuffing two subjects under one heading; adding a section the reader does not need is padding.
+- Format of each section: decide it from what the heading asks for and from what your research shows the strongest pages on this subject use for that section. Prose for reasoning, explanation and anything with a "because". A numbered list for a sequence the reader performs in order. A table only when the section sets two or more items against the same attributes (options, figures, dates, thresholds) and a reader would scan it. Bullets only for four or more short parallel items. Never a table where prose answers the heading, never bullets to pad, never a list of one or two items.
+- Tables are optional. Use one only where a section compares items on the same attributes.
+- H3 subheadings: at least one H2 on this page carries two or more H3s. Choose the H2 whose subject splits into distinct sub-questions or items a reader would scan for (the section your research shows answer engines quote), and put at least two H3s there; use H3s in other sections only where they split the same way. Phrase each H3 as the specific sub-question or item it covers, in sentence case. Never one lone H3, never an H3 in a section under 150 words, never an H4.
+- Length: about 650 words for the whole page. Give each section the length its subject needs, not an equal share; a section that answers its heading in 80 words stops there, and a section the reader will act on gets the room. Stay within roughly 20 percent of the target.
 - Research: This page type is written from the client facts and general professional knowledge. Use the Live Research tool only when a sentence needs a specific external figure or quote, and drop the sentence if nothing reliable comes back.
+- External citations are welcome where a figure, a study or a quote needs one; every citation is a markdown link to a source you found with the Live Research tool, with the source named in the sentence. Never cite from memory.
 - Every H2 section opens with a sentence that answers that heading directly, then explains, then gives what varies, then what to check.
-- Each section has its own job. Say a thing once, in the section where it belongs. A client fact appears where it is relevant and at most twice on the whole page. Never recycle facts to reach a word budget; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
+- Each section has its own job. Say a thing once, in the section where it belongs. Never recycle a fact to reach a length; when a section needs more substance, explain the subject itself: how the practice works, what varies from case to case, what a reader should check, what goes wrong and why.
 
 Questions this page must answer:
 Readers and answer engines ask these questions. Answer each one once, inside the section where it fits best, with a direct answering sentence first and the evidence after it. Never insert a question as text, never add a question and answer block, never restate the question. The reader must not notice the question was planted.
@@ -569,16 +592,15 @@ Readers and answer engines ask these questions. Answer each one once, inside the
   2. Second AI prompt sent by the app?
 
 Client facts:
-These are the only claims you may make about the client. Use them exactly and invent nothing about the client beyond them. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
-- fact_key_1: fact value from the app
-- fact_key_2: ["list","of","values"]
+These are the only claims you may make about the client. They are material, not a list to reproduce: work each fact into the page at the point where it supports what that section is saying, as evidence inside the argument, in your own sentence. Never list them, never put them all in one section, never copy a fact as a datasheet line, never use a fact twice. A fact that supports nothing on this page is left out. General knowledge about the field, the practice and what buyers should look for is welcome and must never be phrased as a claim about the client.
+- fact key 1: fact value from the app
+- fact key 2: ["list","of","values"]
 
 Hard rules for this page:
 - Never invent a number, a price, a client result, a certification, a credential or a capability. If it is not in the client facts or in a Live Research result you saw, do not write it.
 - Never link to the client's own website (https://example.com) and never invent an internal link. Links between the client's pages are placed by a separate process after this page is written. The only client link allowed is the CTA link described below, when there is one.
 - Do not write an author line, a testimonial block, a breadcrumb, a related links block or a FAQ. Those are produced separately.
 - No exclamation marks.
-
 
 CTA:
 There is no call to action on this page. Nowhere on the page do you ask the reader to contact, book, call, schedule, sign up, request or get in touch.

@@ -62,7 +62,8 @@ One request writes one page in one language. Everything about the page comes fro
 | Field | Required | Notes |
 |---|---|---|
 | `taskId`, `brandId`, `userId`, `callback_url` | yes | as in Content Maker 5.0 (`callbackUrl` also accepted) |
-| `pageType` | yes | a `type_id` from `page_type_specs` (dropdown = rows with `ai_writable` not `N`) |
+| `pageType` | yes | a `type_id` from `page_type_specs` (the dropdown lists every row) |
+| `searchIntent` | yes | one of `informational`, `commercial`, `transactional`, `navigational` (a dropdown in the app). Parse Request rejects a request without it or with another value. It drives the writer brief (what the reader wants first, which formats carry the sections, how the page ends) and the meta description rules |
 | `targetLanguage` | yes | language name as in Content Maker 5.0 (English name, e.g. "French", "German", "Japanese"); default English; one run per language. **Every text value in the request is sent in this language**, the way the app stores it. For a non-English run the flow translates those values to English with DeepL before Parse Request (`Translate Inputs?`, `DeepL Prep Inputs`, `Translate Inputs`, `Request EN`), writes and edits in English, then translates the page, meta description, FAQ and E-E-A-T back and restores the app's own `h1`, `h2Outline`, author and reviewer wording on the final page |
 | `clientName` | yes | `clientDescription` optional but strongly recommended (`productDescription` also accepted) |
 | `h1` | yes | used verbatim |
@@ -70,18 +71,16 @@ One request writes one page in one language. Everything about the page comes fro
 | `siteRootUrl` | recommended | absolute URLs in JSON-LD; any link to this host other than `ctaUrl` is rejected by the validator, because internal links are placed by a separate process |
 | `coreKeyword` | per type | placed in the first 60 words and used lightly in the body; never density-checked |
 | `secondaryKeywords` | no | array or comma string |
-| `h2Outline` | yes | array of heading strings (a `\|` separated string also works); followed verbatim, in order. No per-heading format: the spec's `format_rules` decide where tables, steps, bullets and prose go. When the last heading already reads as a closing section (next steps, how to get started, contact, book) it is used as the closing section; otherwise the flow appends one closing H2 per the spec |
+| `h2Outline` | yes | array of heading strings (a `\|` separated string also works); every heading appears on the page word for word, in this order; the writer may add H2 sections of its own between or after them when the reader needs a subject the outline misses (never instead of a supplied one). No per-heading format: the writer decides prose, steps, table or bullets per section from the heading, the search intent and its research, and puts at least two H3s under the H2 whose subject splits. When the last heading already reads as a closing section (next steps, how to get started, contact, book) it is used as the closing section; otherwise the flow appends one closing H2 per the spec |
 | `aiPrompts` | no | answered inside the sections, used as the first FAQ questions, and returned word for word in `monitoringPrompts` |
-| `ctaRules`, `ctaUrl` | no | the action the closing section asks for and its link. The spec's `cta_mode` decides whether the page has a CTA at all: `required` types get one even when these are empty (the action is named in words, without a link), `optional` types get one only when `ctaRules` or `ctaUrl` is sent, `none` types never get one. The CTA appears in the closing section only, never in the body or the FAQ |
+| `ctaRules`, `ctaUrl` | no | the action the closing section asks for and its link. The spec's `cta_mode` decides whether the page has a CTA at all: `required` types get one natural CTA as the last sentence or two of the closing section, following `ctaRules` (named in words without a link when `ctaUrl` is empty); `none` types never get one. Never in the body or the FAQ, never forced (no urgency, no superlative) |
 | `writingPreferences`, `whitelistDomains`, `blacklistDomains` | no | as in Content Maker |
 | `metaTitle` | no | ignored since 2026-09-22: the page returns a meta description only |
 | `author` | yes | the page's author, stored once in the app's article settings: `name` (required), `jobTitle`, `url` (author page), `linkedin` or `sameAs[]`, `image`, `description`. Fills the Person and author blocks of the JSON-LD and the ProfilePage of bio pages (for a bio page send the person the page is about as the author) |
 | `reviewer` | no | optional expert reviewer for medical, legal and financial pages: `name`, `jobTitle` or `credentials`, `url`. Fills `reviewedBy` in the JSON-LD |
-| `facts` | per type | free-form object keyed by the spec's `required_facts`; the writer may only claim about the client what is in here |
+| `facts` | recommended | free-form object, any keys (deliverables, process, pricing, proof, team, locations, whatever the page needs); the writer may only claim about the client what is in here, and blends each fact into the section where it supports the point instead of listing them. No fact list is required per type; a commercial page with no facts is written without client claims |
 
-Families `offer`, `proof`, `entity`, `local`, `catalogue`, `evaluation` and `tool` stop with `status: blocked` when `facts` is empty. The other families run without facts.
-
-The smallest valid request is `pageType`, `clientName`, `callback_url`, `h1`, `h2Outline` and `author.name` (plus `facts` for the families above). No page type needs structured data for its schema beyond the author: every JSON-LD block is built from the request, the page, the FAQ and the author or reviewer objects. Page types whose schema needed client data (events, jobs, products, listings, vehicles, recipes, videos, podcasts, courses, datasets, infographics, rooms, tours, menus, app listings) were removed from the catalogue on 2026-09-21; it now has 128 types. Fields that were accepted earlier and are now ignored: `internalLinks`, per-heading `format`. Nothing else is required from the user.
+The smallest valid request is `pageType`, `searchIntent`, `clientName`, `callback_url`, `h1`, `h2Outline` and `author.name`. No page type needs structured data for its schema beyond the author: every JSON-LD block is built from the request, the page, the FAQ and the author or reviewer objects. Page types whose schema needed client data (events, jobs, products, listings, vehicles, recipes, videos, podcasts, courses, datasets, infographics, rooms, tours, menus, app listings) were removed from the catalogue on 2026-09-21; it now has 128 types. Fields that were accepted earlier and are now ignored: `internalLinks`, per-heading `format`. Nothing else is required from the user.
 
 ## Callbacks
 
@@ -136,25 +135,23 @@ Progress: the Content Plan Progress Reporter sub-workflow is called with `articl
 
 ## page_type_specs data table (id `2ErETiHi4MCy5LOc`)
 
-One row per page type, 128 rows seeded from `skills/content-map-builder/assets/page_type_specs.json`. Add a row to add a type; the dropdown in the app should list rows where `ai_writable` is not `N`.
+One row per page type, 128 rows seeded from `skills/content-map-builder/assets/page_type_specs.json` (generated by `tools/build_specs.py`, listed in `docs/page-type-writing-rules.md`). Add a row to add a type; the app's dropdown lists every row. Sixteen columns since 2026-09-24:
 
 | Column | Meaning |
 |---|---|
 | `type_id`, `label`, `family` | id sent in `pageType`; label for people; one of hub, guide, reference, evaluation, offer, proof, entity, tool, asset, local, catalogue, ops |
-| `definition`, `industries` | help text |
-| `words_min`, `words_max`, `default_words` | length band; sections share `default_words` |
+| `definition` | two or three sentences: what the page is for and what readers expect to find; quoted to the writer, the FAQ writer and the prompt maker |
+| `industries` | help text |
+| `words_count_approx` | the length the writer aims for; complete guides, pillar hubs and research reports sit near 4,000, bios and hubs near 500 |
 | `answer_paragraph`, `answer_style`, `answer_max_words` | whether the page opens with a direct answer and in which style |
-| `tables_min`, `citations_min`, `research` | minimum tables and citations; how much the writer should use its Live Research tool (Tavily): none, search, deep (with `none`, citations are not required) |
+| `tables_min`, `research` | minimum tables; how much the writer should use its Live Research tool (none, search, deep) |
 | `schema_types` | JSON-LD blocks, e.g. `Service + Organization + FAQPage + BreadcrumbList` |
-| `required_facts`, `optional_facts` | what the app's facts form asks for |
-| `constraints` | sector rules injected into the writer and the validator |
-| `opening`, `section_format_hints` | how the family opens and default section formats |
-| `closing_mode`, `closing_heading`, `closing_content` | whether the flow appends a closing H2 after the outline, the heading patterns it follows and what it says |
-| `cta_mode`, `cta_guidance` | required, optional or none, and how the CTA is written for this type (closing section only) |
-| `format_rules` | when this type uses tables, numbered steps, bullets and prose; replaces per-heading formats in the request |
-| `h3_policy` | required, optional or none, with the rule for H3 subheadings (validated) |
-| `meta_description_pattern` | what the meta description of this type must contain (120 to 155 characters, factual, front loaded) |
-| `ai_writable` | Y, P (facts must be supplied and checked) or N (never written) |
+| `opening` | how the opening paragraph is written |
+| `closing_heading` | when set, the flow appends one closing H2 after the outline with a heading following these patterns (unless the outline already ends with a closing section); empty means no closing H2 |
+| `cta_mode` | `required` (one natural CTA at the end of the closing section, following `ctaRules`) or `none` |
+| `faq_required` | Y: five FAQs; N: no FAQ block, no FAQPage schema |
+
+Removed on 2026-09-24: `words_min`, `words_max`, `default_words` (one approximate length instead), `citations_min` (citations wherever a figure needs one), `required_facts`, `optional_facts` (facts are free-form and blended in), `constraints`, `section_format_hints`, `format_rules`, `h3_policy` (the writer decides formats and H3 placement per section from the heading, the intent and its research), `ai_writable`, `closing_mode`, `closing_content`, `cta_guidance` and `meta_description_pattern` (the meta description rules come from the search intent).
 
 ## Prompts and node code
 

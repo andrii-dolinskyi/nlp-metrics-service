@@ -40,22 +40,22 @@ Progress reporting to the app's progress endpoint stays as in Content Maker 5.0,
 
 ### 2.1 Specs as data
 
-A page type is a row in `page_type_specs`, not a branch in code. The Page Contract node reads the row for `pageType` and derives section budgets and validation from it. Adding a type, including a one-off type for a niche client, is adding a row. The app's page-type dropdown is the list of rows where `ai_writable` is not `N`.
+A page type is a row in `page_type_specs`, not a branch in code. The Page Contract node reads the row for `pageType` and derives the closing section, the CTA mode, the FAQ count and the length target from it. Adding a type, including a one-off type for a niche client, is adding a row. The app's page-type dropdown is the list of rows. Since 2026-09-24 the table has 16 columns:
 
 | Column | Meaning |
 |---|---|
 | `type_id`, `label`, `family` | id the app sends, label people see, one of the 12 families |
-| `definition`, `industries` | what the page is, where it is common (for the dropdown's help text) |
-| `words_min`, `words_max`, `default_words` | length band; sections get `default_words` divided by the outline length, clamped |
+| `definition`, `industries` | what the page is for and what readers expect to find (two or three sentences, quoted in the prompts); where the type is common |
+| `words_count_approx` | the length the writer aims for; sections get the length their subject needs |
 | `answer_paragraph`, `answer_style`, `answer_max_words` | whether the page opens with a direct answer, and in which style (definition, verdict, key facts, value proposition) |
-| `tables_min`, `citations_min`, `research` | minimum tables, minimum external citations, Tavily depth (none, search, deep) |
+| `tables_min`, `research` | minimum tables, Live Research depth (none, search, deep) |
 | `schema_types` | JSON-LD blocks to build, for example `Service + Organization + FAQPage + BreadcrumbList` |
-| `required_facts`, `optional_facts` | the fact fields the app must send for this type (drives the UI form) |
-| `constraints` | standing rules for sector types: disclaimers, claim limits, reviewer requirement (a condition page needs a named reviewer and "see a professional" language; a practice-area page needs the "prior results do not guarantee" line) |
-| `opening`, `section_format_hints` | how the family opens, and default formats (table, steps, bullets) when the outline does not say |
-| `ai_writable` | Y, P (writer drafts, facts must be supplied) or N (never written by the flow) |
+| `opening` | how the family opens |
+| `closing_heading` | heading patterns for the closing H2 the writer appends after the outline; empty means none |
+| `cta_mode` | required or none |
+| `faq_required` | Y or N |
 
-The seed for this table is the catalogue in Appendix A: 145 types in 12 families, 136 writer-usable. Sector constraints in Appendix B become the `constraints` column of the sector types.
+What the table no longer holds: the format of each section, the H3 placement, the fact list per type, sector constraints, citation minimums and meta patterns. The writer brief carries one set of structure rules for every type (format per section from the heading and research, at least two H3s under the H2 that splits, supplied H2s word for word with the freedom to add H2s), the facts are free-form and blended in, and the request's `searchIntent` (required) selects the intent block of the brief and the meta description rules.
 
 ### 2.2 Families
 
