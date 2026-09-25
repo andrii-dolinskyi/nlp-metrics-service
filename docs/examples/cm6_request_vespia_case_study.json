@@ -1,0 +1,59 @@
+{
+  "taskId": "cm6-vespia-case-study-01",
+  "brandId": "vespia-test",
+  "userId": "andrii",
+  "callback_url": "https://n8n-test.snoika.com/webhook/pm-test-callback",
+
+  "pageType": "case_study",
+  "searchIntent": "commercial",
+  "targetLanguage": "English",
+
+  "clientName": "Vespia",
+  "clientDescription": "Vespia is an AI-powered business verification (KYB) and AML compliance platform founded in Tallinn, Estonia, in 2021 by Julia Ront and Anton Vedešin. It verifies companies, their ultimate beneficial owners and their people in one flow: commercial register data from more than 300 jurisdictions and over 5,000 official sources, UBO discovery, PEP, sanctions and adverse media screening against more than 4,000 lists, identity verification for over 7,000 document types from more than 190 countries, transaction monitoring and risk scoring. A business check returns in under 30 seconds. Customers are fintechs, marketplaces, payment providers, crypto businesses, VC and investment firms and law firms. Vespia was acquired by Veriff in February 2026.",
+  "siteRootUrl": "https://vespia.io",
+  "slugPath": "/case-studies/eurora/",
+
+  "h1": "How Eurora verified 1,200 business customers in 100 countries with Vespia",
+  "coreKeyword": "KYB case study",
+  "secondaryKeywords": ["business verification for cross-border e-commerce", "UBO verification", "automated KYB onboarding"],
+
+  "h2Outline": [
+    "Who Eurora is and why every seller must be verified",
+    "The problem: UBO documents from dozens of sources",
+    "The solution: KYB, UBO, AML and KYC checks in one platform",
+    "The results: 1,200 businesses, 100 countries, 37 times lower cost",
+    "What Eurora's compliance team does differently now"
+  ],
+  "aiPrompts": [
+    "How does an automated KYB platform reduce the cost of verifying business customers?",
+    "How long does it take to verify a company and its ultimate beneficial owners with automated KYB?",
+    "What does a cross-border e-commerce compliance provider need to check before onboarding a seller?"
+  ],
+
+  "ctaRules": "Invite the reader to book a demo of Vespia's business verification platform.",
+  "ctaUrl": "https://vespia.io/book-a-demo",
+  "writingPreferences": "British spelling. Present every result exactly as Eurora reported it and never generalise it to other customers. Do not describe the Veriff acquisition beyond one neutral sentence if it fits.",
+  "whitelistDomains": ["vespia.io", "veriff.com", "eu-startups.com", "arcticstartup.com", "globenewswire.com"],
+  "blacklistDomains": ["wikipedia.org", "reddit.com"],
+
+  "author": {
+    "name": "Julia Ront",
+    "jobTitle": "Co-founder and CEO, Vespia",
+    "url": "https://vespia.io/about",
+    "description": "Co-founded Vespia in 2021 after being Veriff's second employee, where she led KYC work."
+  },
+  "reviewer": null,
+
+  "facts": {
+    "customer_profile": "Eurora Solutions is an Estonian technology company founded in 2018 by Marko Lastik. Its AI platform automates cross-border trade compliance for online sellers, marketplaces, logistics and postal companies: duty and tax calculation, HS code allocation, restrictions screening and customs clearance. It was the first official VAT intermediary and the first company to issue an IOSS number, and it processes up to 5,000 requests per second with up to 98 percent accuracy.",
+    "customer_scale": "Eurora raised a 40 million dollar Series A in April 2022 led by Connected Capital, one of the largest Series A rounds in Estonia at the time.",
+    "challenge": "Before Vespia, Eurora's compliance team collected documents from several separate sources to confirm the ultimate beneficial owners of each business customer, across many countries, which took time and manual work for every onboarding.",
+    "solution": "Vespia gave Eurora one platform to run KYB, UBO, AML and KYC checks together. UBO information now arrives in seconds from a single place instead of tens of different sources.",
+    "result_volume": "With Vespia, Eurora verified more than 1,200 business customers operating in more than 100 different countries.",
+    "result_cost": "Eurora's verification with Vespia is 37 times cheaper than market prices, with results delivered fast.",
+    "result_satisfaction": "Eurora reports being very satisfied with having an all-in-one platform where KYB, UBO, AML and KYC checks run smoothly.",
+    "vespia_coverage": "Commercial register data from more than 300 jurisdictions and over 5,000 official sources, more than 1,500 data points per check, results in under 30 seconds, screening against more than 4,000 PEP, sanctions and adverse media lists, identity verification for over 7,000 document types from more than 190 countries.",
+    "vespia_pricing": "Starter package from 99 euros per month plus per-report fees from 35 euros, varying by region; pay-as-you-go and subscription models.",
+    "vespia_company": "Founded in 2021 in Tallinn by Julia Ront and Anton Vedešin; a Plug and Play-backed seed round and an Icebreaker VC portfolio company; winner of the Baltic class of Mastercard's Lighthouse FINITIV programme, followed by a global partnership to embed Vespia's KYB checks in Mastercard's Merchant Digital Onboarding Platform; acquired by Veriff on 5 February 2026, with the KYB product to be available across Veriff's platform by mid-2026."
+  }
+}
