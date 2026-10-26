@@ -21,7 +21,9 @@ const keywordLocal = r.coreKeywordLocal || (r.original && r.original.coreKeyword
 const clientLocal = r.clientNameLocal || (r.original && r.original.clientName) || r.clientName;
 return [{ json: {
   taskId: r.taskId, brandId: r.brandId, userId: r.userId, n8nExecutionId: String($execution.id),
-  status: 'ok', pageType: r.pageType, language: r.targetLanguage,
+  status: 'ok', pageType: r.pageType, language: r.targetLanguage, sourceLanguage: r.sourceLanguage || 'English',
+  // Set on pages produced by the CM6 Translator: the task and execution of the English page this one translates.
+  translationOf: r.translationOf || undefined, sourceExecutionId: r.sourceExecutionId || undefined, translated: !!f.translated, translationWarnings: (f.translationWarnings && f.translationWarnings.length) ? f.translationWarnings : undefined,
   slug: f.slug, slugPath: f.slugPath, canonicalUrl: f.canonicalUrl,
   metaDescription: f.metaDescription,
   articleTextMd: f.finalPage,

@@ -1,28 +1,26 @@
-// Joins the DeepL batches: the English values go into the body the writer will see, the originals are kept
-// in body._original so the final page carries the app's own H1, H2s, author fields and slug.
+// Reads the Input Translator's reply: the English values go into the body the writer will see, the originals are
+// kept in body._original so the final page in the source language carries the app's own H1, H2s, keyword, author
+// fields and slug. A text the model skipped keeps its original value, so the run never stops here.
 const raw = $('Start').first().json;
-const preps = $('DeepL Prep Inputs').all().map(i => i.json);
-const results = $input.all().map(i => i.json);
-const body = preps[0].body || JSON.parse(JSON.stringify(raw.body || raw || {}));
+const prep = $('Prep Inputs Translation').first().json;
+const body = prep.body || JSON.parse(JSON.stringify(raw.body || raw || {}));
 const get = (o, path) => path.split('.').reduce((x, p) => (x === undefined || x === null) ? undefined : x[p], o);
 const set = (o, path, value) => { const parts = path.split('.'); let cur = o; for (let i = 0; i < parts.length - 1; i++) { const p = parts[i]; if (cur[p] === undefined || cur[p] === null || typeof cur[p] !== 'object') cur[p] = /^\d+$/.test(parts[i + 1]) ? [] : {}; cur = cur[p]; } cur[parts[parts.length - 1]] = value; };
+const j = $input.first().json;
+const text = String((j && (j.output !== undefined ? j.output : (j.text !== undefined ? j.text : j))) || '');
+const translations = {};
+const re = /^\s*\[\[(\d+)\]\][^\n]*\n([\s\S]*?)(?=^\s*\[\[(?:\d+|END)\]\]|(?![\s\S]))/gm;
+let m; while ((m = re.exec(text)) !== null) translations[m[1]] = m[2].replace(/\s+$/, '').replace(/^\s+/, '');
 const original = {};
-const decode = x => String(x || '')
-  .replace(/&#x([0-9a-f]{1,6});/gi, (m, h) => { try { return String.fromCodePoint(parseInt(h, 16)); } catch (e) { return m; } })
-  .replace(/&#(\d{1,7});/g, (m, n) => { try { return String.fromCodePoint(parseInt(n, 10)); } catch (e) { return m; } })
-  .replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
-let enName = '';
-preps.forEach((p, k) => { const i = p.paths.indexOf('clientName'); if (i !== -1 && results[k] && results[k].translations && results[k].translations[i]) enName = decode(results[k].translations[i].text).trim(); });
-const fix = x => { let out = decode(x).replace(/<span[^>]*translate="no"[^>]*>\s*CLIENTNAME\s*<\/span>/gi, enName || get(body, 'clientName') || '').replace(/<\/?span[^>]*>/gi, ''); return out.replace(/\bCLIENTNAME\b/g, enName || get(body, 'clientName') || ''); };
-if (preps.length && preps[0].paths.length) {
-  if (results.length !== preps.length) throw new Error('DeepL returned ' + results.length + ' batches for ' + preps.length + ' input batches');
-  preps.forEach((p, k) => {
-    const tr = results[k].translations || [];
-    if (tr.length !== p.paths.length) throw new Error('DeepL returned ' + tr.length + ' translations but ' + p.paths.length + ' input texts were sent');
-    p.paths.forEach((path, i) => { set(original, path, get(body, path)); set(body, path, fix(String(tr[i].text || '')).trim() || get(body, path)); });
-  });
-}
+const missing = [];
+(prep.paths || []).forEach((path, i) => {
+  const tr = translations[String(i + 1)];
+  set(original, path, get(body, path));
+  if (tr && tr.trim()) set(body, path, tr.trim()); else missing.push(path);
+});
+if (prep.paths && prep.paths.length && Object.keys(translations).length === 0) throw new Error('Input Translator returned no translations. Reply started with: ' + text.slice(0, 200));
 if (original.writingPreferences && body.writingPreferences && body.writingPreferences !== original.writingPreferences) body.writingPreferences = body.writingPreferences + ' (original wording in the page language: ' + original.writingPreferences + ')';
 body._original = original;
-body._deeplTarget = preps.length ? preps[0].targetLang : '';
+body._sourceLanguage = prep.sourceLanguage;
+body._inputsTranslation = { translated: (prep.paths || []).length - missing.length, keptOriginal: missing };
 return [{ json: { headers: raw.headers, params: raw.params, query: raw.query, body } }];

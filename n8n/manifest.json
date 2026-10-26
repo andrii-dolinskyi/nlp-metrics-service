@@ -79,27 +79,9 @@
  },
  {
   "workflowId": "MZUUvWCdCXlHKllN",
-  "node": "DeepL Prep",
-  "param": "jsCode",
-  "file": "n8n/cm6/deepl_prep.js"
- },
- {
-  "workflowId": "MZUUvWCdCXlHKllN",
-  "node": "Unwrap Translation",
-  "param": "jsCode",
-  "file": "n8n/cm6/unwrap_translation.js"
- },
- {
-  "workflowId": "MZUUvWCdCXlHKllN",
   "node": "Metadata Generator",
   "param": "text",
   "file": "n8n/cm6/metadata_generator_text.txt"
- },
- {
-  "workflowId": "MZUUvWCdCXlHKllN",
-  "node": "DeepL Prep Inputs",
-  "param": "jsCode",
-  "file": "n8n/cm6/deepl_prep_inputs.js"
  },
  {
   "workflowId": "MZUUvWCdCXlHKllN",
@@ -136,5 +118,101 @@
   "node": "Prompt Maker",
   "param": "options.systemMessage",
   "file": "n8n/cm6/prompt_maker_system.txt"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "Prep Inputs Translation",
+  "param": "jsCode",
+  "file": "n8n/cm6/prep_inputs_translation.js"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "Prep Page Translation",
+  "param": "jsCode",
+  "file": "n8n/cm6/prep_page_translation.js"
+ },
+ {
+  "workflowId": "MZUUvWCdCXlHKllN",
+  "node": "Extra Languages",
+  "param": "jsCode",
+  "file": "n8n/cm6/extra_languages.js"
+ },
+ {
+  "workflowId": "vFI5Eq5wZjfjY2vD",
+  "node": "Request Context",
+  "param": "jsCode",
+  "file": "n8n/translator/request_context.js"
+ },
+ {
+  "workflowId": "vFI5Eq5wZjfjY2vD",
+  "node": "Retry Context",
+  "param": "jsCode",
+  "file": "n8n/translator/retry_context.js"
+ },
+ {
+  "workflowId": "vFI5Eq5wZjfjY2vD",
+  "node": "Context",
+  "param": "jsCode",
+  "file": "n8n/translator/context.js"
+ },
+ {
+  "workflowId": "vFI5Eq5wZjfjY2vD",
+  "node": "Prep Translation",
+  "param": "jsCode",
+  "file": "n8n/translator/prep_translation.js"
+ },
+ {
+  "workflowId": "vFI5Eq5wZjfjY2vD",
+  "node": "Extract Translation",
+  "param": "jsCode",
+  "file": "n8n/translator/extract_translation.js"
+ },
+ {
+  "workflowId": "vFI5Eq5wZjfjY2vD",
+  "node": "Report Failure",
+  "param": "jsCode",
+  "file": "n8n/translator/report_failure.js"
+ },
+ {
+  "workflowId": "vFI5Eq5wZjfjY2vD",
+  "node": "Return Bundle",
+  "param": "jsCode",
+  "file": "n8n/translator/translated_page.js"
+ },
+ {
+  "workflowId": "vFI5Eq5wZjfjY2vD",
+  "node": "Parse Request",
+  "param": "jsCode",
+  "file": "n8n/translator/parse_request.js"
+ },
+ {
+  "workflowId": "vFI5Eq5wZjfjY2vD",
+  "node": "Page Contract",
+  "param": "jsCode",
+  "file": "n8n/translator/page_contract.js"
+ },
+ {
+  "workflowId": "vFI5Eq5wZjfjY2vD",
+  "node": "Translated Page",
+  "param": "jsCode",
+  "file": "n8n/translator/translated_page.js"
+ },
+ {
+  "workflowId": "vFI5Eq5wZjfjY2vD",
+  "node": "Clean Text",
+  "param": "jsCode",
+  "file": "n8n/cm6/clean_text.js"
+ },
+ {
+  "workflowId": "vFI5Eq5wZjfjY2vD",
+  "node": "Build JSON-LD",
+  "param": "jsCode",
+  "file": "n8n/cm6/build_jsonld.js"
+ },
+ {
+  "workflowId": "vFI5Eq5wZjfjY2vD",
+  "node": "Build Payload",
+  "param": "jsCode",
+  "file": "n8n/cm6/build_payload.js"
  }
 ]
