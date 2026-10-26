@@ -5,7 +5,9 @@ let st = {}; try { st = $('Stabilizer').first().json; } catch (e) { st = {}; }
 // Page statistics for the callback, counted on the final page text (there is no validator step).
 const md = String(f.finalPage || '');
 const body = md.replace(/^#{1,6}\s+.*$/gm, ' ').replace(/^\|.*\|\s*$/gm, ' ').replace(/\[([^\]]+)\]\([^\)]*\)/g, '$1');
-const totalWords = body.split(/\s+/).filter(Boolean).length;
+// Words for languages written with spaces; for Japanese, Chinese, Korean and Thai each character counts as one, which is how those languages measure length.
+const cjkChars = (body.match(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uac00-\ud7af\u0e00-\u0e7f]/g) || []).length;
+const totalWords = body.replace(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uac00-\ud7af\u0e00-\u0e7f]/g, ' ').split(/\s+/).filter(Boolean).length + cjkChars;
 const h2Count = (md.match(/^##\s+\S/gm) || []).length;
 const h3Count = (md.match(/^###\s+\S/gm) || []).length;
 const tableRows = (md.match(/^\|.*\|\s*$/gm) || []).filter(l => !/^\|\s*:?-{2,}/.test(l)).length;
