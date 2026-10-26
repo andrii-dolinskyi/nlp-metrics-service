@@ -23,6 +23,8 @@ const common = {
 return extras.filter(L => !isEnglish(L)).map((L, i) => {
   const loc = Object.assign({}, (r.localized && r.localized[L]) || {});
   if (L === r.sourceLanguage && r.inputsOriginal) Object.assign(loc, r.inputsOriginal, (r.localized && r.localized[L]) || {});
+  // The request's slug belongs to the page in the inputs' language; other languages get the app's localized slug or one from the translator.
+  if (L === r.sourceLanguage && !loc.slugPath) loc.slugPath = r.slugPath;
   const p = Object.assign({}, common, { language: L, localized: loc, delaySeconds: Math.floor(i / 5) * 240 });
   return { json: { payload: JSON.stringify(p), language: L, delaySeconds: p.delaySeconds } };
 });

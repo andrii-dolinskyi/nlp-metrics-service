@@ -15,7 +15,8 @@ const block = name => { const m = raw.match(new RegExp('//' + name + '_START//\\
 const L = x.language;
 // Page
 let page = block('PAGE');
-if (!page || page.split(/\s+/).length < Math.max(50, String(b.finalPage || '').split(/\s+/).length * 0.4)) { warnings.push('page block missing or far too short, English page kept'); page = s(b.finalPage); }
+// Length is compared in characters, not words: Japanese, Chinese and Thai carry no spaces and run shorter than English.
+if (!page || page.length < Math.max(200, String(b.finalPage || '').length * 0.2) || !/^#\s+\S/m.test(page)) { warnings.push('page block missing or far too short, English page kept'); page = s(b.finalPage); }
 else {
   const enLines = String(b.finalPage || '').split('\n');
   const enH2 = enLines.filter(l => /^##\s+\S/.test(l)).map(l => l.replace(/^##\s+/, '').trim());

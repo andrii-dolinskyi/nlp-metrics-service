@@ -7,6 +7,8 @@ const a = $('Assemble Assets').first().json;
 const L = r.targetLanguage;
 const loc = Object.assign({}, (r.localized && r.localized[L]) || {}, r.original || {});
 if (!loc.aiPrompts && r.inputsOriginal && Array.isArray(r.inputsOriginal.aiPrompts) && r.sourceLanguage === L) loc.aiPrompts = r.inputsOriginal.aiPrompts;
+// The request's slug is the slug of the page this execution delivers, whatever language it is in.
+loc.slugPath = r.slugPath;
 const payload = {
   inline: true, delaySeconds: 0,
   taskId: r.taskId, brandId: r.brandId, userId: r.userId, callbackUrl: r.callbackUrl,
