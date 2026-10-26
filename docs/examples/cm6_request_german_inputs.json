@@ -1,0 +1,43 @@
+{
+ "taskId": "cm6-lang-test-s1",
+ "brandId": "vespia-test",
+ "userId": "andrii",
+ "callback_url": "https://n8n-test.snoika.com/webhook/pm-test-callback",
+ "pageType": "glossary_term",
+ "searchIntent": "informational",
+ "sourceLanguage": "German",
+ "targetLanguages": [
+  "German"
+ ],
+ "clientName": "Vespia",
+ "clientDescription": "Vespia ist eine KI-gestützte Plattform für Unternehmensverifizierung (KYB) und AML-Compliance aus Tallinn, Estland, gegründet 2021. Sie prüft Unternehmen, ihre wirtschaftlich Berechtigten und die handelnden Personen in einem Ablauf: Handelsregisterdaten aus über 300 Jurisdiktionen, UBO-Ermittlung, PEP-, Sanktions- und Adverse-Media-Screening, Identitätsprüfung und Transaktionsüberwachung. Eine Unternehmensprüfung liefert ein Ergebnis in unter 30 Sekunden.",
+ "siteRootUrl": "https://vespia.io",
+ "slugPath": "/glossar/wirtschaftlich-berechtigter/",
+ "h1": "Wirtschaftlich Berechtigter (UBO): Definition und Bedeutung für KYB",
+ "coreKeyword": "wirtschaftlich Berechtigter",
+ "secondaryKeywords": [
+  "UBO-Prüfung",
+  "Ultimate Beneficial Owner"
+ ],
+ "h2Outline": [
+  "Wer als wirtschaftlich Berechtigter gilt",
+  "Warum die UBO-Ermittlung Teil jeder KYB-Prüfung ist",
+  "Wie sich der wirtschaftlich Berechtigte vom gesetzlichen Vertreter unterscheidet"
+ ],
+ "aiPrompts": [
+  "Wer gilt als wirtschaftlich Berechtigter eines Unternehmens?",
+  "Wie findet man den wirtschaftlich Berechtigten einer GmbH heraus?"
+ ],
+ "ctaRules": "",
+ "ctaUrl": "",
+ "writingPreferences": "Sachlicher Ton. Verwende die Schreibweise 'wirtschaftlich Berechtigter' konsequent.",
+ "author": {
+  "name": "Julia Ront",
+  "jobTitle": "Mitgründerin und CEO, Vespia",
+  "url": "https://vespia.io/about"
+ },
+ "facts": {
+  "ubo_discovery": "Vespia ermittelt wirtschaftlich Berechtigte automatisch über mehrere Beteiligungsebenen hinweg und visualisiert die Eigentümerstruktur als Graph.",
+  "threshold": "Nach der EU-Geldwäscherichtlinie gilt eine natürliche Person ab 25 Prozent Anteil oder Stimmrechten als wirtschaftlich Berechtigter; Vespia erlaubt es, diese Schwelle je Jurisdiktion anzupassen."
+ }
+}

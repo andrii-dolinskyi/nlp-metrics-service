@@ -30,7 +30,7 @@ Parse → Load spec (page_type_specs by pageType) → Check required facts (stop
 → 5 peelers → Style Updater → Validate (structure, links, facts, style) → Section Fixer → Revalidate
 → Answer-coverage check (every AI prompt answered somewhere; misses go back to the fixer once)
 → FAQ (always 5) → Meta (slug from app; title if missing; description) → JSON-LD (from spec) → EEAT
-→ Translate body, FAQ, meta with DeepL (only for non-English runs)
+→ Translate page, meta, FAQ, E-E-A-T, prompts with Claude Opus 5.5 in the CM6 Translator (inline for a non-English primary target; one execution per extra language)
 → Build payload → Callback → Money Calculator
 ```
 
@@ -152,7 +152,7 @@ A missing required fact stops the run before any model call; the callback carrie
 
 ## 6. Languages
 
-As built: everything in English through the peelers, the Style Updater, validation, fixing and revalidation. FAQ, meta title and meta description are generated in English too, so every check runs on checked text. Then one DeepL call per text unit (body, FAQ, meta title, meta description) with `tag_handling: html` so the internal links the app sent survive translation untouched. One run per language; the app sends the language's own H1, outline, prompts, links and slug. Languages DeepL does not support fall back to a model translation.
+As built (revised 2026-10-26): everything in English through the writer, the peelers, the Style Updater, FAQ, meta, E-E-A-T and prompts, so every check runs on checked text. The request carries `sourceLanguage` (the language of its text values) and `targetLanguages`. Non-English inputs are translated to English by the Input Translator (Claude Opus 5.5, GPT 5.6 Sol fallback; numbered sentinel lines in and out, brand name never translated) and the originals kept. The primary target (English when listed, else the first) is delivered by the writing execution: a non-English primary goes through the CM6 Translator sub-workflow inline. Every further target is a separate CM6 Translator execution started after the primary page is sent, five at a time with a four-minute stagger per group, each with its own callbacks, Money Calculator run and restart by execution id (`POST /webhook/cm6-translate` with `retryExecutionId`, or `sourceExecutionId` plus `language` to add a language later). The translator is one Claude Opus 5.5 call per language with the transcreation prompt: keywords integrated in their grammatical form, H1 and H2s locked to the app's wording where supplied, links untouched, output in sentinel blocks (page, meta, FAQ, E-E-A-T, prompts, keywords) parsed tolerantly so a bad block keeps the English text and is reported instead of losing the page. DeepL is not used anywhere any more; its credential stays in n8n untouched.
 
 ## 7. Callback
 
@@ -177,7 +177,7 @@ As built: everything in English through the peelers, the Style Updater, validati
 
 ## 8. Relation to Content Maker 5.0
 
-Page Maker replaces it. Kept from 5.0: the callback contract above, the progress reporter, the five peelers and the Style Updater, the writer with live research, DeepL translation, FAQ, metadata, EEAT analysis, the Money Calculator. Dropped from 5.0: the outliner, the SEO density check and edit loop, Pinecone internal links, the GEO route switch, the STRAPI converter, the evaluation and run-log sheets. Blog articles are written as catalogue types.
+Page Maker replaces it. Kept from 5.0: the callback contract above, the progress reporter, the five peelers and the Style Updater, the writer with live research, translation (now Claude Opus 5.5 instead of DeepL), FAQ, metadata, EEAT analysis, the Money Calculator. Dropped from 5.0: the outliner, the SEO density check and edit loop, Pinecone internal links, the GEO route switch, the STRAPI converter, the evaluation and run-log sheets. Blog articles are written as catalogue types.
 
 ## 9. Node-level delta in the n8n workflow
 
@@ -196,7 +196,7 @@ Page Maker replaces it. Kept from 5.0: the callback contract above, the progress
 | Metadata Generator | slug removed (from app); meta title only when absent; description |
 | Build JSON-LD | block builders from the spec's `schema_types`; generated fallback |
 | new: EEAT Analysis | ported from Content Maker |
-| DeepL Translate | inputs to English before the writer; page, meta description, FAQ and E-E-A-T back to the target language in one batch, links preserved, app headings restored |
+| Input Translator, CM6 Translator | inputs to English before the writer (Claude Opus 5.5, Sol fallback); page, meta description, FAQ, E-E-A-T and prompts into each target language by the CM6 Translator sub-workflow (inline for the primary target, separate executions for the others), links untouched, app headings locked. DeepL removed 2026-10-26 |
 | Build Payload, Send Page | Content Maker shape from section 7 |
 | Mark Page Written | removed |
 | Calculate Money | passes the real title |

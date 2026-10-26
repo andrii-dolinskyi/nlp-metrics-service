@@ -5,7 +5,7 @@ Endpoint: `POST https://n8n-test.snoika.com/webhook/page-maker` (production once
 
 ## Request
 
-One request writes one page in one language. Everything about the page comes from the app; how the page type is written comes from the `page_type_specs` data table in n8n.
+One request writes one page in English and delivers it in every language listed in `targetLanguages`. Everything about the page comes from the app; how the page type is written comes from the `page_type_specs` data table in n8n.
 
 ```json
 {
@@ -15,7 +15,9 @@ One request writes one page in one language. Everything about the page comes fro
   "callback_url": "https://app.example.com/api/cm6",
 
   "pageType": "service_page",
-  "targetLanguage": "English",
+  "sourceLanguage": "English",
+  "targetLanguages": ["English", "German"],
+  "localizedKeywords": { "German": "Recruiter für Vertriebsführungskräfte" },
   "clientName": "TruAlign Partners",
   "clientDescription": "TruAlign Partners is a US executive search and recruiting firm for medical device companies ...",
 
@@ -64,7 +66,10 @@ One request writes one page in one language. Everything about the page comes fro
 | `taskId`, `brandId`, `userId`, `callback_url` | yes | as in Content Maker 5.0 (`callbackUrl` also accepted) |
 | `pageType` | yes | a `type_id` from `page_type_specs` (the dropdown lists every row) |
 | `searchIntent` | yes | one of `informational`, `commercial`, `transactional`, `navigational` (a dropdown in the app). Parse Request rejects a request without it or with another value. It drives the writer brief (what the reader wants first, which formats carry the sections, how the page ends) and the meta description rules |
-| `targetLanguage` | yes | language name as in Content Maker 5.0 (English name, e.g. "French", "German", "Japanese"); default English; one run per language. **Every text value in the request is sent in this language**, the way the app stores it. For a non-English run the flow translates those values to English with DeepL before Parse Request (`Translate Inputs?`, `DeepL Prep Inputs`, `Translate Inputs`, `Request EN`), writes and edits in English, then translates the page, meta description, FAQ and E-E-A-T back and restores the app's own `h1`, `h2Outline`, author and reviewer wording on the final page |
+| `sourceLanguage` | no | the language the text values of this request are written in (`clientDescription`, `h1`, `h2Outline`, keywords, `aiPrompts`, `ctaRules`, `writingPreferences`, author fields, `facts`), as an English language name. Default: English when `targetLanguages` is sent, else `targetLanguage` (the old one-language contract: the app sends everything in the page language). A non-English source is translated to English before Parse Request by the Input Translator (Claude Opus 5.5, GPT 5.6 Sol as fallback); the originals are kept and go back on the page in that language |
+| `targetLanguages` | yes (or `targetLanguage`) | array of English language names, one to 150 or more, e.g. `["English", "German", "Japanese"]`. The page is written once, in English. English, when listed, is delivered from the English writing run itself and is never a translation. The **primary** target (English if listed, else the first entry) is delivered by this execution on `/page`; every other target is started as its own CM6 Translator execution after the primary page is sent (five at once, each further group of five four minutes later), with its own `/execution-started` and `/page` callbacks. A language that is also the `sourceLanguage` reuses the app's own wording (H1, H2s, keyword, slug, prompts) instead of a translation of it. `targetLanguage` (one string) is still accepted and means `targetLanguages: [targetLanguage]` with `sourceLanguage` = that language. Names are validated against the list in Parse Request (185 names including regional variants such as `French (Canada)`, `Portuguese (Brazil)`, `Chinese (Simplified)`, and aliases such as `Brazilian Portuguese`); an unknown name fails the request before anything runs |
+| `localizedKeywords` | no | per language, the core keyword the content map already has in that language: `{"German": "KYB-Fallstudie", "Japanese": "KYB導入事例"}`. Used verbatim in the translation; where none is given the translator chooses the phrase a native searcher would type and returns it in the callback's `localized` block |
+| `localized` | no | per language, anything else the app already has in that language: `{"German": {"h1": "...", "h2Outline": [...], "secondaryKeywords": [...], "slugPath": "/de/...", "clientName": "...", "aiPrompts": [...], "author": {...}, "reviewer": {...}}}`. Every value given is locked in the translation (H1 and H2s character for character, by position); every value missing is produced by the translator |
 | `clientName` | yes | `clientDescription` optional but strongly recommended (`productDescription` also accepted) |
 | `h1` | yes | used verbatim |
 | `slugPath` | no | the page's own path; echoed as `slug` and used for canonical and breadcrumb; derived from the H1 when empty |
@@ -94,13 +99,21 @@ The final callback is one object whose parts stay separate: `articleTextMd` (the
 
 Three to five prompts per page. The two generated ones are translated with the page for non-English runs.
 
-On a non-English run the app's own wording is guaranteed in the output for: the H1 and every outline H2 (rewritten from the request after translation, on English runs too), the client name (translated to one English form for the writer, protected through DeepL with a `translate="no"` span carrying the original, so the page, meta description, E-E-A-T and prompts carry it exactly), the author and reviewer fields, and the JSON-LD `name`, `headline`, `serviceType`, `termCode` and organisation name. The core keyword is not forced, because inserting a fixed form into inflected languages breaks grammar; `quality.coreKeywordMentions` and `quality.clientNameMentions` report how often the exact original strings appear in the shipped page instead. `writingPreferences` reach the writer in English with the original wording appended, since translated instructions lose meaning. Nothing is merged into the page text, so the app stores and renders each part in its own template slot. For a non-English run all four text parts are in the target language and the H1 and H2s are the app's own wording. Every text field passes the `Clean Text` node before the callback: no HTML entities, no invisible characters, no em dashes, no semicolons in FAQ, meta or E-E-A-T lines, markdown intact.
+On a non-English page the app's own wording is guaranteed in the output for: the H1 and every outline H2 (locked in the translation prompt and rewritten from the request afterwards), the client name (never translated; one spelling everywhere), the author and reviewer fields, and the JSON-LD `name`, `headline`, `serviceType`, `termCode` and organisation name. The core keyword is given to the translator as the phrase to integrate in its natural grammatical form, so it may appear declined or compounded; `quality.coreKeywordMentions` and `quality.clientNameMentions` report how often the exact strings appear in the shipped page. `writingPreferences` reach the writer in English with the original wording appended, since translated instructions lose meaning. Nothing is merged into the page text, so the app stores and renders each part in its own template slot. All four text parts, the monitoring prompts and the E-E-A-T notes are in the page language. Every text field passes the `Clean Text` node before the callback: no HTML entities, no invisible characters, no em dashes, no semicolons in FAQ, meta or E-E-A-T lines, markdown intact.
+
+Translation is a transcreation by Claude Opus 5.5 (GPT 5.6 Sol when Claude fails twice) in the CM6 Translator workflow (`vFI5Eq5wZjfjY2vD`), one call per language for the page, meta description, FAQ, E-E-A-T notes and prompts together. Links are never changed: every URL of the English page is kept, only anchor text is translated, and a missing URL is reported in `translationWarnings`. No research runs during translation. DeepL is no longer used anywhere.
+
+Translated pages arrive on the same `POST {callback_url}/page` with the same shape plus `sourceLanguage: "English"`, `translated: true`, `translationOf` (the `taskId` of the English page), `sourceExecutionId` (the Content Maker execution that wrote it), `localized` (the keyword, secondary keywords, H1, H2s and slug used in this language, for the app to store) and `translationWarnings` (empty when every block came back). `n8nExecutionId` is the translator execution. A translation that fails on both models sends `{ "status": "error", "reason": "...", "taskId", "language", "translationOf", "n8nExecutionId", "retryExecutionId" }` on `/page`; the primary page of a run is never lost this way, because its translation runs inline and a failure there fails the whole execution like any other step.
+
+Restart or add a language without rewriting: `POST https://n8n-test.snoika.com/webhook/cm6-translate` with `{ "retryExecutionId": "<the failed translator execution>" }` runs the same translation again (optionally with a new `language`, `callbackUrl` or `localized`), and `{ "sourceExecutionId": "<a finished Content Maker 6.0 execution>", "language": "Italian", "localized": { "coreKeyword": "..." } }` translates that page into one more language. Both answer at once and deliver on the callbacks.
 
 `POST {callback_url}/execution-started` at the start:
 
 ```json
-{ "createdAt": "2026-09-08T13:36:48.000Z", "executionId": "15926", "workflowId": "MZUUvWCdCXlHKllN", "workflowName": "Content Maker 6.0", "taskId": "cm6-test-001", "brandId": "trualign-test", "userId": "andrii", "pageType": "service_page", "targetLanguage": "English" }
+{ "createdAt": "2026-09-08T13:36:48.000Z", "executionId": "15926", "workflowId": "MZUUvWCdCXlHKllN", "workflowName": "Content Maker 6.0", "taskId": "cm6-test-001", "brandId": "trualign-test", "userId": "andrii", "pageType": "service_page", "targetLanguage": "English", "sourceLanguage": "English", "targetLanguages": ["English", "German"], "extraTargets": ["German"] }
 ```
+
+Each extra language sends its own `execution-started` from the CM6 Translator with `workflowName: "CM6 Translator"`, `targetLanguage`, `sourceLanguage: "English"`, `translationOf` and `sourceExecutionId`.
 
 `POST {callback_url}/page` at the end. Same shape as Content Maker 5.0's `/blog-post` without the Strapi block, plus the page-specific fields:
 
@@ -108,7 +121,7 @@ On a non-English run the app's own wording is guaranteed in the output for: the 
 {
   "taskId": "cm6-test-001", "brandId": "trualign-test", "userId": "andrii", "n8nExecutionId": "15926",
   "status": "ok",
-  "pageType": "service_page", "language": "English",
+  "pageType": "service_page", "language": "English", "sourceLanguage": "English", "translated": false,
   "slug": "sales-leadership-recruiters", "slugPath": "/sales-leadership-recruiters/",
   "canonicalUrl": "https://trualignpartners.com/sales-leadership-recruiters/",
   "metaDescription": "TruAlign Partners provides sales leadership recruiters for medical device roles, so you get a shortlist of three to five vetted candidates.",
